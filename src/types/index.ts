@@ -181,6 +181,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
       { id: "fridge-medium", label: "Compressor fridge 40–60l", watts: 45, defaultHours: 8, unit: "h/day", powerSource: "12v", hint: "Good for 1–2 people with less frequent shopping, or 2–3 people daily" },
       { id: "fridge-large", label: "Compressor fridge 60l+", watts: 60, defaultHours: 8, unit: "h/day", powerSource: "12v", hint: "For 3+ people or long stays without shopping" },
       { id: "fridge-freezer", label: "Add freezer function (+15W)", watts: 15, defaultHours: 8, unit: "h/day", powerSource: "12v", hint: "Additional load on top of fridge" },
+      { id: "fridge-absorption", label: "Absorption fridge (3-way)", watts: 120, defaultHours: 24, unit: "h/day", powerSource: "12v", hint: "Runs on gas, 230V or 12V. No compressor — silent but less efficient. Good for gas-heavy setups without solar." },
     ],
   },
   {
