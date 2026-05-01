@@ -364,12 +364,14 @@ export function calculate(state: WizardState): CalculationResult {
   const hasSolar = recommendedSolarW > 0;
   const hasDcDc = frequency !== "shore-power" && frequency !== "off-grid";
   const hasShoreCharger = shore !== "never";
-  const hasInternal230VSockets = max230VInverter > 0; // inverter implies internal 230V sockets
+  const hasInternal230VSockets = max230VInverter > 0; // inverter implies internal 230V sockets (informational)
   const shoreOnlyAppliances = shoreLines.length > 0;
   const hasShorePower = hasShoreCharger || shoreOnlyAppliances;
+  // Full 230V install only required when user has actual shore-only appliances.
+  // If shore is only used to charge the battery, a simpler setup is enough.
   const shoreInstallMode: ShoreInstallMode = !hasShorePower
     ? "none"
-    : (shoreOnlyAppliances || hasInternal230VSockets ? "full-ac" : "charging-only");
+    : (shoreOnlyAppliances ? "full-ac" : "charging-only");
 
   // 1. DC protection and distribution
   const dcItems: MaterialItem[] = [
