@@ -217,6 +217,9 @@ export default function Results() {
           {/* Section 1 */}
           <ProfileSummary s={state} />
 
+          {/* Edit chips */}
+          <EditChips state={state} />
+
           {/* Section 2 — Daily consumption */}
           <SectionCard title="Daily consumption">
             <div className="overflow-x-auto">
