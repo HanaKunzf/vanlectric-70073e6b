@@ -1,6 +1,7 @@
 // Feature flags — flip these to unlock phases without code changes.
 export const FEATURES = {
   PDF_EXPORT: false,        // Phase 2
+  EXISTING_COMPONENTS: false, // Phase 2 PRO
   EXCEL_EXPORT: false,      // Phase 2
   EMAIL_REPORT: false,      // Phase 2
   SAVE_DESIGNS: false,      // Phase 3

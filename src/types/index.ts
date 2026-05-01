@@ -102,6 +102,18 @@ export interface BudgetStep {
   budget?: Budget;
 }
 
+export type BatteryChemistry = "lifepo4" | "agm" | "other";
+
+export interface ExistingStep {
+  skip?: boolean;
+  battery?: { qty: number; ah: number; chemistry: BatteryChemistry };
+  solar?: { qty: number; watts: number };
+  mppt?: { amps: number };
+  dcdc?: boolean;
+  shore?: { amps: number };
+  inverter?: { watts: number };
+}
+
 export interface WizardState {
   step1: VehicleStep;
   step2: UsageStep;
@@ -115,6 +127,7 @@ export interface WizardState {
   step10: SeasonStep;
   step11: InsulationStep;
   step12: BudgetStep;
+  step13: ExistingStep;
 }
 
 export const initialWizardState: WizardState = {
@@ -130,9 +143,10 @@ export const initialWizardState: WizardState = {
   step10: {},
   step11: {},
   step12: {},
+  step13: {},
 };
 
-export const TOTAL_STEPS = 12;
+export const TOTAL_STEPS = 13;
 
 // Default appliance catalog with categories and base wattage.
 export type PowerSource = "12v" | "230v-inverter" | "230v-shore";
