@@ -110,11 +110,25 @@ export interface CalculationResult {
   lines: ApplianceLine[];
   shoreLines: ApplianceLine[];
   applianceSubtotalWh: number;
+  dailyWh12V: number;
+  dailyWh230VInverter: number;
   inverterLossWh: number;
   remoteWorkWh: number;
   reserveWh: number;
   totalDailyWh: number;
   hasInverterLoad: boolean;
+  /** Largest single 230V-inverter appliance, used to size the inverter (excludes shore-only). */
+  inverterPeakW: number;
+  /** Recommended inverter size in W (0 if not required). */
+  inverterSizeRecommendedW: number;
+  /** AC system recommendation key based on the user's appliance mix. */
+  acRecommendation:
+    | "none"
+    | "shore-only"
+    | "inverter-required"
+    | "shore-and-inverter";
+  /** High-power AC appliances flagged for warning, with their power source. */
+  highPowerAcAppliances: Array<{ id: string; label: string; watts: number; shoreOnly: boolean }>;
 
   // Battery
   daysAutonomy: number;
