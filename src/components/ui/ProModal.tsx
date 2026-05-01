@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { X, Mail } from "lucide-react";
 
 interface ProModalProps {
@@ -11,12 +12,14 @@ const STORAGE_KEY = "vec_pro_notify_email";
 export const ProModal = ({ open, onClose }: ProModalProps) => {
   const [showInput, setShowInput] = useState(false);
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
     if (open) {
       setShowInput(false);
       setEmail("");
+      setConsent(false);
       setConfirmed(false);
     }
   }, [open]);
@@ -35,6 +38,7 @@ export const ProModal = ({ open, onClose }: ProModalProps) => {
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed || !trimmed.includes("@")) return;
+    if (!consent) return;
     try {
       const existing: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
       if (!existing.includes(trimmed)) existing.push(trimmed);
