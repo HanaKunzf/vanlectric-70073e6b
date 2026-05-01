@@ -789,6 +789,48 @@ export default function Results() {
 
           {/* 4. Daily consumption */}
           <SectionCard title="Daily consumption">
+            {/* Energy split breakdown — 12V vs 230V via inverter vs losses */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+              <div className="rounded-lg bg-background/60 border border-border p-3">
+                <div className="text-xs text-muted-foreground">12V appliances</div>
+                <div className="font-display text-lg font-bold mt-1">{fmt(result.dailyWh12V)} Wh</div>
+                <div className="text-[10px] text-muted-foreground font-sans mt-0.5">Direct battery draw</div>
+              </div>
+              <div className="rounded-lg bg-background/60 border border-border p-3">
+                <div className="text-xs text-muted-foreground">230V via inverter</div>
+                <div className="font-display text-lg font-bold mt-1">{fmt(result.dailyWh230VInverter)} Wh</div>
+                <div className="text-[10px] text-muted-foreground font-sans mt-0.5">Battery-side, incl. losses</div>
+              </div>
+              <div className="rounded-lg bg-background/60 border border-border p-3">
+                <div className="text-xs text-muted-foreground">Inverter losses</div>
+                <div className="font-display text-lg font-bold mt-1">{fmt(result.inverterLossWh)} Wh</div>
+                <div className="text-[10px] text-muted-foreground font-sans mt-0.5">~90% efficiency</div>
+              </div>
+              <div className="rounded-lg bg-primary/5 border border-primary/30 p-3">
+                <div className="text-xs text-primary/80 font-semibold">Total battery draw</div>
+                <div className="font-display text-lg font-bold mt-1 text-primary">{fmt(result.totalDailyWh)} Wh</div>
+                <div className="text-[10px] text-muted-foreground font-sans mt-0.5">incl. reserve & remote work</div>
+              </div>
+            </div>
+
+            {/* AC system recommendation */}
+            {(() => {
+              const rec = result.acRecommendation;
+              if (rec === "none") return null;
+              const text =
+                rec === "shore-only"
+                  ? "Shore power AC outlets are recommended, but an inverter is not required."
+                  : rec === "inverter-required"
+                  ? `Inverter and AC outlets are required. Recommended size: ${fmt(result.inverterSizeRecommendedW)}W (sized from battery-powered 230V appliances only).`
+                  : `Your system should support both shore power and an inverter for AC outlets. Recommended inverter size: ${fmt(result.inverterSizeRecommendedW)}W.`;
+              return (
+                <div className="mb-5 rounded-lg border-l-4 border-primary bg-primary/5 p-3 text-sm">
+                  <div className="font-sans font-semibold text-primary mb-0.5">AC system recommendation</div>
+                  <div className="text-foreground">{text}</div>
+                </div>
+              );
+            })()}
+
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-left text-muted-foreground font-sans font-semibold border-b border-border">
