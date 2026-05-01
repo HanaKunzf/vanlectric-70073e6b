@@ -1100,9 +1100,12 @@ export default function Results() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-3">
-                Price profiles are rough market estimates. Low-cost means budget-friendly components,
-                Balanced means good value, Premium means higher-end brands such as Victron or similar.
-                Profiles affect estimated prices only — not technical sizing.
+                Low cost means budget-friendly components, Balanced means good price/performance,
+                Premium means higher-end brands such as Victron or similar. The variant affects
+                estimated prices only — not technical sizing.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                Prices are indicative and may vary by brand, country and supplier.
               </p>
             </div>
 
