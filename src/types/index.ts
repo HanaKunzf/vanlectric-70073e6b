@@ -39,15 +39,33 @@ export type RemoteWork = "no" | "occasionally" | "partTime" | "fullTime";
 export type Insulation = "full" | "basic" | "none";
 export type Budget = "<500" | "500-1000" | "1000-2000" | "2000-3000" | "3000+" | "show-me";
 export type RoofType = "flat" | "pop-top" | "high-top" | "unsure";
-export type RoofObstacle =
-  | "vents"
-  | "antenna"
-  | "ac"
-  | "rails"
-  | "skylight"
+
+export type RoofObstacleId =
+  | "small-window"
+  | "large-window"
+  | "fan"
+  | "gps-antenna"
   | "satellite"
+  | "solar-shower"
   | "rack"
-  | "none";
+  | "ac"
+  | "tent"
+  | "other";
+
+export type ObstacleCount = 0 | 1 | 2 | 3;
+
+export interface RoofObstacleEntry {
+  count: ObstacleCount;
+  customSize?: boolean;
+  lengthCm?: number;
+  widthCm?: number;
+  /** "other" obstacle: user-entered name */
+  name?: string;
+  /** "rack": panels can be mounted on/inside the rack */
+  panelsOnRack?: boolean;
+  /** "tent": can solar panels be mounted alongside? "yes-mc4" | "no" */
+  solarAlongside?: "yes-mc4" | "no";
+}
 
 export interface ClimateStep {
   climate?: ClimateZone;
@@ -77,7 +95,7 @@ export interface ShoreStep {
 }
 
 export interface RoofStep {
-  obstacles: RoofObstacle[];
+  obstacles: Partial<Record<RoofObstacleId, RoofObstacleEntry>>;
   roofType?: RoofType;
   popTopHoursPerDay?: number;
 }
@@ -137,7 +155,7 @@ export const initialWizardState: WizardState = {
   step4: { appliances: {} },
   step5: {},
   step6: {},
-  step7: { obstacles: [] },
+  step7: { obstacles: {} },
   step8: {},
   step9: {},
   step10: {},

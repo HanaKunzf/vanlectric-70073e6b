@@ -8,7 +8,7 @@ import {
   type Season,
   type VehicleSize,
   type RoofType,
-  type RoofObstacle,
+  type RoofObstacleId,
   type DrivingFrequency,
   type JourneyDuration,
   type UsageProfile,
@@ -56,9 +56,18 @@ const solarHoursMatrix: Record<ClimateZone, Record<Season, number>> = {
 
 const roofAreaMap: Record<VehicleSize, number> = { L1: 2.0, L2: 2.8, L3: 3.4, L4: 4.0 };
 
-const obstacleAreaMap: Record<RoofObstacle, number> = {
-  vents: 0.25, antenna: 0.05, ac: 0.6, rails: 0.2, skylight: 0.4,
-  satellite: 0.3, rack: 0.5, none: 0,
+// Default footprints in m² per single unit (length × width converted from cm).
+const obstacleDefaults: Record<RoofObstacleId, { l: number; w: number }> = {
+  "small-window": { l: 50, w: 50 },
+  "large-window": { l: 90, w: 50 },
+  "fan": { l: 40, w: 40 },
+  "gps-antenna": { l: 0, w: 0 },
+  "satellite": { l: 60, w: 60 },
+  "solar-shower": { l: 60, w: 30 },
+  "rack": { l: 140, w: 100 },
+  "ac": { l: 70, w: 40 },
+  "tent": { l: 240, w: 120 },
+  "other": { l: 0, w: 0 },
 };
 
 // ---------- result types ----------
@@ -228,10 +237,30 @@ export function calculate(state: WizardState): CalculationResult {
   // ----- Solar -----
   const size = step1.size ?? "L2";
   const roofArea = roofAreaMap[size];
-  const obstacleArea = (step7.obstacles ?? [])
-    .filter((o) => o !== "none")
-    .reduce((s, o) => s + obstacleAreaMap[o], 0);
-  const maxSolarW = Math.max(0, (roofArea - obstacleArea - 0.4) * 200);
+  const obstacleEntries = Object.entries(step7.obstacles ?? {}) as Array<[RoofObstacleId, import("@/types").RoofObstacleEntry]>;
+  let obstacleArea = 0;
+  let rackMountingArea = 0; // added back when rack used as platform
+  for (const [id, entry] of obstacleEntries) {
+    if (!entry || !entry.count) continue;
+    const def = obstacleDefaults[id];
+    const lCm = entry.customSize && entry.lengthCm != null ? entry.lengthCm : def.l;
+    const wCm = entry.customSize && entry.widthCm != null ? entry.widthCm : def.w;
+    const m2 = (lCm * wCm) / 10000;
+    const total = m2 * entry.count;
+    if (id === "rack" && entry.panelsOnRack) {
+      // rack is a mounting platform, not an obstacle
+      rackMountingArea += total;
+      continue;
+    }
+    if (id === "tent" && entry.solarAlongside === "yes-mc4") {
+      // tent leaves space alongside — deduct only half its footprint
+      obstacleArea += total * 0.5;
+      continue;
+    }
+    obstacleArea += total;
+  }
+  const availableArea = Math.max(0, roofArea - obstacleArea - 0.4);
+  const maxSolarW = (availableArea + rackMountingArea) * 200;
   const solarHours = solarHoursMatrix[climate][season];
   const requiredSolarW = totalDailyWh / Math.max(0.5, solarHours);
   const recommendedSolarW = Math.max(50, Math.min(requiredSolarW, maxSolarW));
