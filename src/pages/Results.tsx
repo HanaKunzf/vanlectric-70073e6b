@@ -354,6 +354,8 @@ export default function Results() {
           {/* Edit chips */}
           <EditChips state={state} />
 
+          {showExisting && <ExistingSystemSection state={state} result={result} />}
+
           {/* Section 2 — Daily consumption */}
           <SectionCard title="Daily consumption">
             <div className="overflow-x-auto">
