@@ -46,6 +46,24 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
   const t = en.steps.s4;
   const [openCat, setOpenCat] = useState<string>(APPLIANCE_CATALOG[0].id);
   const [overrideOpen, setOverrideOpen] = useState<Record<string, boolean>>({});
+  const headerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  const toggleCat = (catId: string) => {
+    const willOpen = openCat !== catId;
+    setOpenCat(willOpen ? catId : "");
+    if (willOpen) {
+      // Keep the category header anchored at the top so the first items are
+      // visible immediately, instead of the page settling at the bottom of
+      // the newly expanded list.
+      requestAnimationFrame(() => {
+        const el = headerRefs.current[catId];
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const target = window.scrollY + rect.top - 80; // leave room for sticky header
+        window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
+      });
+    }
+  };
 
   const updateEntry = (id: string, patch: Partial<ApplianceEntry>, shorePowerOnly?: boolean) => {
     const current = value.appliances[id] ?? { enabled: false };
