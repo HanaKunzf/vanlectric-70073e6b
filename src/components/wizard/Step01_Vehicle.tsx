@@ -40,7 +40,7 @@ export const Step01_Vehicle = ({ value, onChange }: Props) => {
               onClick={() => set("brand", brand)}
               size="sm"
             >
-              <span className="text-sm sm:text-base">🚐 {t.brandOptions[brand]}</span>
+              <span className="text-sm sm:text-base">{t.brandOptions[brand]}</span>
             </SelectButton>
           ))}
         </div>
