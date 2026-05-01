@@ -256,6 +256,10 @@ export function calculate(state: WizardState): CalculationResult {
   else if (requiredAh < 300) battery = { key: "battery", category: "Battery", name: "2× 150Ah LiFePO4", why: "Two batteries in parallel for higher capacity.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 320 };
   else if (requiredAh < 400) battery = { key: "battery", category: "Battery", name: "2× 200Ah LiFePO4", why: "Large bank for full-time / heavy daily loads.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 440 };
   else battery = { key: "battery", category: "Battery", name: "3× 200Ah LiFePO4", why: "Maximum bank for extended off-grid use.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 660 };
+
+  if (profile === "weekendWarrior" && requiredAh > 300) {
+    battery.note = "💡 As a weekend warrior, you recharge at home between trips. If your system seems oversized, consider whether you really need worst-case winter sizing — or adjust your climate/season settings to match your typical travel conditions.";
+  }
   components.push(battery);
 
   // Solar panel
