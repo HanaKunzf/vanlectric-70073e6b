@@ -23,7 +23,9 @@ export default function Wizard() {
   const navigate = useNavigate();
   const location = useLocation();
   const incoming = (location.state as { wizard?: WizardState; resumeAtStep?: number; editMode?: boolean }) || {};
-  const [state, setState] = useState<WizardState>(incoming.wizard ?? initialWizardState);
+  const [state, setState] = useState<WizardState>(
+    incoming.wizard ? { ...initialWizardState, ...incoming.wizard } : initialWizardState,
+  );
   const [step, setStep] = useState(incoming.resumeAtStep ?? 1);
   const [editMode] = useState(!!incoming.editMode);
 
