@@ -214,6 +214,97 @@ const EditChips = ({ state }: { state: WizardState }) => {
   );
 };
 
+// ---------- Existing system analysis ----------
+const hasExistingData = (e?: ExistingStep) =>
+  !!e && (!!e.battery || !!e.solar || !!e.mppt || !!e.dcdc || !!e.shore || !!e.inverter);
+
+interface ExistingAnalysis {
+  capacityAh: number;
+  capacityWh: number;
+  existingSolarW: number;
+  existingSolarWh: number;
+  autonomyNoSolar: number;
+  autonomyWithSolar: number;
+  dailyGapWh: number;
+  sufficient: string[];
+  upgrades: string[];
+  reduceTo: number;
+}
+
+const analyzeExisting = (e: ExistingStep, result: CalculationResult): ExistingAnalysis => {
+  const usableFactor = e.battery?.chemistry === "lifepo4" ? 0.8 : e.battery?.chemistry === "agm" ? 0.5 : 0.6;
+  const capacityAh = (e.battery?.qty ?? 0) * (e.battery?.ah ?? 0);
+  const capacityWh = capacityAh * 12 * usableFactor;
+  const existingSolarW = (e.solar?.qty ?? 0) * (e.solar?.watts ?? 0);
+  const peakSunHours = result.solarDailyWh > 0 && (result.components.find(c => c.category.toLowerCase().includes("solar"))) ? 3.5 : 3.5;
+  const existingSolarWh = existingSolarW * peakSunHours * 0.75;
+  const dailyNet = Math.max(0, result.totalDailyWh - existingSolarWh);
+  const autonomyNoSolar = result.totalDailyWh > 0 ? capacityWh / result.totalDailyWh : 0;
+  const autonomyWithSolar = dailyNet > 0 ? capacityWh / dailyNet : Infinity;
+  const dailyGapWh = Math.max(0, result.totalDailyWh - existingSolarWh);
+
+  const sufficient: string[] = [];
+  const upgrades: string[] = [];
+
+  if (capacityWh >= result.totalDailyWh * 1.5) sufficient.push("Battery capacity"); else if (e.battery) upgrades.push("Battery — too small for daily load");
+  if (existingSolarWh >= result.totalDailyWh * 0.7) sufficient.push("Solar array"); else if (e.solar) upgrades.push("Solar — add more panels to cover daily load");
+  if (e.mppt && e.mppt.amps * 12 >= existingSolarW) sufficient.push("MPPT controller"); else if (e.mppt) upgrades.push("MPPT — undersized for current panels");
+  if (e.dcdc) sufficient.push("DC-DC charger"); else upgrades.push("DC-DC charger — recommended");
+  if (e.inverter && result.hasInverterLoad) sufficient.push("Inverter"); else if (!e.inverter && result.hasInverterLoad) upgrades.push("Inverter — needed for 230V appliances");
+  if (e.shore) sufficient.push("Shore power charger");
+
+  const reduceTo = Math.max(0, Math.round(capacityWh / 1.5));
+  return { capacityAh, capacityWh, existingSolarW, existingSolarWh, autonomyNoSolar, autonomyWithSolar, dailyGapWh, sufficient, upgrades, reduceTo };
+};
+
+const ExistingSystemSection = ({ state, result }: { state: WizardState; result: CalculationResult }) => {
+  const e = state.step13;
+  const a = analyzeExisting(e, result);
+  return (
+    <SectionCard title="Your existing system">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+        <div className="rounded-lg bg-background/60 border border-border p-3">
+          <div className="text-xs text-muted-foreground">Existing capacity</div>
+          <div className="font-display text-lg font-bold mt-1">{fmt(a.capacityAh)} Ah</div>
+          <div className="text-xs text-muted-foreground">~{fmt(a.capacityWh)} Wh usable</div>
+        </div>
+        <div className="rounded-lg bg-background/60 border border-border p-3">
+          <div className="text-xs text-muted-foreground">Autonomy (no solar)</div>
+          <div className="font-display text-lg font-bold mt-1">{a.autonomyNoSolar.toFixed(1)} days</div>
+        </div>
+        <div className="rounded-lg bg-background/60 border border-border p-3">
+          <div className="text-xs text-muted-foreground">Autonomy (with solar)</div>
+          <div className="font-display text-lg font-bold mt-1">
+            {Number.isFinite(a.autonomyWithSolar) ? `${a.autonomyWithSolar.toFixed(1)} days` : "∞"}
+          </div>
+          <div className="text-xs text-muted-foreground">Gap: {fmt(a.dailyGapWh)} Wh/day</div>
+        </div>
+      </div>
+
+      {a.sufficient.length > 0 && (
+        <div className="mb-3">
+          <div className="font-sans font-semibold text-primary mb-1">✓ Sufficient</div>
+          <ul className="text-sm space-y-1">
+            {a.sufficient.map((s) => <li key={s} className="text-foreground">• {s}</li>)}
+          </ul>
+        </div>
+      )}
+      {a.upgrades.length > 0 && (
+        <div className="mb-3">
+          <div className="font-sans font-semibold text-accent mb-1">⚠️ Upgrade or add</div>
+          <ul className="text-sm space-y-1">
+            {a.upgrades.map((s) => <li key={s} className="text-foreground">• {s}</li>)}
+          </ul>
+        </div>
+      )}
+      <div className="mt-4 rounded-lg bg-accent/10 border-l-4 border-accent p-3 text-sm">
+        <span className="font-semibold">Alternative:</span> reduce your daily consumption to ~{fmt(a.reduceTo)} Wh/day
+        to make your existing system work without upgrades.
+      </div>
+    </SectionCard>
+  );
+};
+
 // ---------- Page ----------
 export default function Results() {
   const navigate = useNavigate();
