@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle } from "lucide-react";
 import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
-import { initialWizardState, type WizardState } from "@/types";
+import { initialWizardState, type WizardState, type ExistingStep } from "@/types";
+import { FEATURES } from "@/config/features";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
 
@@ -186,6 +187,7 @@ const EDIT_CHIPS: Array<{ step: number; emoji: string; label: string }> = [
   { step: 10, emoji: "🍂", label: "Season" },
   { step: 11, emoji: "🧱", label: "Insulation" },
   { step: 12, emoji: "💰", label: "Budget" },
+  { step: 13, emoji: "🔧", label: "Existing" },
 ];
 
 const EditChips = ({ state }: { state: WizardState }) => {
@@ -219,8 +221,9 @@ export default function Results() {
   const state: WizardState = (location.state as { wizard?: WizardState })?.wizard ?? initialWizardState;
   const result = useMemo(() => calculate(state), [state]);
 
-  const goBack = () => navigate("/wizard", { state: { resumeAtStep: 12, wizard: state } });
+  const goBack = () => navigate("/wizard", { state: { resumeAtStep: 13, wizard: state } });
   const recalculate = () => navigate("/wizard", { state: { resumeAtStep: 4, wizard: state } });
+  const showExisting = FEATURES.EXISTING_COMPONENTS && state.step13?.skip !== true && hasExistingData(state.step13);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
