@@ -168,13 +168,13 @@ export function calculate(state: WizardState): CalculationResult {
     }
 
     let baseWh = watts * hours;
+    let displayHours = hours;
 
     // Fridge duty cycle
-    if (FRIDGE_IDS.has(id) && id !== "freezer") {
-      baseWh = watts * 24 * fridgeDuty[climate][insulation];
-    }
-    if (id === "freezer") {
-      baseWh = watts * 24 * fridgeDuty[climate][insulation];
+    if (FRIDGE_IDS.has(id)) {
+      const duty = fridgeDuty[climate][insulation];
+      baseWh = watts * 24 * duty;
+      displayHours = 24 * duty;
     }
 
     // Diesel heater
