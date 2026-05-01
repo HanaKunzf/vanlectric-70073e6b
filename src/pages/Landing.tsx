@@ -82,6 +82,7 @@ export default function Landing() {
           ✨ PRO features coming soon — PDF export, saved designs &amp; more. Free forever for basic use.
         </p>
       </main>
+      <SiteFooter />
     </div>
   );
 }
