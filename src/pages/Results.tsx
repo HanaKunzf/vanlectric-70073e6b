@@ -234,7 +234,13 @@ export default function Results() {
                       <td className="py-2 pr-3 font-sans">{l.label}</td>
                       <td className="py-2 px-2 text-muted-foreground text-xs">{sourceLabel(l.powerSource)}</td>
                       <td className="py-2 px-2 text-right font-mono">{l.watts}</td>
-                      <td className="py-2 px-2 text-right font-mono">{l.hours}</td>
+                      <td className="py-2 px-2 text-right font-mono">
+                        {l.isDutyCycle ? (
+                          <span>~{l.hours.toFixed(1)}<span className="block text-[10px] text-muted-foreground font-sans">(duty cycle)</span></span>
+                        ) : (
+                          l.hours
+                        )}
+                      </td>
                       <td className="py-2 pl-2 text-right font-mono">{fmt(l.wh)}</td>
                     </tr>
                   ))}
