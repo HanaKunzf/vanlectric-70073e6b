@@ -121,6 +121,8 @@ export interface CalculationResult {
   journeyWh: number;
   requiredWh: number;
   requiredAh: number;
+  recommendedBatteryAh: number;
+  usableBatteryWh: number;
 
   // Solar
   roofArea: number;
@@ -297,11 +299,14 @@ export function calculate(state: WizardState): CalculationResult {
 
   // Battery
   let battery: RecommendedComponent;
-  if (requiredAh < 100) battery = { key: "battery", category: "Battery", name: "1× 100Ah LiFePO4", why: "Sized for ~2 days off-grid autonomy.", detail: `Required ~${Math.round(requiredAh)}Ah — fits one 100Ah battery.`, price: 120 };
-  else if (requiredAh < 200) battery = { key: "battery", category: "Battery", name: "1× 200Ah LiFePO4", why: "Single battery covers your daily needs with reserve.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 220 };
-  else if (requiredAh < 300) battery = { key: "battery", category: "Battery", name: "2× 150Ah LiFePO4", why: "Two batteries in parallel for higher capacity.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 320 };
-  else if (requiredAh < 400) battery = { key: "battery", category: "Battery", name: "2× 200Ah LiFePO4", why: "Large bank for full-time / heavy daily loads.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 440 };
-  else battery = { key: "battery", category: "Battery", name: "3× 200Ah LiFePO4", why: "Maximum bank for extended off-grid use.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 660 };
+  let recommendedBatteryAh: number;
+  if (requiredAh < 100) { recommendedBatteryAh = 100; battery = { key: "battery", category: "Battery", name: "1× 100Ah LiFePO4", why: "Sized for ~2 days off-grid autonomy.", detail: `Required ~${Math.round(requiredAh)}Ah — fits one 100Ah battery.`, price: 120 }; }
+  else if (requiredAh < 200) { recommendedBatteryAh = 200; battery = { key: "battery", category: "Battery", name: "1× 200Ah LiFePO4", why: "Single battery covers your daily needs with reserve.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 220 }; }
+  else if (requiredAh < 300) { recommendedBatteryAh = 300; battery = { key: "battery", category: "Battery", name: "2× 150Ah LiFePO4", why: "Two batteries in parallel for higher capacity.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 320 }; }
+  else if (requiredAh < 400) { recommendedBatteryAh = 400; battery = { key: "battery", category: "Battery", name: "2× 200Ah LiFePO4", why: "Large bank for full-time / heavy daily loads.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 440 }; }
+  else { recommendedBatteryAh = 600; battery = { key: "battery", category: "Battery", name: "3× 200Ah LiFePO4", why: "Maximum bank for extended off-grid use.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 660 }; }
+  // LiFePO4 usable energy ~90% DoD at 12V
+  const usableBatteryWh = recommendedBatteryAh * 12 * 0.9;
 
   if (profile === "weekendWarrior" && requiredAh > 300) {
     battery.note = "💡 As a weekend warrior, you recharge at home between trips. If your system seems oversized, consider whether you really need worst-case winter sizing — or adjust your climate/season settings to match your typical travel conditions.";
@@ -489,7 +494,7 @@ export function calculate(state: WizardState): CalculationResult {
   return {
     lines, shoreLines,
     applianceSubtotalWh, inverterLossWh, remoteWorkWh: rwWh, reserveWh, totalDailyWh, hasInverterLoad,
-    daysAutonomy, journeyWh, requiredWh, requiredAh,
+    daysAutonomy, journeyWh, requiredWh, requiredAh, recommendedBatteryAh, usableBatteryWh,
     roofArea, obstacleArea, maxSolarW, solarHours, requiredSolarW, recommendedSolarW, panelType, solarDailyWh,
     alternatorDailyWh, hasDCDC,
     components,

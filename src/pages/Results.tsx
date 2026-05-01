@@ -1,6 +1,6 @@
 import { Fragment, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle, CheckSquare, Square, Wrench } from "lucide-react";
 import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
 import { initialWizardState, type WizardState, type ExistingStep } from "@/types";
 import { FEATURES } from "@/config/features";
@@ -14,6 +14,15 @@ const eur = (n: number) => `€${fmt(n)}`;
 
 const sourceLabel = (s: ApplianceLine["powerSource"]) =>
   s === "12v" ? "12V" : s === "230v-inverter" ? "230V (inverter)" : "230V (shore)";
+
+// ---------- Section wrapper ----------
+const SectionCard = ({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) => (
+  <section className={cn("step-card p-6 sm:p-8", className)}>
+    <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary mb-1 normal-case tracking-tight">{title}</h2>
+    <div className="h-px w-12 bg-primary/40 mb-5" />
+    {children}
+  </section>
+);
 
 // ---------- Profile summary ----------
 const ProfileSummary = ({ s }: { s: WizardState }) => {
@@ -45,15 +54,6 @@ const ProfileSummary = ({ s }: { s: WizardState }) => {
   );
 };
 
-// ---------- Section wrapper ----------
-const SectionCard = ({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) => (
-  <section className={cn("step-card p-6 sm:p-8", className)}>
-    <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary mb-1 normal-case tracking-tight">{title}</h2>
-    <div className="h-px w-12 bg-primary/40 mb-5" />
-    {children}
-  </section>
-);
-
 // ---------- Locked button ----------
 const LockedAction = ({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) => (
   <button
@@ -69,7 +69,7 @@ const LockedAction = ({ icon, label, onClick }: { icon: React.ReactNode; label: 
   </button>
 );
 
-// ---------- Component card with detail ----------
+// ---------- Component card ----------
 const ComponentCard = ({ c }: { c: CalculationResult["components"][number] }) => {
   const [open, setOpen] = useState(false);
   return (
@@ -104,7 +104,7 @@ const ComponentCard = ({ c }: { c: CalculationResult["components"][number] }) =>
   );
 };
 
-// ---------- Shopping list editable row ----------
+// ---------- Shopping list ----------
 interface ShopRow { item: string; qty: number; estimate: number; userPrice: number }
 interface ShopGroup { title: string; rows: ShopRow[] }
 
@@ -176,20 +176,15 @@ const ShoppingList = ({ result }: { result: CalculationResult }) => {
                 <tr key={ri} className="border-b border-border/60">
                   <td className="py-2 pr-3 font-sans">{r.item}</td>
                   <td className="py-2 px-2">
-                    <input
-                      type="number" min={0} value={r.qty}
+                    <input type="number" min={0} value={r.qty}
                       onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
-                      className="w-full bg-background border border-border rounded px-2 py-1 text-center"
-                    />
+                      className="w-full bg-background border border-border rounded px-2 py-1 text-center" />
                   </td>
                   <td className="py-2 px-2 text-right font-mono text-muted-foreground">{r.estimate}</td>
                   <td className="py-2 px-2">
-                    <input
-                      type="number" min={0} value={r.userPrice || ""}
-                      placeholder="—"
+                    <input type="number" min={0} value={r.userPrice || ""} placeholder="—"
                       onChange={(e) => update(gi, ri, { userPrice: Number(e.target.value) })}
-                      className="w-full bg-background border border-border rounded px-2 py-1 text-right"
-                    />
+                      className="w-full bg-background border border-border rounded px-2 py-1 text-right" />
                   </td>
                   <td className="py-2 pl-2 text-right font-mono font-semibold">
                     {r.userPrice ? eur(r.qty * r.userPrice) : eur(r.qty * r.estimate)}
@@ -260,16 +255,9 @@ const hasExistingData = (e?: ExistingStep) =>
   !!e && (!!e.battery || !!e.solar || !!e.mppt || !!e.dcdc || !!e.shore || !!e.inverter);
 
 interface ExistingAnalysis {
-  capacityAh: number;
-  capacityWh: number;
-  existingSolarW: number;
-  existingSolarWh: number;
-  autonomyNoSolar: number;
-  autonomyWithSolar: number;
-  dailyGapWh: number;
-  sufficient: string[];
-  upgrades: string[];
-  reduceTo: number;
+  capacityAh: number; capacityWh: number; existingSolarW: number; existingSolarWh: number;
+  autonomyNoSolar: number; autonomyWithSolar: number; dailyGapWh: number;
+  sufficient: string[]; upgrades: string[]; reduceTo: number;
 }
 
 const analyzeExisting = (e: ExistingStep, result: CalculationResult): ExistingAnalysis => {
@@ -277,23 +265,19 @@ const analyzeExisting = (e: ExistingStep, result: CalculationResult): ExistingAn
   const capacityAh = (e.battery?.qty ?? 0) * (e.battery?.ah ?? 0);
   const capacityWh = capacityAh * 12 * usableFactor;
   const existingSolarW = (e.solar?.qty ?? 0) * (e.solar?.watts ?? 0);
-  const peakSunHours = result.solarDailyWh > 0 && (result.components.find(c => c.category.toLowerCase().includes("solar"))) ? 3.5 : 3.5;
-  const existingSolarWh = existingSolarW * peakSunHours * 0.75;
+  const existingSolarWh = existingSolarW * 3.5 * 0.75;
   const dailyNet = Math.max(0, result.totalDailyWh - existingSolarWh);
   const autonomyNoSolar = result.totalDailyWh > 0 ? capacityWh / result.totalDailyWh : 0;
   const autonomyWithSolar = dailyNet > 0 ? capacityWh / dailyNet : Infinity;
   const dailyGapWh = Math.max(0, result.totalDailyWh - existingSolarWh);
-
   const sufficient: string[] = [];
   const upgrades: string[] = [];
-
   if (capacityWh >= result.totalDailyWh * 1.5) sufficient.push("Battery capacity"); else if (e.battery) upgrades.push("Battery — too small for daily load");
   if (existingSolarWh >= result.totalDailyWh * 0.7) sufficient.push("Solar array"); else if (e.solar) upgrades.push("Solar — add more panels to cover daily load");
   if (e.mppt && e.mppt.amps * 12 >= existingSolarW) sufficient.push("MPPT controller"); else if (e.mppt) upgrades.push("MPPT — undersized for current panels");
   if (e.dcdc) sufficient.push("DC-DC charger"); else upgrades.push("DC-DC charger — recommended");
   if (e.inverter && result.hasInverterLoad) sufficient.push("Inverter"); else if (!e.inverter && result.hasInverterLoad) upgrades.push("Inverter — needed for 230V appliances");
   if (e.shore) sufficient.push("Shore power charger");
-
   const reduceTo = Math.max(0, Math.round(capacityWh / 1.5));
   return { capacityAh, capacityWh, existingSolarW, existingSolarWh, autonomyNoSolar, autonomyWithSolar, dailyGapWh, sufficient, upgrades, reduceTo };
 };
@@ -321,21 +305,16 @@ const ExistingSystemSection = ({ state, result }: { state: WizardState; result: 
           <div className="text-xs text-muted-foreground">Gap: {fmt(a.dailyGapWh)} Wh/day</div>
         </div>
       </div>
-
       {a.sufficient.length > 0 && (
         <div className="mb-3">
           <div className="font-sans font-semibold text-primary mb-1">✓ Sufficient</div>
-          <ul className="text-sm space-y-1">
-            {a.sufficient.map((s) => <li key={s} className="text-foreground">• {s}</li>)}
-          </ul>
+          <ul className="text-sm space-y-1">{a.sufficient.map((s) => <li key={s}>• {s}</li>)}</ul>
         </div>
       )}
       {a.upgrades.length > 0 && (
         <div className="mb-3">
           <div className="font-sans font-semibold text-accent mb-1">⚠️ Upgrade or add</div>
-          <ul className="text-sm space-y-1">
-            {a.upgrades.map((s) => <li key={s} className="text-foreground">• {s}</li>)}
-          </ul>
+          <ul className="text-sm space-y-1">{a.upgrades.map((s) => <li key={s}>• {s}</li>)}</ul>
         </div>
       )}
       <div className="mt-4 rounded-lg bg-accent/10 border-l-4 border-accent p-3 text-sm">
@@ -345,6 +324,353 @@ const ExistingSystemSection = ({ state, result }: { state: WizardState; result: 
     </SectionCard>
   );
 };
+
+// ---------- Autonomy formatting ----------
+const formatDays = (d: number): string => {
+  if (!Number.isFinite(d) || d > 30) return "Potentially continuous in good conditions";
+  return `${d.toFixed(1)} days`;
+};
+
+// ---------- Autonomy Section ----------
+const AutonomySection = ({ result }: { result: CalculationResult }) => {
+  const eps = 1;
+  const noCharge = result.usableBatteryWh / Math.max(eps, result.totalDailyWh);
+  const withSolar = result.usableBatteryWh / Math.max(eps, result.totalDailyWh - result.solarDailyWh);
+  const withAll = result.usableBatteryWh / Math.max(eps, result.totalDailyWh - result.solarDailyWh - result.alternatorDailyWh);
+  const dailyBalance = result.solarDailyWh + result.alternatorDailyWh - result.totalDailyWh;
+  const positive = dailyBalance >= 0;
+
+  return (
+    <SectionCard title="Your off-grid autonomy">
+      <p className="text-sm text-muted-foreground mb-4">
+        Estimated days you can stay parked before recharging — based on your usable battery capacity
+        (~{fmt(result.usableBatteryWh)} Wh) and daily consumption (~{fmt(result.totalDailyWh)} Wh).
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="rounded-lg border border-border bg-background/60 p-4">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-sans font-semibold">Without charging</div>
+          <div className="font-display text-2xl font-bold text-foreground mt-1">{formatDays(noCharge)}</div>
+          <div className="text-xs text-muted-foreground mt-1">Battery only — no solar, no driving.</div>
+        </div>
+        <div className="rounded-lg border border-border bg-background/60 p-4">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-sans font-semibold">With average solar</div>
+          <div className="font-display text-2xl font-bold text-foreground mt-1">{formatDays(withSolar)}</div>
+          <div className="text-xs text-muted-foreground mt-1">~{fmt(result.solarDailyWh)} Wh/day from solar.</div>
+        </div>
+        <div className="rounded-lg border border-border bg-background/60 p-4">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-sans font-semibold">With solar + driving</div>
+          <div className="font-display text-2xl font-bold text-foreground mt-1">{formatDays(withAll)}</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            {result.alternatorDailyWh > 0 ? `+~${fmt(result.alternatorDailyWh)} Wh/day from alternator.` : "No alternator charging in your profile."}
+          </div>
+        </div>
+      </div>
+      <div className={cn("mt-5 rounded-lg p-3 text-sm border-l-4",
+        positive ? "bg-primary/5 border-primary text-foreground" : "bg-accent/10 border-accent text-foreground")}>
+        {positive
+          ? "Your daily charging sources can cover your estimated consumption in these conditions."
+          : `Daily deficit: ~${fmt(Math.abs(dailyBalance))} Wh/day. Plan for shore-power top-ups or reduce consumption.`}
+      </div>
+      <p className="text-xs text-muted-foreground mt-3 italic">
+        Estimated values. Actual autonomy depends on real-world weather, temperature and usage patterns.
+      </p>
+    </SectionCard>
+  );
+};
+
+// ---------- Scenarios ----------
+const ScenariosSection = ({ result }: { result: CalculationResult }) => {
+  const scenarios = [
+    { key: "good", label: "Good sun", emoji: "☀️", mult: 1.2, desc: "Clear summer days. Strong solar harvest." },
+    { key: "avg", label: "Average weather", emoji: "🌤️", mult: 1.0, desc: "Typical mixed conditions." },
+    { key: "cloudy", label: "Cloudy", emoji: "☁️", mult: 0.35, desc: "Overcast days. Solar covers only part of consumption." },
+    { key: "winter", label: "Winter / poor solar", emoji: "❄️", mult: 0.15, desc: "Short days, low sun angle. Plan alternator or shore." },
+  ];
+  const eps = 1;
+  return (
+    <SectionCard title="Solar & weather scenarios">
+      <p className="text-sm text-muted-foreground mb-4">
+        How your system behaves under different weather conditions. Useful for planning real-world trips.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {scenarios.map((s) => {
+          const solarWh = result.solarDailyWh * s.mult;
+          const balance = solarWh + result.alternatorDailyWh - result.totalDailyWh;
+          const auto = result.usableBatteryWh / Math.max(eps, result.totalDailyWh - solarWh - result.alternatorDailyWh);
+          return (
+            <div key={s.key} className="rounded-lg border border-border bg-background/60 p-4">
+              <div className="flex items-center justify-between">
+                <div className="font-display text-lg font-bold">{s.emoji} {s.label}</div>
+                <div className="text-xs font-sans text-muted-foreground">{(s.mult * 100).toFixed(0)}%</div>
+              </div>
+              <dl className="mt-3 space-y-1 text-sm">
+                <div className="flex justify-between"><dt className="text-muted-foreground">Solar</dt><dd className="font-mono">~{fmt(solarWh)} Wh/day</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Daily balance</dt>
+                  <dd className={cn("font-mono", balance >= 0 ? "text-primary" : "text-accent")}>
+                    {balance >= 0 ? "+" : ""}{fmt(balance)} Wh
+                  </dd>
+                </div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Autonomy</dt><dd className="font-mono">{formatDays(auto)}</dd></div>
+              </dl>
+              <p className="text-xs text-muted-foreground mt-2">{s.desc}</p>
+            </div>
+          );
+        })}
+      </div>
+    </SectionCard>
+  );
+};
+
+// ---------- Optimization ----------
+const OptimizationSection = ({ state, result }: { state: WizardState; result: CalculationResult }) => {
+  const navigate = useNavigate();
+  const top = useMemo(() => {
+    return [...result.lines]
+      .filter((l) => !l.informational && l.wh > 0)
+      .sort((a, b) => b.wh - a.wh)
+      .slice(0, 3);
+  }, [result.lines]);
+
+  const heavy230v = new Set(["kettle", "hairdryer", "induction", "oven", "tools", "coffee", "microwave", "toaster", "straightener"]);
+  const tips: string[] = [];
+  for (const l of top) {
+    if (heavy230v.has(l.id)) {
+      tips.push(`${l.label}: Move to shore power only to reduce inverter and battery size.`);
+    }
+    if (l.id === "fridge-freezer") {
+      tips.push("Freezer function increases daily consumption. Removing it can reduce battery and solar requirements.");
+    }
+    if (l.id === "laptop" || l.id === "monitor") {
+      tips.push("Reducing laptop/screen use or charging while driving can lower battery needs.");
+    }
+  }
+  if ((state.step3.climate === "cold" || state.step3.climate === "mixed") &&
+      (state.step10.season === "year-round" || state.step10.season === "winter")) {
+    tips.push("Your climate and season settings are conservative (worst case). If you mainly travel in summer, update your season profile for a more realistic estimate.");
+  }
+  if (tips.length === 0) {
+    tips.push("Your appliance mix already looks well balanced — no obvious optimizations.");
+  }
+
+  return (
+    <SectionCard title="Can this system be smaller?">
+      <p className="text-sm text-muted-foreground mb-4">
+        Your top energy consumers and ways to reduce battery and solar requirements.
+      </p>
+      <div className="mb-4">
+        <div className="text-xs uppercase tracking-wider text-accent font-sans font-semibold mb-2">Top 3 consumers</div>
+        {top.length === 0 ? (
+          <div className="text-sm text-muted-foreground italic">No appliances selected yet.</div>
+        ) : (
+          <ul className="space-y-1">
+            {top.map((l) => (
+              <li key={l.id} className="flex justify-between border-b border-border/60 py-1.5 text-sm">
+                <span className="font-sans">{l.label}</span>
+                <span className="font-mono text-muted-foreground">~{fmt(l.wh)} Wh/day</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <ul className="space-y-2 text-sm">
+        {tips.map((t, i) => (
+          <li key={i} className="rounded-md bg-primary/5 border-l-4 border-primary p-3">{t}</li>
+        ))}
+      </ul>
+      <button
+        type="button"
+        onClick={() => navigate("/wizard", { state: { wizard: state, resumeAtStep: 4, editMode: true } })}
+        className="mt-5 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors min-h-[44px] font-sans font-semibold text-sm"
+      >
+        <Wrench className="w-4 h-4" />
+        Review high-consumption appliances
+      </button>
+    </SectionCard>
+  );
+};
+
+// ---------- Red flags ----------
+const RedFlagsSection = ({ state, result }: { state: WizardState; result: CalculationResult }) => {
+  const flags: string[] = [];
+  const shoreAccess = state.step6.shorePower;
+
+  if (result.shoreLines.length > 0 && (!shoreAccess || shoreAccess === "never")) {
+    flags.push("You selected shore-only appliances but no shore power access. These appliances will not be usable off-grid.");
+  }
+  const max230V = result.lines.filter((l) => l.powerSource === "230v-inverter").reduce((m, l) => Math.max(m, l.watts), 0);
+  if (max230V >= 2000) {
+    flags.push("High-power 230V appliances significantly increase inverter and battery requirements.");
+  }
+  if (state.step3.climate === "cold" || state.step10.season === "winter" || state.step10.season === "year-round") {
+    flags.push("Cold-weather use requires attention to LiFePO4 charging below 0°C. Use batteries with low-temperature protection or heating.");
+  }
+  const availableArea = Math.max(0, result.roofArea - result.obstacleArea - 0.4);
+  if (availableArea < 1.0) {
+    flags.push("Roof space appears tight. Measure your actual roof and mark out panel positions before purchasing.");
+  }
+  if (result.recommendedSolarW < result.requiredSolarW * 0.95) {
+    flags.push("Your roof cannot fit the calculated ideal solar capacity. Plan for alternator or shore charging.");
+  }
+  if (result.shoreLines.length >= 3) {
+    flags.push("Your setup depends strongly on 230V hookup. This is fine for campsite use but not for wild camping.");
+  }
+
+  if (flags.length === 0) return null;
+
+  return (
+    <SectionCard title="Red flags to review">
+      <ul className="space-y-2">
+        {flags.map((f, i) => (
+          <li key={i} className="warning-banner flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
+    </SectionCard>
+  );
+};
+
+// ---------- Confidence ----------
+const ConfidenceSection = ({ state, result }: { state: WizardState; result: CalculationResult }) => {
+  let score = 0;
+  const reasons: string[] = [];
+
+  // Custom appliance wattages
+  const apps = state.step4.appliances ?? {};
+  const enabled = Object.values(apps).filter((a) => a.enabled);
+  const customWatts = enabled.filter((a) => a.wattsOverride).length;
+  if (enabled.length > 0 && customWatts >= Math.max(2, Math.floor(enabled.length * 0.3))) {
+    score += 1;
+  } else {
+    reasons.push("most appliance wattages use defaults");
+  }
+
+  // Custom roof dims
+  const obs = Object.values(state.step7.obstacles ?? {});
+  const usedObs = obs.filter((o) => o && o.count > 0);
+  const customObs = usedObs.filter((o) => o?.customSize && o.lengthCm && o.widthCm).length;
+  if (usedObs.length > 0 && customObs > 0) score += 1;
+  else if (usedObs.length > 0) reasons.push("roof obstacles use default sizes");
+
+  // Clear profile
+  if (state.step3.climate && state.step3.climate !== "mixed" &&
+      state.step10.season && state.step10.season !== "year-round" &&
+      state.step5.frequency) {
+    score += 1;
+  } else {
+    if (state.step3.climate === "mixed") reasons.push("climate is 'mixed'");
+    if (state.step10.season === "year-round") reasons.push("season is 'year-round'");
+  }
+
+  // Penalty: high-power 230V
+  const max230V = result.lines.filter((l) => l.powerSource === "230v-inverter").reduce((m, l) => Math.max(m, l.watts), 0);
+  if (max230V >= 1500) {
+    score -= 1;
+    reasons.push("high-power 230V appliances are selected");
+  }
+
+  let level: "High" | "Medium" | "Low" = "Medium";
+  if (score >= 2) level = "High";
+  else if (score <= 0) level = "Low";
+
+  const tone = level === "High" ? "text-primary border-primary bg-primary/5"
+    : level === "Low" ? "text-accent border-accent bg-accent/10"
+    : "text-foreground border-border bg-muted/40";
+
+  return (
+    <SectionCard title="Calculation confidence">
+      <div className={cn("rounded-lg border-l-4 p-4", tone)}>
+        <div className="font-display text-xl font-bold">Confidence: {level}</div>
+        <p className="text-sm mt-2">
+          <span className="font-semibold">Why:</span>{" "}
+          {reasons.length === 0
+            ? "You provided clear inputs and customized key values."
+            : reasons.join("; ") + "."}
+        </p>
+        {level !== "High" && (
+          <p className="text-sm mt-2 text-muted-foreground">
+            Add real appliance wattage or roof dimensions to improve accuracy.
+          </p>
+        )}
+      </div>
+    </SectionCard>
+  );
+};
+
+// ---------- Before-you-buy checklist ----------
+const CHECKLIST_ITEMS = [
+  "Measure your actual roof and obstacle positions.",
+  "Verify your vehicle alternator type (smart vs. standard).",
+  "Check whether your LiFePO4 battery supports low-temperature charging protection.",
+  "Verify the BMS maximum discharge current.",
+  "Check inverter continuous and peak power rating.",
+  "Confirm cable lengths before buying cables.",
+  "Fuse every positive cable close to the power source.",
+  "Use proper RCD / MCB protection for 230V shore power.",
+  "Have 230V installation checked by a qualified electrician.",
+];
+
+const BeforeYouBuySection = () => {
+  const [checked, setChecked] = useState<Record<number, boolean>>({});
+  return (
+    <SectionCard title="Before you buy">
+      <p className="text-sm text-muted-foreground mb-4">
+        A practical checklist to verify before placing orders or starting installation.
+      </p>
+      <ul className="space-y-2">
+        {CHECKLIST_ITEMS.map((item, i) => {
+          const on = !!checked[i];
+          return (
+            <li key={i}>
+              <button
+                type="button"
+                onClick={() => setChecked((c) => ({ ...c, [i]: !c[i] }))}
+                className="w-full flex items-start gap-3 text-left rounded-md border border-border bg-background/60 hover:border-primary p-3 transition-colors"
+              >
+                {on
+                  ? <CheckSquare className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  : <Square className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />}
+                <span className={cn("text-sm font-sans", on && "line-through text-muted-foreground")}>{item}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </SectionCard>
+  );
+};
+
+// ---------- Installer PRO preview ----------
+const InstallerPreview = ({ onClick }: { onClick: () => void }) => (
+  <SectionCard title="For electrician / installer">
+    <p className="text-sm text-muted-foreground mb-4">
+      A condensed report tailored for the professional fitting your system. Coming soon in PRO.
+    </p>
+    <div className="relative">
+      <div className="rounded-lg border border-border bg-background/60 p-5 blur-sm select-none pointer-events-none" aria-hidden>
+        <ul className="space-y-2 text-sm">
+          <li>• Input summary</li>
+          <li>• Daily energy calculation</li>
+          <li>• Recommended components</li>
+          <li>• Safety notes</li>
+          <li>• Open questions for installer</li>
+          <li>• 230V shore-power checklist</li>
+        </ul>
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <button
+          type="button"
+          onClick={onClick}
+          className="inline-flex items-center gap-2 px-4 py-3 rounded-lg bg-card border border-primary text-primary font-sans font-semibold text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
+        >
+          <Lock className="w-4 h-4" />
+          PRO — Coming Soon
+        </button>
+      </div>
+    </div>
+  </SectionCard>
+);
 
 // ---------- Page ----------
 export default function Results() {
@@ -385,21 +711,24 @@ export default function Results() {
             Your van's electrical system
           </h1>
           <p className="text-muted-foreground mt-3 max-w-2xl">
-            Based on your inputs, here's a balanced 12V system sized for your real-world use.
-            Prices are indicative European market averages.
+            Indicative sizing based on your inputs. Use it as a recommended starting point —
+            verify before buying and depend on real-world conditions.
           </p>
         </div>
 
         <div className="space-y-6 sm:space-y-8">
-          {/* Section 1 */}
+          {/* 1. Profile summary */}
           <ProfileSummary s={state} />
 
-          {/* Edit chips */}
+          {/* 2. Edit chips */}
           <EditChips state={state} />
 
           {showExisting && <ExistingSystemSection state={state} result={result} />}
 
-          {/* Section 2 — Daily consumption */}
+          {/* 3. Off-grid autonomy */}
+          <AutonomySection result={result} />
+
+          {/* 4. Daily consumption */}
           <SectionCard title="Daily consumption">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -424,9 +753,7 @@ export default function Results() {
                       <td className="py-2 px-2 text-right font-mono">
                         {l.isDutyCycle ? (
                           <span>~{l.hours.toFixed(1)}<span className="block text-[10px] text-muted-foreground font-sans">(duty cycle)</span></span>
-                        ) : (
-                          l.hours
-                        )}
+                        ) : (l.hours)}
                       </td>
                       <td className="py-2 pl-2 text-right font-mono">{fmt(l.wh)}</td>
                     </tr>
@@ -481,7 +808,7 @@ export default function Results() {
             </div>
           </SectionCard>
 
-          {/* Section 3 — Shore power appliances */}
+          {/* Shore appliances list (kept inline) */}
           {result.shoreLines.length > 0 && (
             <SectionCard title="Shore power appliances">
               <p className="text-sm text-muted-foreground mb-3">
@@ -498,7 +825,10 @@ export default function Results() {
             </SectionCard>
           )}
 
-          {/* Section 4 — Recommended system */}
+          {/* 5. Solar & weather scenarios */}
+          <ScenariosSection result={result} />
+
+          {/* 6. Recommended system */}
           <SectionCard title="Recommended system">
             {(() => {
               const tight = result.recommendedSolarW < result.requiredSolarW * 1.2;
@@ -540,7 +870,13 @@ export default function Results() {
             </div>
           </SectionCard>
 
-          {/* Section 5 — Installation materials & safety components */}
+          {/* 7. Optimization */}
+          <OptimizationSection state={state} result={result} />
+
+          {/* 8. Red flags */}
+          <RedFlagsSection state={state} result={result} />
+
+          {/* 9. Installation materials & safety */}
           <SectionCard title="Installation materials & safety components">
             <p className="text-sm text-muted-foreground mb-5">
               Protection, distribution and wiring parts you'll need alongside the main components.
@@ -591,7 +927,7 @@ export default function Results() {
             </div>
           </SectionCard>
 
-          {/* Section 6 — Cost summary */}
+          {/* 10. Cost summary */}
           <SectionCard title="Cost summary">
             <dl className="space-y-2 text-sm max-w-md ml-auto">
               <div className="flex justify-between"><dt className="text-muted-foreground">Components total</dt><dd className="font-mono">{eur(result.componentsTotal)}</dd></div>
@@ -610,12 +946,10 @@ export default function Results() {
             </dl>
             <p className="text-xs text-muted-foreground mt-4 italic">
               Prices are indicative European market averages. Actual prices vary by country.
-              Vanlectric provides indicative sizing and shopping guidance only — not a final
-              electrical installation design.
             </p>
           </SectionCard>
 
-          {/* Section 7 — Warnings */}
+          {/* Things to watch (calculator-generated) */}
           {result.warnings.length > 0 && (
             <SectionCard title="Things to watch">
               <ul className="space-y-2">
@@ -629,7 +963,7 @@ export default function Results() {
             </SectionCard>
           )}
 
-          {/* Section 8 — Shopping list */}
+          {/* 11. Shopping list */}
           <SectionCard title="Shopping list">
             <p className="text-sm text-muted-foreground mb-4">
               Fill in real prices as you shop — totals update automatically.
@@ -637,7 +971,23 @@ export default function Results() {
             <ShoppingList result={result} />
           </SectionCard>
 
-          {/* Section 9 — Actions */}
+          {/* 12. Confidence */}
+          <ConfidenceSection state={state} result={result} />
+
+          {/* 13. Before-you-buy */}
+          <BeforeYouBuySection />
+
+          {/* 14. PRO preview */}
+          <InstallerPreview onClick={() => setProOpen(true)} />
+
+          {/* Disclaimer */}
+          <div className="rounded-lg border border-border bg-muted/40 p-4 text-xs text-muted-foreground italic">
+            Vanlectric provides indicative sizing and shopping guidance only. It is not a final
+            electrical installation design. Always verify your setup and have 230V installations
+            checked by a qualified electrician.
+          </div>
+
+          {/* 15. Actions */}
           <SectionCard title="Next steps">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
