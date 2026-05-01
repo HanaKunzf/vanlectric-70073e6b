@@ -494,7 +494,7 @@ export function calculate(state: WizardState): CalculationResult {
   return {
     lines, shoreLines,
     applianceSubtotalWh, inverterLossWh, remoteWorkWh: rwWh, reserveWh, totalDailyWh, hasInverterLoad,
-    daysAutonomy, journeyWh, requiredWh, requiredAh,
+    daysAutonomy, journeyWh, requiredWh, requiredAh, recommendedBatteryAh, usableBatteryWh,
     roofArea, obstacleArea, maxSolarW, solarHours, requiredSolarW, recommendedSolarW, panelType, solarDailyWh,
     alternatorDailyWh, hasDCDC,
     components,
