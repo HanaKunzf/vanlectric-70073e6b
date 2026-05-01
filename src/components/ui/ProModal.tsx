@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { X, Mail } from "lucide-react";
 
 interface ProModalProps {
@@ -11,12 +12,14 @@ const STORAGE_KEY = "vec_pro_notify_email";
 export const ProModal = ({ open, onClose }: ProModalProps) => {
   const [showInput, setShowInput] = useState(false);
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
     if (open) {
       setShowInput(false);
       setEmail("");
+      setConsent(false);
       setConfirmed(false);
     }
   }, [open]);
@@ -35,6 +38,7 @@ export const ProModal = ({ open, onClose }: ProModalProps) => {
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed || !trimmed.includes("@")) return;
+    if (!consent) return;
     try {
       const existing: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
       if (!existing.includes(trimmed)) existing.push(trimmed);
@@ -108,9 +112,26 @@ export const ProModal = ({ open, onClose }: ProModalProps) => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-primary"
                 />
+                <label className="flex items-start gap-2 text-xs font-sans text-foreground/85 leading-relaxed cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-border text-primary accent-primary focus:ring-primary"
+                  />
+                  <span>
+                    I agree to receive occasional emails about the Vanlectric PRO launch and
+                    updates. I can unsubscribe anytime.{" "}
+                    <Link to="/privacy" className="text-primary hover:underline" onClick={onClose}>
+                      Privacy Policy
+                    </Link>
+                  </span>
+                </label>
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px]"
+                  disabled={!consent}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Submit
                 </button>

@@ -6,7 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Wizard from "./pages/Wizard.tsx";
 import Results from "./pages/Results.tsx";
+import Privacy from "./pages/Privacy.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { CookieBanner } from "@/components/ui/CookieBanner";
 
 const queryClient = new QueryClient();
 
@@ -20,9 +22,11 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/wizard" element={<Wizard />} />
           <Route path="/results" element={<Results />} />
+          <Route path="/privacy" element={<Privacy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

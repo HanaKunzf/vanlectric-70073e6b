@@ -543,8 +543,17 @@ export default function Results() {
         </div>
       </main>
 
-      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground font-sans">
-        {en.app.name} — indicative sizing, not a substitute for professional electrical advice.
+      <footer className="border-t border-border py-4 text-center text-xs text-muted-foreground font-sans">
+        <div className="container mx-auto px-4 flex flex-col gap-1.5">
+          <div>{en.app.name} — indicative sizing, not a substitute for professional electrical advice.</div>
+          <div>© 2025 Vanlectric · Hana Kunzfeldová</div>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+            <Link to="/privacy" className="hover:text-primary hover:underline">Privacy Policy</Link>
+            <span aria-hidden>·</span>
+            <a href="mailto:hello@vanlectric.com" className="hover:text-primary hover:underline">hello@vanlectric.com</a>
+          </div>
+          <div>Free to use · No account required</div>
+        </div>
       </footer>
       <ProModal open={proOpen} onClose={() => setProOpen(false)} />
     </div>
