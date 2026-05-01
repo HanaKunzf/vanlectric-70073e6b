@@ -1,87 +1,95 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Vanlife Electrical Calculator — industrial-utilitarian dark theme.
+/* Vanlife Electrical Calculator — "Field Notes" theme.
+   Warm cream + forest green, golden brown accents.
    All colors HSL. Tokens drive every component. */
 
 @layer base {
   :root {
-    /* Dark theme is the default */
-    --background: 0 0% 10%;          /* #1a1a1a deep charcoal */
-    --foreground: 0 0% 96%;          /* #f5f5f5 off-white */
+    /* Backgrounds — warm cream / ivory */
+    --background: 50 30% 97%;          /* #FAFAF7 */
+    --foreground: 156 17% 14%;         /* #1C2B26 near-black green */
 
-    --card: 0 0% 14%;                /* #242424 */
-    --card-foreground: 0 0% 96%;
+    --card: 45 30% 94%;                /* #F5F2EA warm ivory */
+    --card-foreground: 156 17% 14%;
 
-    --popover: 0 0% 14%;
-    --popover-foreground: 0 0% 96%;
+    --popover: 45 30% 94%;
+    --popover-foreground: 156 17% 14%;
 
-    --primary: 38 92% 50%;           /* #f59e0b warm amber */
-    --primary-foreground: 0 0% 10%;
+    /* Primary — dark forest green */
+    --primary: 153 24% 23%;            /* #2D4A3E */
+    --primary-foreground: 50 30% 97%;
 
-    --secondary: 215 14% 47%;        /* #64748b muted slate */
-    --secondary-foreground: 0 0% 96%;
+    /* Secondary — warm terracotta */
+    --secondary: 28 41% 59%;           /* #C4956A */
+    --secondary-foreground: 156 17% 14%;
 
-    --muted: 0 0% 18%;
-    --muted-foreground: 215 14% 65%;
+    --muted: 45 25% 88%;               /* warm grey */
+    --muted-foreground: 150 11% 32%;   /* #4A5E55 muted forest */
 
-    --accent: 38 92% 50%;
-    --accent-foreground: 0 0% 10%;
+    /* Accent — golden brown */
+    --accent: 41 75% 32%;              /* #8B6914 */
+    --accent-foreground: 50 30% 97%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 50 30% 97%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 10%;
+    --warning: 41 75% 32%;
+    --warning-foreground: 45 92% 92%;
 
-    --border: 0 0% 20%;              /* #333333 */
-    --input: 0 0% 20%;
-    --ring: 38 92% 50%;
+    --border: 43 24% 83%;              /* #DDD8CC warm grey */
+    --input: 43 24% 83%;
+    --ring: 153 24% 23%;
 
-    --radius: 0.625rem;
+    --radius: 0.75rem;                 /* 12px on cards */
 
     /* Custom design tokens */
-    --amber-glow: 38 92% 50%;
-    --gradient-hero: radial-gradient(ellipse at top, hsl(38 92% 50% / 0.18), transparent 60%), linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 7%));
-    --gradient-amber: linear-gradient(135deg, hsl(38 92% 55%), hsl(38 92% 45%));
-    --shadow-amber: 0 8px 32px -8px hsl(38 92% 50% / 0.45);
-    --shadow-card: 0 4px 24px -8px hsl(0 0% 0% / 0.6);
+    --neutral: 130 7% 45%;             /* #6B7B6E grey-green */
+    --selected-bg: 150 18% 94%;        /* #EEF2F0 */
+    --warning-bg: 45 92% 92%;          /* #FEF3C7 */
+    --warning-text: 32 81% 30%;        /* #92400E */
+    --primary-hover: 153 36% 17%;      /* #1C3830 */
+
+    --shadow-card: 0 2px 12px rgba(45, 74, 62, 0.08);
+    --shadow-card-hover: 0 4px 20px rgba(45, 74, 62, 0.12);
+    --gradient-hero: radial-gradient(ellipse at top, hsl(153 24% 23% / 0.08), transparent 60%), linear-gradient(180deg, hsl(50 30% 97%), hsl(45 30% 94%));
     --transition-smooth: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 14%;
-    --sidebar-foreground: 0 0% 96%;
-    --sidebar-primary: 38 92% 50%;
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 0 0% 18%;
-    --sidebar-accent-foreground: 0 0% 96%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 38 92% 50%;
+    --sidebar-background: 45 30% 94%;
+    --sidebar-foreground: 156 17% 14%;
+    --sidebar-primary: 153 24% 23%;
+    --sidebar-primary-foreground: 50 30% 97%;
+    --sidebar-accent: 45 25% 88%;
+    --sidebar-accent-foreground: 156 17% 14%;
+    --sidebar-border: 43 24% 83%;
+    --sidebar-ring: 153 24% 23%;
   }
 
-  /* keep .dark identical — app is always dark */
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 96%;
-    --card: 0 0% 14%;
-    --card-foreground: 0 0% 96%;
-    --popover: 0 0% 14%;
-    --popover-foreground: 0 0% 96%;
-    --primary: 38 92% 50%;
-    --primary-foreground: 0 0% 10%;
-    --secondary: 215 14% 47%;
-    --secondary-foreground: 0 0% 96%;
-    --muted: 0 0% 18%;
-    --muted-foreground: 215 14% 65%;
-    --accent: 38 92% 50%;
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 38 92% 50%;
+    /* Field Notes stays light — keep .dark tokens identical */
+    --background: 50 30% 97%;
+    --foreground: 156 17% 14%;
+    --card: 45 30% 94%;
+    --card-foreground: 156 17% 14%;
+    --popover: 45 30% 94%;
+    --popover-foreground: 156 17% 14%;
+    --primary: 153 24% 23%;
+    --primary-foreground: 50 30% 97%;
+    --secondary: 28 41% 59%;
+    --secondary-foreground: 156 17% 14%;
+    --muted: 45 25% 88%;
+    --muted-foreground: 150 11% 32%;
+    --accent: 41 75% 32%;
+    --accent-foreground: 50 30% 97%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 50 30% 97%;
+    --border: 43 24% 83%;
+    --input: 43 24% 83%;
+    --ring: 153 24% 23%;
   }
 }
 
@@ -91,20 +99,20 @@
   }
 
   html {
-    @apply dark;
+    /* Field Notes is a light theme — do not force .dark */
   }
 
   body {
-    @apply bg-background text-foreground font-mono;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "ss01", "ss02";
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight uppercase;
+    @apply font-display tracking-tight;
+    /* No uppercase — Fraunces is a serif, set sentence case */
   }
 
-  /* iOS zoom prevention */
   input, select, textarea {
     font-size: 16px;
   }
@@ -112,11 +120,12 @@
 
 @layer components {
   .step-card {
-    @apply bg-card border border-border rounded-lg shadow-[var(--shadow-card)];
+    @apply bg-card border border-border rounded-xl;
+    box-shadow: var(--shadow-card);
   }
 
-  .amber-glow {
-    box-shadow: var(--shadow-amber);
+  .soft-shadow {
+    box-shadow: var(--shadow-card);
   }
 
   .grid-bg {
@@ -124,6 +133,13 @@
       linear-gradient(hsl(var(--border) / 0.5) 1px, transparent 1px),
       linear-gradient(90deg, hsl(var(--border) / 0.5) 1px, transparent 1px);
     background-size: 40px 40px;
+  }
+
+  .warning-banner {
+    background-color: hsl(var(--warning-bg));
+    color: hsl(var(--warning-text));
+    border-left: 3px solid hsl(var(--accent));
+    @apply rounded-md px-4 py-3 text-sm;
   }
 }
 

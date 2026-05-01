@@ -10,11 +10,6 @@ interface LockedFeatureProps {
   className?: string;
 }
 
-/**
- * Renders children when the flag is enabled. When disabled, renders the same
- * children visually greyed out, with a PRO badge, and intercepts clicks to
- * show the "coming soon" notice.
- */
 export const LockedFeature = ({ flag, children, className }: LockedFeatureProps) => {
   const enabled = FEATURES[flag];
   if (enabled) return <>{children}</>;
@@ -32,12 +27,11 @@ export const LockedFeature = ({ flag, children, className }: LockedFeatureProps)
         className="absolute inset-0 flex items-center justify-center cursor-not-allowed"
         onClick={(e) => {
           e.preventDefault();
-          // soft toast — keep simple alert for now
           alert(en.pro.locked);
         }}
         aria-label={en.pro.locked}
       >
-        <span className="inline-flex items-center gap-1.5 rounded-md bg-background/80 backdrop-blur border border-primary px-2 py-1 text-xs font-display tracking-wider uppercase text-primary">
+        <span className="inline-flex items-center gap-1.5 rounded-md bg-card/90 backdrop-blur border border-primary px-2.5 py-1 text-xs font-sans font-semibold tracking-wide text-primary">
           <Lock className="w-3 h-3" />
           {en.pro.badge}
         </span>

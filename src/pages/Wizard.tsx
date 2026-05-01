@@ -46,7 +46,7 @@ export default function Wizard() {
             aria-label="Home"
           >
             <Zap className="w-5 h-5 text-primary" />
-            <span className="hidden sm:inline font-display uppercase tracking-widest text-sm">
+            <span className="hidden sm:inline font-display text-base font-semibold tracking-tight">
               {en.app.name}
             </span>
           </Link>
@@ -73,7 +73,7 @@ export default function Wizard() {
           )}
           {step > 2 && (
             <div className="step-card max-w-2xl mx-auto p-10 text-center animate-step-in">
-              <h2 className="font-display text-2xl uppercase mb-3">Step {step}</h2>
+              <h2 className="font-display text-3xl font-bold mb-3">Step {step}</h2>
               <p className="text-muted-foreground">
                 Coming next — this step will be wired up shortly.
               </p>
@@ -88,7 +88,7 @@ export default function Wizard() {
           <button
             type="button"
             onClick={goBack}
-            className="inline-flex items-center gap-2 px-4 sm:px-5 py-3 rounded-md border border-border text-foreground hover:border-primary hover:text-primary transition-colors min-h-[44px] font-display uppercase tracking-widest text-sm"
+            className="inline-flex items-center gap-2 px-4 sm:px-5 py-3 rounded-lg border border-border bg-card text-foreground hover:border-primary hover:text-primary transition-colors min-h-[44px] font-sans font-semibold text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             {en.nav.back}
@@ -98,9 +98,9 @@ export default function Wizard() {
             onClick={goNext}
             disabled={!canAdvance}
             className={cn(
-              "inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-md font-display uppercase tracking-widest text-sm min-h-[44px] transition-[filter,transform,opacity]",
+              "inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-lg font-sans font-semibold text-sm min-h-[44px] transition-[background-color,transform,opacity]",
               canAdvance
-                ? "bg-primary text-primary-foreground amber-glow hover:brightness-110 active:scale-[0.98]"
+                ? "bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] active:scale-[0.98]"
                 : "bg-muted text-muted-foreground cursor-not-allowed",
             )}
           >

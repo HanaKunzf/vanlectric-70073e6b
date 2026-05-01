@@ -25,7 +25,7 @@ export const StepCard = ({ title, illustration, children, className }: StepCardP
           </div>
         )}
         <div className="flex-1 md:order-1">
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6 normal-case tracking-tight">
             {title}
           </h2>
           {children}
