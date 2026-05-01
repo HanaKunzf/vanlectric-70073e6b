@@ -11,7 +11,7 @@ interface Props {
   onChange: (next: ExistingStep) => void;
 }
 
-export const Step13_Existing = ({ value, onChange }: Props) => {
+export const Step13_Existing = ({ value = {}, onChange }: Props) => {
   const enabled = FEATURES.EXISTING_COMPONENTS;
   const navigate = useNavigate();
   const location = useLocation();
