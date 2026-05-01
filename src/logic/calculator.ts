@@ -492,7 +492,11 @@ export function calculate(state: WizardState): CalculationResult {
     daysAutonomy, journeyWh, requiredWh, requiredAh,
     roofArea, obstacleArea, maxSolarW, solarHours, requiredSolarW, recommendedSolarW, panelType, solarDailyWh,
     alternatorDailyWh, hasDCDC,
-    components, materials, materialsTotal, componentsTotal, subtotal, contingency, totalBudget,
+    components,
+    materials, materialsTotal,
+    materialGroups, dcMaterialsTotal, solarMaterialsTotal, shoreMaterialsTotal,
+    shoreInstallMode, hasInternal230VSockets,
+    componentsTotal, subtotal, contingency, totalBudget,
     warnings,
   };
 }
