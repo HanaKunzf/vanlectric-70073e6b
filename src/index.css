@@ -26,10 +26,10 @@
 
     /* Secondary — warm terracotta */
     --secondary: 28 41% 59%;           /* #C4956A */
-    --secondary-foreground: 156 17% 14%;
+    --secondary-foreground: 156 30% 10%; /* deep forest for AA contrast on terracotta */
 
     --muted: 45 25% 88%;               /* warm grey */
-    --muted-foreground: 150 11% 32%;   /* #4A5E55 muted forest */
+    --muted-foreground: 150 14% 26%;   /* darker forest for legibility */
 
     /* Accent — golden brown */
     --accent: 41 75% 32%;              /* #8B6914 */
@@ -80,9 +80,9 @@
     --primary: 153 24% 23%;
     --primary-foreground: 50 30% 97%;
     --secondary: 28 41% 59%;
-    --secondary-foreground: 156 17% 14%;
+    --secondary-foreground: 156 30% 10%;
     --muted: 45 25% 88%;
-    --muted-foreground: 150 11% 32%;
+    --muted-foreground: 150 14% 26%;
     --accent: 41 75% 32%;
     --accent-foreground: 50 30% 97%;
     --destructive: 0 70% 45%;
