@@ -4,10 +4,43 @@ import { en } from "@/i18n/en";
 import { StepCard } from "@/components/ui/StepCard";
 import { HelperText } from "@/components/ui/WarningBanner";
 import { AppliancesIllustration } from "@/components/illustrations/Illustrations";
-import { APPLIANCE_CATALOG, type AppliancesStep, type ApplianceEntry } from "@/types";
+import { APPLIANCE_CATALOG, type AppliancesStep, type ApplianceEntry, type PowerSource } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface Props {
+  value: AppliancesStep;
+  onChange: (next: AppliancesStep) => void;
+}
+
+const PowerSourceBadge = ({ source, gas }: { source: PowerSource; gas?: boolean }) => {
+  if (gas) {
+    return (
+      <span className="text-[10px] font-sans font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+        Gas
+      </span>
+    );
+  }
+  const map: Record<PowerSource, { label: string; cls: string }> = {
+    "12v": {
+      label: "12V",
+      cls: "bg-[hsl(var(--primary)/0.12)] text-primary border-[hsl(var(--primary)/0.3)]",
+    },
+    "230v-inverter": {
+      label: "230V inverter",
+      cls: "bg-[#FEF3C7] text-[#92400E] border-[#8B6914]/40",
+    },
+    "230v-shore": {
+      label: "Shore only",
+      cls: "bg-[#FEE2E2] text-[#991B1B] border-[#991B1B]/30",
+    },
+  };
+  const { label, cls } = map[source];
+  return (
+    <span className={cn("text-[10px] font-sans font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap", cls)}>
+      {label}
+    </span>
+  );
+};
   value: AppliancesStep;
   onChange: (next: AppliancesStep) => void;
 }
