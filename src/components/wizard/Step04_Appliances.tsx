@@ -199,7 +199,7 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                           <div className="mt-3 ml-7 space-y-2">
                             {!entry?.shoreOnly && (
                               <div className="text-xs text-muted-foreground italic">
-                                Via inverter — 12% efficiency loss applied
+                                Via inverter — ~90% efficiency, losses applied to battery draw
                               </div>
                             )}
                             <label className="flex items-start gap-2 cursor-pointer text-sm">
