@@ -175,6 +175,8 @@ export const en = {
       title: "🏠 Tell us about your roof",
       obstaclesTitle: "What's already on your roof?",
       obstaclesHelper: "Set how many of each. We'll subtract their footprint from your usable solar area.",
+      measurementInfo:
+        "💡 These calculations use typical dimensions. Always measure your actual roof and mark out obstacle positions before ordering panels. Component placement matters — a window near the centre may block more usable area than one at the edge.",
       emptyButton: "✨ Nothing — it's empty",
       countLabel: "Count",
       countOptions: { 0: "0", 1: "1", 2: "2", 3: "3+" },

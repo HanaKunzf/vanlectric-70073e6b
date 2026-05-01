@@ -199,6 +199,10 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
         })}
       </div>
 
+      <div className="mb-8 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs font-sans text-foreground/90 leading-relaxed">
+        {t.measurementInfo}
+      </div>
+
       <h3 className="font-sans text-sm font-semibold tracking-wide text-muted-foreground mb-3">
         {t.roofTypeTitle}
       </h3>
