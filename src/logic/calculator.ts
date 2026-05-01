@@ -81,6 +81,7 @@ export interface RecommendedComponent {
   why: string;
   detail: string;
   price: number;
+  note?: string;
 }
 
 export interface MaterialItem { item: string; price: number; qty?: number }
