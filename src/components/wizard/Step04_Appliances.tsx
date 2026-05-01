@@ -106,14 +106,17 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                             className="mt-1 w-4 h-4 accent-primary"
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="font-sans font-medium">{item.label}</div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-sans font-medium">{item.label}</span>
+                              <PowerSourceBadge source={item.powerSource} gas={item.id === "gas-stove"} />
+                            </div>
                             {item.hint && (
                               <div className="text-xs text-muted-foreground mt-0.5">{item.hint}</div>
                             )}
                           </div>
                         </label>
 
-                        {enabled && (
+                        {enabled && !item.informational && (
                           <div className="mt-3 ml-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                               <label className="text-xs font-sans font-semibold text-muted-foreground">
@@ -164,12 +167,18 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                           </div>
                         )}
 
-                        {enabled && item.shorePowerOnly && (
+                        {enabled && item.powerSource === "230v-shore" && (
                           <div className="mt-3 ml-7 warning-banner flex items-start gap-2 text-sm">
                             <span aria-hidden>⚠️</span>
                             <span>
-                              This appliance is best used with 230V shore power. It will be excluded from off-grid battery sizing.
+                              Shore power only. Excluded from off-grid battery sizing.
                             </span>
+                          </div>
+                        )}
+
+                        {enabled && item.powerSource === "230v-inverter" && (
+                          <div className="mt-2 ml-7 text-xs text-muted-foreground italic">
+                            Via inverter — 12% efficiency loss applied
                           </div>
                         )}
                       </div>
