@@ -1,7 +1,8 @@
 // All user-facing strings. No hardcoded text in components.
 export const en = {
   app: {
-    name: "Vanlife Electrical Calculator",
+    name: "Vanlectric",
+    fullName: "Vanlectric — Vanlife Electrical Calculator",
     tagline: "Size your van's electrical system in 10 minutes. No electrician needed.",
   },
   landing: {
