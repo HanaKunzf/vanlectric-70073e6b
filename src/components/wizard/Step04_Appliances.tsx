@@ -72,7 +72,7 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                           <input
                             type="checkbox"
                             checked={enabled}
-                            onChange={(e) => updateEntry(item.id, { enabled: e.target.checked })}
+                            onChange={(e) => updateEntry(item.id, { enabled: e.target.checked }, item.shorePowerOnly)}
                             className="mt-1 w-4 h-4 accent-primary"
                           />
                           <div className="flex-1 min-w-0">
@@ -131,6 +131,15 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                                 </div>
                               )}
                             </div>
+                          </div>
+                        )}
+
+                        {enabled && item.shorePowerOnly && (
+                          <div className="mt-3 ml-7 warning-banner flex items-start gap-2 text-sm">
+                            <span aria-hidden>⚠️</span>
+                            <span>
+                              This appliance is best used with 230V shore power. It will be excluded from off-grid battery sizing.
+                            </span>
                           </div>
                         )}
                       </div>
