@@ -139,6 +139,12 @@ export interface CalculationResult {
   components: RecommendedComponent[];
   materials: MaterialItem[];
   materialsTotal: number;
+  materialGroups: MaterialGroup[];
+  dcMaterialsTotal: number;
+  solarMaterialsTotal: number;
+  shoreMaterialsTotal: number;
+  shoreInstallMode: ShoreInstallMode;
+  hasInternal230VSockets: boolean;
   componentsTotal: number;
   subtotal: number;
   contingency: number;
