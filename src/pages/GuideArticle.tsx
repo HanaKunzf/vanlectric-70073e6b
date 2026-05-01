@@ -18,7 +18,8 @@ const PlannerCta = () => (
     </div>
     <Link
       to="/planner"
-      className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold px-5 py-2.5 rounded-md hover:bg-[hsl(var(--primary-hover))]"
+      data-prose-cta
+      className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold px-5 py-2.5 rounded-md no-underline hover:bg-[hsl(var(--primary-hover))]"
     >
       Open planner <ArrowRight className="w-4 h-4" />
     </Link>
@@ -212,7 +213,7 @@ export default function GuideArticle() {
     <SiteLayout title={`${guide.title} — Vanlectric`} description={guide.description}>
       <PageHero eyebrow="Guide" title={guide.title} subtitle={guide.description} />
       <Prose>
-        <Link to="/guides" className="inline-flex items-center gap-1 text-sm text-muted-foreground no-underline hover:text-primary">
+        <Link to="/guides" data-prose-cta className="inline-flex items-center gap-1 text-sm text-muted-foreground no-underline hover:text-primary">
           <ArrowLeft className="w-4 h-4" /> All guides
         </Link>
         {guide.body}
