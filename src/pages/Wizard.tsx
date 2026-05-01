@@ -14,6 +14,7 @@ import { Step09_RemoteWork, isStep9Valid } from "@/components/wizard/Step09_Remo
 import { Step10_Season, isStep10Valid } from "@/components/wizard/Step10_Season";
 import { Step11_Insulation, isStep11Valid } from "@/components/wizard/Step11_Insulation";
 import { Step12_Budget, isStep12Valid } from "@/components/wizard/Step12_Budget";
+import { Step13_Existing, isStep13Valid } from "@/components/wizard/Step13_Existing";
 import { initialWizardState, TOTAL_STEPS, type WizardState } from "@/types";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ export default function Wizard() {
       case 10: return isStep10Valid(state.step10);
       case 11: return isStep11Valid(state.step11);
       case 12: return isStep12Valid(state.step12);
+      case 13: return isStep13Valid(state.step13);
       default: return true;
     }
   })();
@@ -111,6 +113,7 @@ export default function Wizard() {
           {step === 10 && <Step10_Season value={state.step10} onChange={(v) => set("step10", v)} />}
           {step === 11 && <Step11_Insulation value={state.step11} onChange={(v) => set("step11", v)} />}
           {step === 12 && <Step12_Budget value={state.step12} onChange={(v) => set("step12", v)} />}
+          {step === 13 && <Step13_Existing value={state.step13} onChange={(v) => set("step13", v)} />}
         </div>
       </main>
 
