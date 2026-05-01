@@ -71,6 +71,7 @@ export interface ApplianceLine {
   wh: number;
   shoreOnly: boolean;
   informational: boolean;
+  isDutyCycle?: boolean;
 }
 
 export interface RecommendedComponent {
@@ -80,6 +81,7 @@ export interface RecommendedComponent {
   why: string;
   detail: string;
   price: number;
+  note?: string;
 }
 
 export interface MaterialItem { item: string; price: number; qty?: number }
@@ -168,13 +170,13 @@ export function calculate(state: WizardState): CalculationResult {
     }
 
     let baseWh = watts * hours;
+    let displayHours = hours;
 
     // Fridge duty cycle
-    if (FRIDGE_IDS.has(id) && id !== "freezer") {
-      baseWh = watts * 24 * fridgeDuty[climate][insulation];
-    }
-    if (id === "freezer") {
-      baseWh = watts * 24 * fridgeDuty[climate][insulation];
+    if (FRIDGE_IDS.has(id)) {
+      const duty = fridgeDuty[climate][insulation];
+      baseWh = watts * 24 * duty;
+      displayHours = 24 * duty;
     }
 
     // Diesel heater
@@ -198,7 +200,8 @@ export function calculate(state: WizardState): CalculationResult {
 
     lines.push({
       id, label: def.label, powerSource: def.powerSource,
-      watts, hours, wh: baseWh, shoreOnly: false, informational: false,
+      watts, hours: displayHours, wh: baseWh, shoreOnly: false, informational: false,
+      isDutyCycle: FRIDGE_IDS.has(id),
     });
     applianceSubtotalWh += baseWh;
   }
@@ -253,6 +256,10 @@ export function calculate(state: WizardState): CalculationResult {
   else if (requiredAh < 300) battery = { key: "battery", category: "Battery", name: "2× 150Ah LiFePO4", why: "Two batteries in parallel for higher capacity.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 320 };
   else if (requiredAh < 400) battery = { key: "battery", category: "Battery", name: "2× 200Ah LiFePO4", why: "Large bank for full-time / heavy daily loads.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 440 };
   else battery = { key: "battery", category: "Battery", name: "3× 200Ah LiFePO4", why: "Maximum bank for extended off-grid use.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 660 };
+
+  if (profile === "weekendWarrior" && requiredAh > 300) {
+    battery.note = "💡 As a weekend warrior, you recharge at home between trips. If your system seems oversized, consider whether you really need worst-case winter sizing — or adjust your climate/season settings to match your typical travel conditions.";
+  }
   components.push(battery);
 
   // Solar panel
@@ -341,7 +348,9 @@ export function calculate(state: WizardState): CalculationResult {
     warnings.push("LiFePO4 batteries cannot be charged below 0°C without a built-in heater. Choose a battery with low-temp protection or low-temp heating.");
   }
   if (recommendedSolarW < requiredSolarW * 0.9) {
-    warnings.push(`Roof space is limited (~${maxSolarW.toFixed(0)}W max) but you need ~${Math.round(requiredSolarW)}W. Plan for more frequent driving or shore-power top-ups.`);
+    warnings.push(
+      `Your climate and season combination (${climate} / ${season}) uses a conservative worst-case of ${solarHours} solar hours/day. Your solar panels (~${maxSolarW.toFixed(0)}W) will cover your needs on sunny days. For cloudy periods, plan for alternator top-ups or shore power. If you travel mainly in summer, reconsider your season selection for a more realistic estimate.`
+    );
   }
   if (shoreLines.length > 0 && shore === "never") {
     warnings.push("You have shore-power-only appliances but no shore-power access. Consider removing them or planning campsite stops.");
