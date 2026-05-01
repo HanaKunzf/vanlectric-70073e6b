@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle, CheckSquare, Square, Wrench } from "lucide-react";
 import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
@@ -11,6 +11,17 @@ import { EmailReportModal } from "@/components/ui/EmailReportModal";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
+
+// ---------- Price profiles ----------
+type PriceProfile = "low" | "balanced" | "premium";
+const PRICE_MULTIPLIER: Record<PriceProfile, number> = { low: 0.75, balanced: 1.0, premium: 1.6 };
+const PROFILE_LABEL: Record<PriceProfile, string> = { low: "Low-cost", balanced: "Balanced", premium: "Premium" };
+const adjust = (price: number, p: PriceProfile) => Math.round(price * PRICE_MULTIPLIER[p]);
+const componentNameForProfile = (name: string, p: PriceProfile): string => {
+  if (p === "low") return `Budget-friendly equivalent — ${name.replace(/^Victron\s+/i, "")}`;
+  if (p === "premium") return `Premium-grade — ${name}`;
+  return name;
+};
 
 const sourceLabel = (s: ApplianceLine["powerSource"]) =>
   s === "12v" ? "12V" : s === "230v-inverter" ? "230V (inverter)" : "230V (shore)";
