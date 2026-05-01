@@ -262,14 +262,14 @@ export function calculate(state: WizardState): CalculationResult {
   }
   components.push(battery);
 
-  // Solar panel
+  // Solar panel — €0.50 per watt
   components.push({
     key: "solar",
     category: "Solar panels",
     name: `${Math.round(recommendedSolarW)}W ${panelType}`,
     why: `Replaces your daily consumption with ~${solarHours}h of effective sun.`,
     detail: `Roof area available: ${roofArea.toFixed(1)}m². After obstacles & margin: ~${maxSolarW.toFixed(0)}W max. Required: ${Math.round(requiredSolarW)}W.`,
-    price: Math.round(recommendedSolarW * 0.9),
+    price: Math.round(recommendedSolarW * 0.5),
   });
 
   // MPPT
@@ -304,8 +304,7 @@ export function calculate(state: WizardState): CalculationResult {
     .filter((l) => l.powerSource === "230v-inverter")
     .reduce((m, l) => Math.max(m, l.watts), 0);
   if (max230VInverter > 0) {
-    if (max230VInverter < 500) components.push({ key: "inverter", category: "Inverter", name: "500W pure sine inverter", why: "Powers small 230V appliances cleanly.", detail: `Largest 230V load: ${max230VInverter}W.`, price: 50 });
-    else if (max230VInverter < 1500) components.push({ key: "inverter", category: "Inverter", name: "1000W pure sine inverter", why: "Covers laptops, kettles, small appliances.", detail: `Largest 230V load: ${max230VInverter}W.`, price: 80 });
+    if (max230VInverter < 1000) components.push({ key: "inverter", category: "Inverter", name: "1000W pure sine inverter", why: "Minimum recommended size — covers laptops, kettles, small appliances cleanly.", detail: `Largest 230V load: ${max230VInverter}W.`, price: 80 });
     else if (max230VInverter < 2500) components.push({ key: "inverter", category: "Inverter", name: "2000W pure sine inverter", why: "Handles high-draw 230V appliances.", detail: `Largest 230V load: ${max230VInverter}W.`, price: 150 });
     else components.push({ key: "inverter", category: "Inverter", name: "3000W pure sine inverter", why: "Very high 230V draw — heavy loads.", detail: `Largest 230V load: ${max230VInverter}W. Cable sizing critical.`, price: 250 });
   }
