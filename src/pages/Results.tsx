@@ -106,21 +106,51 @@ const ComponentCard = ({ c }: { c: CalculationResult["components"][number] }) =>
 
 // ---------- Shopping list editable row ----------
 interface ShopRow { item: string; qty: number; estimate: number; userPrice: number }
+interface ShopGroup { title: string; rows: ShopRow[] }
 
 const ShoppingList = ({ result }: { result: CalculationResult }) => {
-  const initial: ShopRow[] = useMemo(
-    () => [
-      ...result.components.map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 })),
-      ...result.materials.map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 })),
-    ],
-    [result],
-  );
-  const [rows, setRows] = useState<ShopRow[]>(initial);
-  const grandEstimate = rows.reduce((s, r) => s + r.qty * r.estimate, 0);
-  const grandUser = rows.reduce((s, r) => s + r.qty * r.userPrice, 0);
+  const groups: ShopGroup[] = useMemo(() => {
+    const mainComponents: ShopRow[] = result.components
+      .filter((c) => !/inverter/i.test(c.category) && !/MPPT|Solar charger/i.test(c.category))
+      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+    const solarComponents: ShopRow[] = result.components
+      .filter((c) => /MPPT|Solar charger|Solar panels/i.test(c.category))
+      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+    const inverterComponents: ShopRow[] = result.components
+      .filter((c) => /inverter/i.test(c.category))
+      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+    const dcMaterials = result.materialGroups.find((g) => g.key === "dc")!.items
+      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
+    const solarMaterials = result.materialGroups.find((g) => g.key === "solar")!.items
+      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
+    const shoreMaterials = result.materialGroups.find((g) => g.key === "shore")!.items
+      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
+    const optional: ShopRow[] = result.shoreLines.map((l) => ({
+      item: `${l.label} (shore-only appliance)`, qty: 1, estimate: 0, userPrice: 0,
+    }));
+    const out: ShopGroup[] = [
+      { title: "Main components", rows: [...mainComponents, ...inverterComponents] },
+      { title: "DC installation", rows: dcMaterials },
+    ];
+    if (solarMaterials.length || solarComponents.length) {
+      out.push({ title: "Solar installation", rows: [...solarComponents, ...solarMaterials] });
+    }
+    if (shoreMaterials.length) {
+      out.push({ title: "230V shore power", rows: shoreMaterials });
+    }
+    if (optional.length) {
+      out.push({ title: "Optional appliances", rows: optional });
+    }
+    return out;
+  }, [result]);
 
-  const update = (i: number, patch: Partial<ShopRow>) =>
-    setRows((rs) => rs.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const [groupRows, setGroupRows] = useState<ShopRow[][]>(() => groups.map((g) => g.rows));
+  const update = (gi: number, ri: number, patch: Partial<ShopRow>) =>
+    setGroupRows((gs) => gs.map((rows, i) => i !== gi ? rows : rows.map((r, j) => j === ri ? { ...r, ...patch } : r)));
+
+  const allRows = groupRows.flat();
+  const grandEstimate = allRows.reduce((s, r) => s + r.qty * r.estimate, 0);
+  const grandUser = allRows.reduce((s, r) => s + r.qty * r.userPrice, 0);
 
   return (
     <div className="overflow-x-auto">
@@ -135,29 +165,38 @@ const ShoppingList = ({ result }: { result: CalculationResult }) => {
           </tr>
         </thead>
         <tbody>
-          {rows.map((r, i) => (
-            <tr key={i} className="border-b border-border/60">
-              <td className="py-2 pr-3 font-sans">{r.item}</td>
-              <td className="py-2 px-2">
-                <input
-                  type="number" min={0} value={r.qty}
-                  onChange={(e) => update(i, { qty: Number(e.target.value) })}
-                  className="w-full bg-background border border-border rounded px-2 py-1 text-center"
-                />
-              </td>
-              <td className="py-2 px-2 text-right font-mono text-muted-foreground">{r.estimate}</td>
-              <td className="py-2 px-2">
-                <input
-                  type="number" min={0} value={r.userPrice || ""}
-                  placeholder="—"
-                  onChange={(e) => update(i, { userPrice: Number(e.target.value) })}
-                  className="w-full bg-background border border-border rounded px-2 py-1 text-right"
-                />
-              </td>
-              <td className="py-2 pl-2 text-right font-mono font-semibold">
-                {r.userPrice ? eur(r.qty * r.userPrice) : eur(r.qty * r.estimate)}
-              </td>
-            </tr>
+          {groups.map((g, gi) => (
+            <Fragment key={g.title}>
+              <tr className="bg-muted/40">
+                <td colSpan={5} className="py-2 px-2 font-display font-bold text-primary text-xs uppercase tracking-wider">
+                  {g.title}
+                </td>
+              </tr>
+              {groupRows[gi].map((r, ri) => (
+                <tr key={ri} className="border-b border-border/60">
+                  <td className="py-2 pr-3 font-sans">{r.item}</td>
+                  <td className="py-2 px-2">
+                    <input
+                      type="number" min={0} value={r.qty}
+                      onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
+                      className="w-full bg-background border border-border rounded px-2 py-1 text-center"
+                    />
+                  </td>
+                  <td className="py-2 px-2 text-right font-mono text-muted-foreground">{r.estimate}</td>
+                  <td className="py-2 px-2">
+                    <input
+                      type="number" min={0} value={r.userPrice || ""}
+                      placeholder="—"
+                      onChange={(e) => update(gi, ri, { userPrice: Number(e.target.value) })}
+                      className="w-full bg-background border border-border rounded px-2 py-1 text-right"
+                    />
+                  </td>
+                  <td className="py-2 pl-2 text-right font-mono font-semibold">
+                    {r.userPrice ? eur(r.qty * r.userPrice) : eur(r.qty * r.estimate)}
+                  </td>
+                </tr>
+              ))}
+            </Fragment>
           ))}
         </tbody>
         <tfoot>
