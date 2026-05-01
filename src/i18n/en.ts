@@ -179,7 +179,11 @@ export const en = {
         "💡 These calculations use typical dimensions. Always measure your actual roof and mark out obstacle positions before ordering panels. Component placement matters — a window near the centre may block more usable area than one at the edge.",
       emptyButton: "✨ Nothing — it's empty",
       countLabel: "Count",
-      countOptions: { 0: "0", 1: "1", 2: "2", 3: "3+" },
+      countOptions: { 0: "0", 1: "1", 2: "2", 3: "3" },
+      tentCoversFanWarning:
+        "⚠️ A roof tent typically covers the full roof including fan openings. Verify compatibility with your specific tent and van.",
+      acFanInfo:
+        "💡 Some roof AC units include ventilation — check if a separate fan is still needed.",
       knowDimensions: "I know the dimensions",
       lengthLabel: "Length (along van), cm",
       widthLabel: "Width (across van), cm",
