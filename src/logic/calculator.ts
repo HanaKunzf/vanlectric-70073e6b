@@ -248,6 +248,11 @@ export function calculate(state: WizardState): CalculationResult {
       isDutyCycle: FRIDGE_IDS.has(id),
     });
     applianceSubtotalWh += baseWh;
+    if (def.powerSource === "230v-inverter") {
+      dailyWh230VInverter += baseWh;
+    } else {
+      dailyWh12V += baseWh;
+    }
   }
 
   const rwWh = remoteWorkWh[step9.remoteWork ?? "no"];
