@@ -181,7 +181,7 @@ const EDIT_CHIPS: Array<{ step: number; emoji: string; label: string }> = [
   { step: 2, emoji: "🏕️", label: "Usage" },
   { step: 3, emoji: "🌤️", label: "Climate" },
   { step: 4, emoji: "🔌", label: "Appliances" },
-  { step: 5, emoji: "🚗", label: "Driving" },
+  { step: 5, emoji: "🛣️", label: "Driving" },
   { step: 6, emoji: "⚡", label: "Shore power" },
   { step: 7, emoji: "🏠", label: "Roof" },
   { step: 8, emoji: "👥", label: "People" },
