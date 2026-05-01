@@ -11,7 +11,18 @@ interface Props {
   onChange: (next: RoofStep) => void;
 }
 
-const COUNTS: ObstacleCount[] = [0, 1, 2, 3];
+const OBSTACLE_MAX: Record<RoofObstacleId, 1 | 2 | 3> = {
+  "small-window": 3,
+  "large-window": 2,
+  "fan": 2,
+  "gps-antenna": 2,
+  "satellite": 1,
+  "solar-shower": 1,
+  "rack": 1,
+  "ac": 1,
+  "tent": 1,
+  "other": 3,
+};
 
 export const Step07_Roof = ({ value, onChange }: Props) => {
   const t = en.steps.s7;
@@ -71,7 +82,7 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
                   <div className="text-xs text-muted-foreground">{meta.defaultText}</div>
                 </div>
                 <div className="flex gap-1" role="group" aria-label={t.countLabel}>
-                  {COUNTS.map((c) => {
+                  {Array.from({ length: OBSTACLE_MAX[id] + 1 }, (_, c) => c as ObstacleCount).map((c) => {
                     const selected = entry.count === c;
                     return (
                       <button
@@ -198,6 +209,18 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
           );
         })}
       </div>
+
+      {(value.obstacles.tent?.count ?? 0) > 0 && (value.obstacles.fan?.count ?? 0) > 0 && (
+        <div className="mb-3 rounded-lg border-l-4 border-accent bg-accent/10 p-3 text-xs font-sans leading-relaxed">
+          {t.tentCoversFanWarning}
+        </div>
+      )}
+
+      {(value.obstacles.ac?.count ?? 0) > 0 && (value.obstacles.fan?.count ?? 0) > 0 && (
+        <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs font-sans leading-relaxed">
+          {t.acFanInfo}
+        </div>
+      )}
 
       <div className="mb-8 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs font-sans text-foreground/90 leading-relaxed">
         {t.measurementInfo}
