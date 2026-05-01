@@ -198,7 +198,7 @@ export function calculate(state: WizardState): CalculationResult {
 
     lines.push({
       id, label: def.label, powerSource: def.powerSource,
-      watts, hours, wh: baseWh, shoreOnly: false, informational: false,
+      watts, hours: displayHours, wh: baseWh, shoreOnly: false, informational: false,
     });
     applianceSubtotalWh += baseWh;
   }
