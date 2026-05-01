@@ -6,6 +6,7 @@ import { initialWizardState, type WizardState, type ExistingStep } from "@/types
 import { FEATURES } from "@/config/features";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
+import { ProModal } from "@/components/ui/ProModal";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
@@ -53,14 +54,14 @@ const SectionCard = ({ title, children, className }: { title: string; children: 
 );
 
 // ---------- Locked button ----------
-const LockedAction = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
+const LockedAction = ({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) => (
   <button
     type="button"
-    onClick={() => alert(en.pro.locked)}
-    className="relative flex items-center gap-2 px-4 py-3 rounded-lg border border-border bg-muted/40 text-muted-foreground cursor-not-allowed min-h-[44px] font-sans font-semibold text-sm"
+    onClick={onClick}
+    className="relative flex items-center gap-2 px-4 py-3 rounded-lg border border-border bg-muted/40 text-muted-foreground min-h-[44px] font-sans font-semibold text-sm hover:border-primary transition-colors"
   >
     <span className="opacity-60">{icon}</span>
-    <span className="opacity-60">{label}</span>
+    <span className="opacity-80">{label}</span>
     <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-primary border border-primary rounded px-1.5 py-0.5">
       <Lock className="w-3 h-3" /> {en.pro.badge}
     </span>
@@ -311,6 +312,7 @@ export default function Results() {
   const location = useLocation();
   const state: WizardState = (location.state as { wizard?: WizardState })?.wizard ?? initialWizardState;
   const result = useMemo(() => calculate(state), [state]);
+  const [proOpen, setProOpen] = useState(false);
 
   const goBack = () => navigate("/wizard", { state: { resumeAtStep: 13, wizard: state } });
   const recalculate = () => navigate("/wizard", { state: { resumeAtStep: 4, wizard: state } });
@@ -524,10 +526,10 @@ export default function Results() {
           {/* Section 9 — Actions */}
           <SectionCard title="Next steps">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <LockedAction icon={<FileText className="w-4 h-4" />} label="Download PDF" />
-              <LockedAction icon={<FileSpreadsheet className="w-4 h-4" />} label="Download Excel" />
-              <LockedAction icon={<Mail className="w-4 h-4" />} label="Email report" />
-              <LockedAction icon={<Save className="w-4 h-4" />} label="Save design" />
+              <LockedAction icon={<FileText className="w-4 h-4" />} label="Download PDF" onClick={() => setProOpen(true)} />
+              <LockedAction icon={<FileSpreadsheet className="w-4 h-4" />} label="Download Excel" onClick={() => setProOpen(true)} />
+              <LockedAction icon={<Mail className="w-4 h-4" />} label="Email report" onClick={() => setProOpen(true)} />
+              <LockedAction icon={<Save className="w-4 h-4" />} label="Save design" onClick={() => setProOpen(true)} />
               <button
                 type="button"
                 onClick={recalculate}
@@ -544,6 +546,7 @@ export default function Results() {
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground font-sans">
         {en.app.name} — indicative sizing, not a substitute for professional electrical advice.
       </footer>
+      <ProModal open={proOpen} onClose={() => setProOpen(false)} />
     </div>
   );
 }
