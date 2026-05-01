@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Lock } from "lucide-react";
 import { StepCard } from "@/components/ui/StepCard";
 import { HelperText } from "@/components/ui/WarningBanner";
+import { ProModal } from "@/components/ui/ProModal";
 import { FEATURES } from "@/config/features";
 import { en } from "@/i18n/en";
 import type { ExistingStep, BatteryChemistry, WizardState } from "@/types";
@@ -15,6 +17,7 @@ export const Step13_Existing = ({ value = {}, onChange }: Props) => {
   const enabled = FEATURES.EXISTING_COMPONENTS;
   const navigate = useNavigate();
   const location = useLocation();
+  const [proOpen, setProOpen] = useState(false);
   const wizard = (location.state as { wizard?: WizardState })?.wizard;
 
   const skipToResults = () => {
@@ -43,10 +46,10 @@ export const Step13_Existing = ({ value = {}, onChange }: Props) => {
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <button
                 type="button"
-                onClick={() => alert(en.pro.locked)}
+                onClick={() => setProOpen(true)}
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px]"
               >
-                Unlock PRO
+                Coming Soon — Notify Me
               </button>
               <button
                 type="button"
@@ -59,6 +62,7 @@ export const Step13_Existing = ({ value = {}, onChange }: Props) => {
           </div>
         )}
       </div>
+      <ProModal open={proOpen} onClose={() => setProOpen(false)} />
     </StepCard>
   );
 };
