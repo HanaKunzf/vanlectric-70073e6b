@@ -343,7 +343,9 @@ export function calculate(state: WizardState): CalculationResult {
     warnings.push("LiFePO4 batteries cannot be charged below 0°C without a built-in heater. Choose a battery with low-temp protection or low-temp heating.");
   }
   if (recommendedSolarW < requiredSolarW * 0.9) {
-    warnings.push(`Roof space is limited (~${maxSolarW.toFixed(0)}W max) but you need ~${Math.round(requiredSolarW)}W. Plan for more frequent driving or shore-power top-ups.`);
+    warnings.push(
+      `Your climate and season combination (${climate} / ${season}) uses a conservative worst-case of ${solarHours} solar hours/day. Your solar panels (~${maxSolarW.toFixed(0)}W) will cover your needs on sunny days. For cloudy periods, plan for alternator top-ups or shore power. If you travel mainly in summer, reconsider your season selection for a more realistic estimate.`
+    );
   }
   if (shoreLines.length > 0 && shore === "never") {
     warnings.push("You have shore-power-only appliances but no shore-power access. Consider removing them or planning campsite stops.");
