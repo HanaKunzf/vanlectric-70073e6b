@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle, CheckSquare, Square, Wrench } from "lucide-react";
 import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
@@ -11,6 +11,17 @@ import { EmailReportModal } from "@/components/ui/EmailReportModal";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
+
+// ---------- Price profiles ----------
+type PriceProfile = "low" | "balanced" | "premium";
+const PRICE_MULTIPLIER: Record<PriceProfile, number> = { low: 0.75, balanced: 1.0, premium: 1.6 };
+const PROFILE_LABEL: Record<PriceProfile, string> = { low: "Low-cost", balanced: "Balanced", premium: "Premium" };
+const adjust = (price: number, p: PriceProfile) => Math.round(price * PRICE_MULTIPLIER[p]);
+const componentNameForProfile = (name: string, p: PriceProfile): string => {
+  if (p === "low") return `Budget-friendly equivalent — ${name.replace(/^Victron\s+/i, "")}`;
+  if (p === "premium") return `Premium-grade — ${name}`;
+  return name;
+};
 
 const sourceLabel = (s: ApplianceLine["powerSource"]) =>
   s === "12v" ? "12V" : s === "230v-inverter" ? "230V (inverter)" : "230V (shore)";
@@ -70,21 +81,36 @@ const LockedAction = ({ icon, label, onClick }: { icon: React.ReactNode; label: 
 );
 
 // ---------- Component card ----------
-const ComponentCard = ({ c }: { c: CalculationResult["components"][number] }) => {
+const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][number]; profile: PriceProfile }) => {
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const toggle = () => {
+    setOpen((o) => {
+      const next = !o;
+      if (next) {
+        // Keep the header in view rather than scrolling to the bottom of expanded content.
+        requestAnimationFrame(() => {
+          headerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+      }
+      return next;
+    });
+  };
+  const adjusted = adjust(c.price, profile);
+  const displayName = componentNameForProfile(c.name, profile);
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div ref={headerRef} className="rounded-lg border border-border bg-card p-4 scroll-mt-24">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">{c.category}</div>
-          <div className="font-display text-lg font-bold mt-0.5">{c.name}</div>
+          <div className="font-display text-lg font-bold mt-0.5">{displayName}</div>
           <div className="text-sm text-muted-foreground mt-1">{c.why}</div>
         </div>
-        <div className="text-right font-display text-xl font-bold text-primary whitespace-nowrap">~{eur(c.price)}</div>
+        <div className="text-right font-display text-xl font-bold text-primary whitespace-nowrap">~{eur(adjusted)}</div>
       </div>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle}
         className="mt-3 inline-flex items-center gap-1 text-xs font-sans font-semibold text-primary hover:underline"
       >
         {open ? "Hide details" : "Why this?"}
@@ -105,28 +131,38 @@ const ComponentCard = ({ c }: { c: CalculationResult["components"][number] }) =>
 };
 
 // ---------- Shopping list ----------
-interface ShopRow { item: string; qty: number; estimate: number; userPrice: number }
+interface ShopRow { item: string; qty: number; estimate: number; userPrice: number; noEstimate?: boolean }
 interface ShopGroup { title: string; rows: ShopRow[] }
 
-const ShoppingList = ({ result }: { result: CalculationResult }) => {
+const ShoppingList = ({ result, profile }: { result: CalculationResult; profile: PriceProfile }) => {
   const groups: ShopGroup[] = useMemo(() => {
+    const mkComp = (c: CalculationResult["components"][number]): ShopRow => ({
+      item: componentNameForProfile(c.name, profile),
+      qty: 1,
+      estimate: adjust(c.price, profile),
+      userPrice: 0,
+    });
+    const mkMat = (m: { item: string; price: number }): ShopRow => ({
+      item: m.item,
+      qty: 1,
+      estimate: adjust(m.price, profile),
+      userPrice: 0,
+    });
     const mainComponents: ShopRow[] = result.components
       .filter((c) => !/inverter/i.test(c.category) && !/MPPT|Solar charger/i.test(c.category))
-      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+      .map(mkComp);
     const solarComponents: ShopRow[] = result.components
       .filter((c) => /MPPT|Solar charger|Solar panels/i.test(c.category))
-      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+      .map(mkComp);
     const inverterComponents: ShopRow[] = result.components
       .filter((c) => /inverter/i.test(c.category))
-      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
-    const dcMaterials = result.materialGroups.find((g) => g.key === "dc")!.items
-      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
-    const solarMaterials = result.materialGroups.find((g) => g.key === "solar")!.items
-      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
-    const shoreMaterials = result.materialGroups.find((g) => g.key === "shore")!.items
-      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
+      .map(mkComp);
+    const dcMaterials = result.materialGroups.find((g) => g.key === "dc")!.items.map(mkMat);
+    const solarMaterials = result.materialGroups.find((g) => g.key === "solar")!.items.map(mkMat);
+    const shoreGroup = result.materialGroups.find((g) => g.key === "shore")!;
+    const shoreMaterials = shoreGroup.items.map(mkMat);
     const optional: ShopRow[] = result.shoreLines.map((l) => ({
-      item: `${l.label} (shore-only appliance)`, qty: 1, estimate: 0, userPrice: 0,
+      item: `${l.label} (shore-only appliance)`, qty: 1, estimate: 0, userPrice: 0, noEstimate: true,
     }));
     const out: ShopGroup[] = [
       { title: "Main components", rows: [...mainComponents, ...inverterComponents] },
@@ -136,21 +172,31 @@ const ShoppingList = ({ result }: { result: CalculationResult }) => {
       out.push({ title: "Solar installation", rows: [...solarComponents, ...solarMaterials] });
     }
     if (shoreMaterials.length) {
-      out.push({ title: "230V shore power", rows: shoreMaterials });
+      out.push({ title: shoreGroup.title, rows: shoreMaterials });
     }
     if (optional.length) {
       out.push({ title: "Optional appliances", rows: optional });
     }
     return out;
-  }, [result]);
+  }, [result, profile]);
 
   const [groupRows, setGroupRows] = useState<ShopRow[][]>(() => groups.map((g) => g.rows));
+  // Re-sync rows when profile changes (preserves user-entered prices).
+  const profileRef = useRef(profile);
+  if (profileRef.current !== profile) {
+    profileRef.current = profile;
+    setGroupRows(groups.map((g, gi) => g.rows.map((r, ri) => {
+      const prev = groupRows[gi]?.[ri];
+      return { ...r, userPrice: prev?.userPrice ?? 0, qty: prev?.qty ?? r.qty };
+    })));
+  }
   const update = (gi: number, ri: number, patch: Partial<ShopRow>) =>
     setGroupRows((gs) => gs.map((rows, i) => i !== gi ? rows : rows.map((r, j) => j === ri ? { ...r, ...patch } : r)));
 
   const allRows = groupRows.flat();
-  const grandEstimate = allRows.reduce((s, r) => s + r.qty * r.estimate, 0);
+  const grandEstimate = allRows.reduce((s, r) => s + (r.noEstimate ? 0 : r.qty * r.estimate), 0);
   const grandUser = allRows.reduce((s, r) => s + r.qty * r.userPrice, 0);
+  const hasOptional = groups.some((g) => g.title === "Optional appliances");
 
   return (
     <div className="overflow-x-auto">
@@ -180,14 +226,16 @@ const ShoppingList = ({ result }: { result: CalculationResult }) => {
                       onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
                       className="w-full bg-background border border-border rounded px-2 py-1 text-center" />
                   </td>
-                  <td className="py-2 px-2 text-right font-mono text-muted-foreground">{r.estimate}</td>
+                  <td className="py-2 px-2 text-right font-mono text-muted-foreground">
+                    {r.noEstimate ? "—" : r.estimate}
+                  </td>
                   <td className="py-2 px-2">
                     <input type="number" min={0} value={r.userPrice || ""} placeholder="—"
                       onChange={(e) => update(gi, ri, { userPrice: Number(e.target.value) })}
                       className="w-full bg-background border border-border rounded px-2 py-1 text-right" />
                   </td>
                   <td className="py-2 pl-2 text-right font-mono font-semibold">
-                    {r.userPrice ? eur(r.qty * r.userPrice) : eur(r.qty * r.estimate)}
+                    {r.userPrice ? eur(r.qty * r.userPrice) : (r.noEstimate ? "—" : eur(r.qty * r.estimate))}
                   </td>
                 </tr>
               ))}
@@ -680,6 +728,17 @@ export default function Results() {
   const result = useMemo(() => calculate(state), [state]);
   const [proOpen, setProOpen] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
+  const [profile, setProfile] = useState<PriceProfile>("balanced");
+
+  // Profile-adjusted totals
+  const adjComponentsTotal = adjust(result.componentsTotal, profile);
+  const adjDcTotal = adjust(result.dcMaterialsTotal, profile);
+  const adjSolarTotal = adjust(result.solarMaterialsTotal, profile);
+  const adjShoreTotal = adjust(result.shoreMaterialsTotal, profile);
+  const adjSubtotal = adjComponentsTotal + adjDcTotal + adjSolarTotal + adjShoreTotal;
+  const adjContingency = Math.round(adjSubtotal * 0.15);
+  const adjTotalBudget = adjSubtotal + adjContingency;
+  const shoreGroupTitle = result.materialGroups.find((g) => g.key === "shore")?.title ?? "230V shore-power installation";
 
   const goBack = () => navigate("/wizard", { state: { resumeAtStep: 13, wizard: state } });
   const recalculate = () => navigate("/wizard", { state: { resumeAtStep: 4, wizard: state } });
@@ -862,11 +921,11 @@ export default function Results() {
               );
             })()}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {result.components.map((c) => <ComponentCard key={c.key} c={c} />)}
+              {result.components.map((c) => <ComponentCard key={c.key} c={c} profile={profile} />)}
             </div>
             <div className="mt-4 flex justify-between font-display font-bold text-primary border-t border-border pt-3">
               <span>Components total</span>
-              <span>{eur(result.componentsTotal)}</span>
+              <span>{eur(adjComponentsTotal)}</span>
             </div>
           </SectionCard>
 
@@ -887,35 +946,42 @@ export default function Results() {
               g.items.length === 0 ? null : (
                 <div key={g.key} className="mb-6 last:mb-0">
                   <h3 className="font-display text-lg font-bold text-foreground mb-2">{g.title}</h3>
+
+                  {g.key === "shore" && result.shoreInstallMode === "charging-only" && (
+                    <p className="mb-3 text-sm text-muted-foreground italic">
+                      Because you only need shore power for battery charging, this estimate uses
+                      a simpler shore charging setup.
+                    </p>
+                  )}
+                  {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
+                    <p className="mb-3 text-sm text-muted-foreground italic">
+                      Because you selected 230V shore-only appliances, this estimate includes a
+                      protected internal 230V distribution system.
+                    </p>
+                  )}
+
                   <ul className="text-sm space-y-1">
                     {g.items.map((m) => (
                       <li key={m.item} className="flex justify-between border-b border-border/60 py-1.5">
                         <span className="font-sans">{m.item}</span>
-                        <span className="font-mono text-muted-foreground">{eur(m.price)}</span>
+                        <span className="font-mono text-muted-foreground">{eur(adjust(m.price, profile))}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="mt-2 flex justify-between text-sm font-semibold text-primary">
                     <span>{g.title} subtotal</span>
-                    <span className="font-mono">{eur(g.total)}</span>
+                    <span className="font-mono">{eur(adjust(g.total, profile))}</span>
                   </div>
 
-                  {g.key === "shore" && result.shoreInstallMode !== "none" && (
-                    <>
-                      <div className="mt-4 warning-banner flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        <span>
-                          230V shore-power installation must include proper RCD/MCB protection and
-                          protective earth wiring. Have the final installation checked by a qualified
-                          electrician.
-                        </span>
-                      </div>
-                      <p className="mt-3 text-xs text-muted-foreground italic">
-                        If shore power is used only to charge the battery, a simpler AC setup may be
-                        sufficient. If internal 230V sockets are installed, a complete protected AC
-                        distribution system is required.
-                      </p>
-                    </>
+                  {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
+                    <div className="mt-4 warning-banner flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>
+                        230V shore-power installation must include proper RCD/MCB protection and
+                        protective earth wiring. Have the final installation checked by a qualified
+                        electrician.
+                      </span>
+                    </div>
                   )}
                 </div>
               )
@@ -929,19 +995,52 @@ export default function Results() {
 
           {/* 10. Cost summary */}
           <SectionCard title="Cost summary">
+            <div className="mb-5 rounded-lg border border-border bg-background/60 p-4">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">Price profile</div>
+                  <div className="font-display text-base font-bold mt-0.5">{PROFILE_LABEL[profile]}</div>
+                </div>
+                <div className="inline-flex rounded-md border border-border overflow-hidden" role="tablist" aria-label="Price profile">
+                  {(["low", "balanced", "premium"] as PriceProfile[]).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      role="tab"
+                      aria-selected={profile === p}
+                      onClick={() => setProfile(p)}
+                      className={cn(
+                        "px-3 py-2 text-xs font-sans font-semibold transition-colors",
+                        profile === p
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card text-muted-foreground hover:text-primary",
+                      )}
+                    >
+                      {PROFILE_LABEL[p]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Price profiles are rough market estimates. Low-cost means budget-friendly components,
+                Balanced means good value, Premium means higher-end brands such as Victron or similar.
+                Profiles affect estimated prices only — not technical sizing.
+              </p>
+            </div>
+
             <dl className="space-y-2 text-sm max-w-md ml-auto">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Components total</dt><dd className="font-mono">{eur(result.componentsTotal)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">DC installation materials</dt><dd className="font-mono">{eur(result.dcMaterialsTotal)}</dd></div>
-              {result.solarMaterialsTotal > 0 && (
-                <div className="flex justify-between"><dt className="text-muted-foreground">Solar installation materials</dt><dd className="font-mono">{eur(result.solarMaterialsTotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Components total</dt><dd className="font-mono">{eur(adjComponentsTotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">DC installation materials</dt><dd className="font-mono">{eur(adjDcTotal)}</dd></div>
+              {adjSolarTotal > 0 && (
+                <div className="flex justify-between"><dt className="text-muted-foreground">Solar installation materials</dt><dd className="font-mono">{eur(adjSolarTotal)}</dd></div>
               )}
-              {result.shoreMaterialsTotal > 0 && (
-                <div className="flex justify-between"><dt className="text-muted-foreground">230V shore-power materials</dt><dd className="font-mono">{eur(result.shoreMaterialsTotal)}</dd></div>
+              {adjShoreTotal > 0 && (
+                <div className="flex justify-between"><dt className="text-muted-foreground">{shoreGroupTitle}</dt><dd className="font-mono">{eur(adjShoreTotal)}</dd></div>
               )}
-              <div className="border-t border-border pt-2 flex justify-between font-semibold"><dt>Subtotal</dt><dd className="font-mono">{eur(result.subtotal)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">+ 15% contingency</dt><dd className="font-mono">{eur(result.contingency)}</dd></div>
+              <div className="border-t border-border pt-2 flex justify-between font-semibold"><dt>Subtotal</dt><dd className="font-mono">{eur(adjSubtotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">+ 15% contingency</dt><dd className="font-mono">{eur(adjContingency)}</dd></div>
               <div className="border-t-2 border-primary pt-2 flex justify-between font-display text-xl font-bold text-primary">
-                <dt>Recommended budget</dt><dd className="font-mono">{eur(result.totalBudget)}</dd>
+                <dt>Recommended budget</dt><dd className="font-mono">{eur(adjTotalBudget)}</dd>
               </div>
             </dl>
             <p className="text-xs text-muted-foreground mt-4 italic">
@@ -965,10 +1064,15 @@ export default function Results() {
 
           {/* 11. Shopping list */}
           <SectionCard title="Shopping list">
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-sm text-muted-foreground mb-2">
               Fill in real prices as you shop — totals update automatically.
             </p>
-            <ShoppingList result={result} />
+            {result.shoreLines.length > 0 && (
+              <p className="text-xs text-muted-foreground italic mb-4">
+                Appliance purchase prices are not estimated. Add your own prices if you plan to buy them.
+              </p>
+            )}
+            <ShoppingList result={result} profile={profile} />
           </SectionCard>
 
           {/* 12. Confidence */}
