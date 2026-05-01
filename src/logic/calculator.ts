@@ -71,6 +71,7 @@ export interface ApplianceLine {
   wh: number;
   shoreOnly: boolean;
   informational: boolean;
+  isDutyCycle?: boolean;
 }
 
 export interface RecommendedComponent {
