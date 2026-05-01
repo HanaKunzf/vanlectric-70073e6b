@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronDown, ChevronRight, Settings2 } from "lucide-react";
 import { en } from "@/i18n/en";
 import { StepCard } from "@/components/ui/StepCard";
