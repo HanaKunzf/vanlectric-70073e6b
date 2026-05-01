@@ -218,11 +218,11 @@ export function calculate(state: WizardState): CalculationResult {
     if (id === "lights-led") baseWh *= 1 + (people - 1) * 0.1;
     if (id === "water-pump") baseWh *= 1 + (people - 1) * 0.2;
 
-    // Inverter losses
+    // Inverter losses — assume 90% inverter efficiency: battery draw = AC Wh / 0.9
     if (def.powerSource === "230v-inverter") {
       hasInverterLoad = true;
       const before = baseWh;
-      baseWh = baseWh * 1.12;
+      baseWh = baseWh / 0.9;
       inverterLossWh += baseWh - before;
     }
 
