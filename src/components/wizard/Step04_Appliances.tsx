@@ -17,11 +17,13 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
   const [openCat, setOpenCat] = useState<string>(APPLIANCE_CATALOG[0].id);
   const [overrideOpen, setOverrideOpen] = useState<Record<string, boolean>>({});
 
-  const updateEntry = (id: string, patch: Partial<ApplianceEntry>) => {
+  const updateEntry = (id: string, patch: Partial<ApplianceEntry>, shorePowerOnly?: boolean) => {
     const current = value.appliances[id] ?? { enabled: false };
+    const next: ApplianceEntry = { ...current, ...patch };
+    if (shorePowerOnly) next.shorePowerOnly = true;
     onChange({
       ...value,
-      appliances: { ...value.appliances, [id]: { ...current, ...patch } },
+      appliances: { ...value.appliances, [id]: next },
     });
   };
 
