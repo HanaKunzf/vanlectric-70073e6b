@@ -110,11 +110,25 @@ export interface CalculationResult {
   lines: ApplianceLine[];
   shoreLines: ApplianceLine[];
   applianceSubtotalWh: number;
+  dailyWh12V: number;
+  dailyWh230VInverter: number;
   inverterLossWh: number;
   remoteWorkWh: number;
   reserveWh: number;
   totalDailyWh: number;
   hasInverterLoad: boolean;
+  /** Largest single 230V-inverter appliance, used to size the inverter (excludes shore-only). */
+  inverterPeakW: number;
+  /** Recommended inverter size in W (0 if not required). */
+  inverterSizeRecommendedW: number;
+  /** AC system recommendation key based on the user's appliance mix. */
+  acRecommendation:
+    | "none"
+    | "shore-only"
+    | "inverter-required"
+    | "shore-and-inverter";
+  /** High-power AC appliances flagged for warning, with their power source. */
+  highPowerAcAppliances: Array<{ id: string; label: string; watts: number; shoreOnly: boolean }>;
 
   // Battery
   daysAutonomy: number;
@@ -170,6 +184,8 @@ export function calculate(state: WizardState): CalculationResult {
   const lines: ApplianceLine[] = [];
   const shoreLines: ApplianceLine[] = [];
   let applianceSubtotalWh = 0;
+  let dailyWh12V = 0;
+  let dailyWh230VInverter = 0; // battery-side Wh after inverter losses
   let inverterLossWh = 0;
   let hasInverterLoad = false;
 
@@ -218,11 +234,11 @@ export function calculate(state: WizardState): CalculationResult {
     if (id === "lights-led") baseWh *= 1 + (people - 1) * 0.1;
     if (id === "water-pump") baseWh *= 1 + (people - 1) * 0.2;
 
-    // Inverter losses
+    // Inverter losses — assume 90% inverter efficiency: battery draw = AC Wh / 0.9
     if (def.powerSource === "230v-inverter") {
       hasInverterLoad = true;
       const before = baseWh;
-      baseWh = baseWh * 1.12;
+      baseWh = baseWh / 0.9;
       inverterLossWh += baseWh - before;
     }
 
@@ -232,6 +248,11 @@ export function calculate(state: WizardState): CalculationResult {
       isDutyCycle: FRIDGE_IDS.has(id),
     });
     applianceSubtotalWh += baseWh;
+    if (def.powerSource === "230v-inverter") {
+      dailyWh230VInverter += baseWh;
+    } else {
+      dailyWh12V += baseWh;
+    }
   }
 
   const rwWh = remoteWorkWh[step9.remoteWork ?? "no"];
@@ -350,14 +371,43 @@ export function calculate(state: WizardState): CalculationResult {
     components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/25A", why: "Faster recharge for frequent shore-power use.", detail: "Waterproof, 25A.", price: 110 });
   }
 
-  // Inverter
+  // Inverter — sized only from 230V appliances run from the battery (excludes shore-only)
   const max230VInverter = lines
     .filter((l) => l.powerSource === "230v-inverter")
     .reduce((m, l) => Math.max(m, l.watts), 0);
+  let inverterSizeRecommendedW = 0;
   if (max230VInverter > 0) {
-    if (max230VInverter < 1000) components.push({ key: "inverter", category: "Inverter", name: "1000W pure sine inverter", why: "Minimum recommended size — covers laptops, kettles, small appliances cleanly.", detail: `Largest 230V load: ${max230VInverter}W.`, price: 80 });
-    else if (max230VInverter < 2500) components.push({ key: "inverter", category: "Inverter", name: "2000W pure sine inverter", why: "Handles high-draw 230V appliances.", detail: `Largest 230V load: ${max230VInverter}W.`, price: 150 });
-    else components.push({ key: "inverter", category: "Inverter", name: "3000W pure sine inverter", why: "Very high 230V draw — heavy loads.", detail: `Largest 230V load: ${max230VInverter}W. Cable sizing critical.`, price: 250 });
+    if (max230VInverter < 1000) { inverterSizeRecommendedW = 1000; components.push({ key: "inverter", category: "Inverter", name: "1000W pure sine inverter", why: "Minimum recommended size — covers laptops, kettles, small appliances cleanly.", detail: `Largest 230V load: ${max230VInverter}W. Sized only from battery-powered 230V appliances.`, price: 80 }); }
+    else if (max230VInverter < 2500) { inverterSizeRecommendedW = 2000; components.push({ key: "inverter", category: "Inverter", name: "2000W pure sine inverter", why: "Handles high-draw 230V appliances.", detail: `Largest 230V load: ${max230VInverter}W. Sized only from battery-powered 230V appliances.`, price: 150 }); }
+    else { inverterSizeRecommendedW = 3000; components.push({ key: "inverter", category: "Inverter", name: "3000W pure sine inverter", why: "Very high 230V draw — heavy loads.", detail: `Largest 230V load: ${max230VInverter}W. Cable sizing critical. Sized only from battery-powered 230V appliances.`, price: 250 }); }
+  }
+
+  // ----- AC system recommendation -----
+  const hasInverterAc = dailyWh230VInverter > 0;
+  const hasShoreOnlyAc = shoreLines.some((l) => !l.informational);
+  const acRecommendation: CalculationResult["acRecommendation"] =
+    !hasInverterAc && !hasShoreOnlyAc ? "none"
+    : hasInverterAc && hasShoreOnlyAc ? "shore-and-inverter"
+    : hasInverterAc ? "inverter-required"
+    : "shore-only";
+
+  // ----- High-power AC appliances (for warning) -----
+  const HIGH_POWER_AC_IDS = new Set([
+    "induction", "kettle", "electric-heater", "hairdryer", "microwave",
+    "toaster", "oven", "water-heater", "flow-heater", "ac",
+  ]);
+  const highPowerAcAppliances: CalculationResult["highPowerAcAppliances"] = [];
+  for (const [id, entry] of Object.entries(step4.appliances)) {
+    if (!entry.enabled) continue;
+    const def = byId.get(id);
+    if (!def) continue;
+    const watts = entry.watts ?? def.watts;
+    if (HIGH_POWER_AC_IDS.has(id) || (def.powerSource !== "12v" && watts >= 1000)) {
+      highPowerAcAppliances.push({
+        id, label: def.label, watts,
+        shoreOnly: def.powerSource === "230v-shore" || !!entry.shoreOnly,
+      });
+    }
   }
 
   // ----- Installation materials (categorised) -----
@@ -485,6 +535,17 @@ export function calculate(state: WizardState): CalculationResult {
   if (shoreLines.length > 0 && shore === "never") {
     warnings.push("You have shore-power-only appliances but no shore-power access. Consider removing them or planning campsite stops.");
   }
+  // High-power AC appliance warnings
+  const highBattery = highPowerAcAppliances.filter((a) => !a.shoreOnly);
+  const highShore = highPowerAcAppliances.filter((a) => a.shoreOnly);
+  if (highBattery.length > 0) {
+    const names = highBattery.map((a) => a.label).join(", ");
+    warnings.push(`High-power 230V appliances selected (${names}) — these may require a much larger inverter, battery bank and heavy-gauge cabling. Consider running them only on shore power.`);
+  }
+  if (highShore.length > 0) {
+    const names = highShore.map((a) => a.label).join(", ");
+    warnings.push(`Shore-only high-power appliances selected (${names}) — these will only work when plugged into external 230V power and are excluded from battery and inverter sizing.`);
+  }
   if (max230VInverter > 2500) {
     warnings.push("Inverter loads above 2500W draw >200A from the battery. Use 70mm² cables and a Class T fuse.");
   }
@@ -498,7 +559,10 @@ export function calculate(state: WizardState): CalculationResult {
 
   return {
     lines, shoreLines,
-    applianceSubtotalWh, inverterLossWh, remoteWorkWh: rwWh, reserveWh, totalDailyWh, hasInverterLoad,
+    applianceSubtotalWh, dailyWh12V, dailyWh230VInverter,
+    inverterLossWh, remoteWorkWh: rwWh, reserveWh, totalDailyWh, hasInverterLoad,
+    inverterPeakW: max230VInverter, inverterSizeRecommendedW,
+    acRecommendation, highPowerAcAppliances,
     daysAutonomy, journeyWh, requiredWh, requiredAh, recommendedBatteryAh, usableBatteryWh,
     roofArea, obstacleArea, maxSolarW, solarHours, requiredSolarW, recommendedSolarW, panelType, solarDailyWh,
     alternatorDailyWh, hasDCDC,
