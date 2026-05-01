@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 
-const KEY = "vanlectric_cookie_dismissed";
+const KEY = "vanlectric-cookie-consent";
+const LEGACY_KEY = "vanlectric_cookie_dismissed";
 
 export const CookieBanner = () => {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     try {
-      if (!localStorage.getItem(KEY)) setShow(true);
+      if (!localStorage.getItem(KEY) && !localStorage.getItem(LEGACY_KEY)) setShow(true);
     } catch {
       // ignore
     }

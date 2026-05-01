@@ -78,8 +78,8 @@ export default function Landing() {
         </p>
 
         {/* PRO coming soon banner */}
-        <p className="mt-4 text-xs sm:text-sm text-primary/80 font-sans max-w-md">
-          ✨ PRO features coming soon — PDF export, saved designs &amp; more. Free forever for basic use.
+        <p className="mt-4 text-xs sm:text-sm text-primary/80 font-sans text-center max-w-md">
+          ✨ PRO features coming soon — PDF export, saved designs &amp; more.
         </p>
       </main>
       <SiteFooter />

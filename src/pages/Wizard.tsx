@@ -93,6 +93,14 @@ export default function Wizard() {
           <div className="flex-1 max-w-md ml-auto">
             <ProgressBar current={step} />
           </div>
+          <button
+            type="button"
+            onClick={() => navigate("/", { replace: true })}
+            className="text-[11px] sm:text-xs font-sans text-muted-foreground hover:text-primary hover:underline transition-colors whitespace-nowrap"
+            aria-label="Start over"
+          >
+            Start over
+          </button>
         </div>
       </header>
 
