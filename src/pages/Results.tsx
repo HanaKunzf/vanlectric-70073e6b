@@ -728,6 +728,17 @@ export default function Results() {
   const result = useMemo(() => calculate(state), [state]);
   const [proOpen, setProOpen] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
+  const [profile, setProfile] = useState<PriceProfile>("balanced");
+
+  // Profile-adjusted totals
+  const adjComponentsTotal = adjust(result.componentsTotal, profile);
+  const adjDcTotal = adjust(result.dcMaterialsTotal, profile);
+  const adjSolarTotal = adjust(result.solarMaterialsTotal, profile);
+  const adjShoreTotal = adjust(result.shoreMaterialsTotal, profile);
+  const adjSubtotal = adjComponentsTotal + adjDcTotal + adjSolarTotal + adjShoreTotal;
+  const adjContingency = Math.round(adjSubtotal * 0.15);
+  const adjTotalBudget = adjSubtotal + adjContingency;
+  const shoreGroupTitle = result.materialGroups.find((g) => g.key === "shore")?.title ?? "230V shore-power installation";
 
   const goBack = () => navigate("/wizard", { state: { resumeAtStep: 13, wizard: state } });
   const recalculate = () => navigate("/wizard", { state: { resumeAtStep: 4, wizard: state } });
