@@ -210,6 +210,18 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
         })}
       </div>
 
+      {(value.obstacles.tent?.count ?? 0) > 0 && (value.obstacles.fan?.count ?? 0) > 0 && (
+        <div className="mb-3 rounded-lg border-l-4 border-accent bg-accent/10 p-3 text-xs font-sans leading-relaxed">
+          {t.tentCoversFanWarning}
+        </div>
+      )}
+
+      {(value.obstacles.ac?.count ?? 0) > 0 && (value.obstacles.fan?.count ?? 0) > 0 && (
+        <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs font-sans leading-relaxed">
+          {t.acFanInfo}
+        </div>
+      )}
+
       <div className="mb-8 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs font-sans text-foreground/90 leading-relaxed">
         {t.measurementInfo}
       </div>
