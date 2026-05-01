@@ -931,6 +931,42 @@ export default function Results() {
 
           {/* 6. Recommended system */}
           <SectionCard title="Recommended system">
+            {/* Component variant selector */}
+            <div className="mb-5 rounded-lg border border-border bg-background/60 p-4">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">Component variant</div>
+                  <div className="font-display text-base font-bold mt-0.5">{PROFILE_LABEL[profile]}</div>
+                </div>
+                <div className="inline-flex rounded-md border border-border overflow-hidden" role="tablist" aria-label="Component variant">
+                  {(["low", "balanced", "premium"] as PriceProfile[]).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      role="tab"
+                      aria-selected={profile === p}
+                      onClick={() => setProfile(p)}
+                      className={cn(
+                        "px-3 py-2 text-xs font-sans font-semibold transition-colors",
+                        profile === p
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card text-muted-foreground hover:text-primary",
+                      )}
+                    >
+                      {PROFILE_LABEL[p]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Switch between <strong>Low cost</strong>, <strong>Balanced</strong> (good price/performance) and
+                <strong> Premium</strong>. This affects recommended batteries, solar panels, inverter, DC/DC charger,
+                shore charger, cables, fuses, distribution, monitoring and installation accessories.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                Prices are indicative and may vary by brand, country and supplier.
+              </p>
+            </div>
             {(() => {
               const tight = result.recommendedSolarW < result.requiredSolarW * 1.2;
               const customLabels = Object.entries(state.step7.obstacles ?? {})
@@ -1040,10 +1076,10 @@ export default function Results() {
             <div className="mb-5 rounded-lg border border-border bg-background/60 p-4">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div>
-                  <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">Price profile</div>
+                  <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">Component variant</div>
                   <div className="font-display text-base font-bold mt-0.5">{PROFILE_LABEL[profile]}</div>
                 </div>
-                <div className="inline-flex rounded-md border border-border overflow-hidden" role="tablist" aria-label="Price profile">
+                <div className="inline-flex rounded-md border border-border overflow-hidden" role="tablist" aria-label="Component variant">
                   {(["low", "balanced", "premium"] as PriceProfile[]).map((p) => (
                     <button
                       key={p}
@@ -1064,9 +1100,12 @@ export default function Results() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-3">
-                Price profiles are rough market estimates. Low-cost means budget-friendly components,
-                Balanced means good value, Premium means higher-end brands such as Victron or similar.
-                Profiles affect estimated prices only — not technical sizing.
+                Low cost means budget-friendly components, Balanced means good price/performance,
+                Premium means higher-end brands such as Victron or similar. The variant affects
+                estimated prices only — not technical sizing.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                Prices are indicative and may vary by brand, country and supplier.
               </p>
             </div>
 
