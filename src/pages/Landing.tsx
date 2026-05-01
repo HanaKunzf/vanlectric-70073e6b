@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { en } from "@/i18n/en";
-import { VanIllustration } from "@/components/illustrations/Illustrations";
+import heroImage from "@/assets/hero-van-mountains.png";
 
 export default function Landing() {
   const [hover, setHover] = useState(false);
@@ -36,9 +36,15 @@ export default function Landing() {
           {en.app.tagline}
         </p>
 
-        {/* illustration */}
-        <div className="my-10 w-full max-w-md text-primary">
-          <VanIllustration className="w-full h-auto" />
+        {/* atmospheric pencil sketch */}
+        <div className="my-10 flex justify-center w-full">
+          <img
+            src={heroImage}
+            alt="Pencil sketch of a campervan parked in a mountain landscape"
+            width={1024}
+            height={1024}
+            className="w-auto max-h-[280px] sm:max-h-[360px] object-contain"
+          />
         </div>
 
         {/* bullets */}
@@ -68,6 +74,11 @@ export default function Landing() {
 
         <p className="mt-5 text-xs sm:text-sm text-muted-foreground">
           {en.landing.note}
+        </p>
+
+        {/* PRO coming soon banner */}
+        <p className="mt-4 text-xs sm:text-sm text-primary/80 font-sans max-w-md">
+          ✨ PRO features coming soon — PDF export, saved designs &amp; more. Free forever for basic use.
         </p>
       </main>
     </div>
