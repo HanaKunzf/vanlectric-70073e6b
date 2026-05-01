@@ -58,6 +58,7 @@ export interface ApplianceEntry {
   hours?: number;
   watts?: number;
   wattsOverride?: boolean;
+  shorePowerOnly?: boolean;
 }
 
 export interface AppliancesStep {
@@ -139,6 +140,7 @@ export interface ApplianceDef {
   defaultHours: number;
   unit?: "h/day" | "uses/day" | "min/day";
   hint?: string;
+  shorePowerOnly?: boolean;
 }
 
 export interface ApplianceCategory {
@@ -154,7 +156,10 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
     label: "Refrigeration",
     icon: "❄️",
     items: [
-      { id: "fridge-compressor", label: "Compressor fridge (12V)", watts: 45, defaultHours: 8, unit: "h/day", hint: "Average duty cycle ~33%" },
+      { id: "fridge-small", label: "Compressor fridge up to 40l", watts: 35, defaultHours: 8, unit: "h/day", hint: "Best for 1–2 people with frequent shopping (every 1–2 days)" },
+      { id: "fridge-medium", label: "Compressor fridge 40–60l", watts: 45, defaultHours: 8, unit: "h/day", hint: "Good for 1–2 people with less frequent shopping, or 2–3 people daily" },
+      { id: "fridge-large", label: "Compressor fridge 60l+", watts: 60, defaultHours: 8, unit: "h/day", hint: "For 3+ people or long stays without shopping" },
+      { id: "fridge-freezer", label: "Add freezer function (+15W)", watts: 15, defaultHours: 8, unit: "h/day", hint: "Additional load on top of fridge" },
       { id: "fridge-absorption", label: "Absorption fridge (3-way)", watts: 120, defaultHours: 24, unit: "h/day" },
       { id: "freezer", label: "Separate freezer", watts: 60, defaultHours: 10, unit: "h/day" },
     ],
@@ -175,9 +180,11 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
     items: [
       { id: "induction", label: "Induction hob (single)", watts: 1500, defaultHours: 0.5, unit: "h/day" },
       { id: "kettle", label: "Electric kettle", watts: 1200, defaultHours: 0.2, unit: "h/day" },
-      { id: "coffee", label: "Coffee machine", watts: 800, defaultHours: 0.15, unit: "h/day" },
+      { id: "coffee", label: "Espresso machine (230V)", watts: 1200, defaultHours: 0.15, unit: "h/day" },
       { id: "microwave", label: "Microwave", watts: 800, defaultHours: 0.2, unit: "h/day" },
       { id: "toaster", label: "Toaster", watts: 800, defaultHours: 0.1, unit: "h/day" },
+      { id: "oven", label: "Electric oven / mini oven (230V)", watts: 1200, defaultHours: 0.5, unit: "h/day", shorePowerOnly: true, hint: "⚠️ Shore power only recommended" },
+      { id: "gas-stove", label: "Gas stove", watts: 0, defaultHours: 0, hint: "No electrical load — reduces need for other cooking appliances" },
     ],
   },
   {
@@ -188,6 +195,9 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
       { id: "water-pump", label: "Water pump (12V)", watts: 60, defaultHours: 0.5, unit: "h/day" },
       { id: "water-heater", label: "Electric water heater", watts: 1000, defaultHours: 0.5, unit: "h/day" },
       { id: "shower-pump", label: "Shower / grey pump", watts: 50, defaultHours: 0.2, unit: "h/day" },
+      { id: "diesel-water-heater", label: "Diesel water heater (Webasto/Espar)", watts: 180, defaultHours: 1, unit: "h/day", hint: "Heats tank once then maintains temp" },
+      { id: "heat-exchanger", label: "Engine heat exchanger", watts: 0, defaultHours: 0, hint: "No electrical load — heats water while driving" },
+      { id: "flow-heater", label: "Electric flow heater (230V)", watts: 3500, defaultHours: 0.2, unit: "h/day", shorePowerOnly: true, hint: "⚠️ Requires shore power — not suitable for off-grid use" },
     ],
   },
   {
@@ -213,6 +223,8 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
       { id: "router", label: "4G/5G router", watts: 12, defaultHours: 12, unit: "h/day" },
       { id: "starlink", label: "Starlink", watts: 60, defaultHours: 8, unit: "h/day" },
       { id: "speakers", label: "Bluetooth speakers", watts: 15, defaultHours: 2, unit: "h/day" },
+      { id: "monitor", label: "External monitor", watts: 30, defaultHours: 6, unit: "h/day" },
+      { id: "cpap", label: "CPAP device", watts: 45, defaultHours: 8, unit: "h/day", hint: "Runs all night — significant daily load" },
     ],
   },
   {
@@ -224,6 +236,8 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
       { id: "vacuum", label: "12V vacuum", watts: 100, defaultHours: 0.1, unit: "h/day" },
       { id: "tools", label: "Power tools (occasional)", watts: 600, defaultHours: 0.2, unit: "h/day" },
       { id: "ebike", label: "E-bike charger", watts: 100, defaultHours: 3, unit: "h/day" },
+      { id: "straightener", label: "Hair straightener (230V)", watts: 150, defaultHours: 0.25, unit: "h/day" },
+      { id: "escooter", label: "E-scooter charger", watts: 100, defaultHours: 3, unit: "h/day" },
     ],
   },
 ];
