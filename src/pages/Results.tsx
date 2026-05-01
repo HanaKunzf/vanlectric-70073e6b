@@ -172,6 +172,46 @@ const ShoppingList = ({ result }: { result: CalculationResult }) => {
   );
 };
 
+// ---------- Edit chips ----------
+const EDIT_CHIPS: Array<{ step: number; emoji: string; label: string }> = [
+  { step: 1, emoji: "🚐", label: "Vehicle" },
+  { step: 2, emoji: "🏕️", label: "Usage" },
+  { step: 3, emoji: "🌤️", label: "Climate" },
+  { step: 4, emoji: "🔌", label: "Appliances" },
+  { step: 5, emoji: "🚗", label: "Driving" },
+  { step: 6, emoji: "⚡", label: "Shore power" },
+  { step: 7, emoji: "🏠", label: "Roof" },
+  { step: 8, emoji: "👥", label: "People" },
+  { step: 9, emoji: "💻", label: "Remote work" },
+  { step: 10, emoji: "🍂", label: "Season" },
+  { step: 11, emoji: "🧱", label: "Insulation" },
+  { step: 12, emoji: "💰", label: "Budget" },
+];
+
+const EditChips = ({ state }: { state: WizardState }) => {
+  const navigate = useNavigate();
+  const editStep = (n: number) =>
+    navigate("/wizard", { state: { wizard: state, resumeAtStep: n, editMode: true } });
+  return (
+    <section className="step-card p-5 sm:p-6">
+      <h2 className="font-display text-lg font-bold text-primary mb-3 normal-case">Edit your inputs</h2>
+      <div className="flex sm:flex-wrap gap-2 overflow-x-auto sm:overflow-visible -mx-1 px-1 pb-1 sm:pb-0">
+        {EDIT_CHIPS.map((c) => (
+          <button
+            key={c.step}
+            type="button"
+            onClick={() => editStep(c.step)}
+            className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-background text-foreground hover:border-primary hover:bg-primary/5 transition-colors font-sans text-xs font-semibold whitespace-nowrap"
+          >
+            <span aria-hidden>{c.emoji}</span>
+            <span>{c.label}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+};
+
 // ---------- Page ----------
 export default function Results() {
   const navigate = useNavigate();
