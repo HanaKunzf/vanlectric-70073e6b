@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Zap } from "lucide-react";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Step01_Vehicle, isStep1Valid } from "@/components/wizard/Step01_Vehicle";
@@ -20,8 +20,10 @@ import { cn } from "@/lib/utils";
 
 export default function Wizard() {
   const navigate = useNavigate();
-  const [state, setState] = useState<WizardState>(initialWizardState);
-  const [step, setStep] = useState(1);
+  const location = useLocation();
+  const incoming = (location.state as { wizard?: WizardState; resumeAtStep?: number }) || {};
+  const [state, setState] = useState<WizardState>(incoming.wizard ?? initialWizardState);
+  const [step, setStep] = useState(incoming.resumeAtStep ?? 1);
 
   const set = <K extends keyof WizardState>(key: K, v: WizardState[K]) =>
     setState((s) => ({ ...s, [key]: v }));
@@ -49,7 +51,7 @@ export default function Wizard() {
   const goNext = () => {
     if (!canAdvance) return;
     if (isLast) {
-      // future: navigate("/results");
+      navigate("/results", { state: { wizard: state } });
       return;
     }
     setStep((s) => Math.min(s + 1, TOTAL_STEPS));
