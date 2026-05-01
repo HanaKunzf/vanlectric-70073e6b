@@ -93,6 +93,11 @@ export default function Wizard() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {editMode && (
+          <div className="mb-6 rounded-lg border-l-4 border-accent bg-accent/10 px-4 py-3 text-sm font-sans text-foreground">
+            ✏️ Editing — click {en.nav.next} to return to results
+          </div>
+        )}
         <div key={step}>
           {step === 1 && <Step01_Vehicle value={state.step1} onChange={(v) => set("step1", v)} />}
           {step === 2 && <Step02_UsageProfile value={state.step2} onChange={(v) => set("step2", v)} />}
