@@ -546,6 +546,7 @@ export function calculate(state: WizardState): CalculationResult {
     const names = highShore.map((a) => a.label).join(", ");
     warnings.push(`Shore-only high-power appliances selected (${names}) — these will only work when plugged into external 230V power and are excluded from battery and inverter sizing.`);
   }
+  if (max230VInverter > 2500) {
     warnings.push("Inverter loads above 2500W draw >200A from the battery. Use 70mm² cables and a Class T fuse.");
   }
   const budget: Budget = step12.budget ?? "show-me";
