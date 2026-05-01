@@ -41,9 +41,6 @@ const PowerSourceBadge = ({ source, gas }: { source: PowerSource; gas?: boolean 
     </span>
   );
 };
-  value: AppliancesStep;
-  onChange: (next: AppliancesStep) => void;
-}
 
 export const Step04_Appliances = ({ value, onChange }: Props) => {
   const t = en.steps.s4;
