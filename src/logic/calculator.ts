@@ -535,7 +535,17 @@ export function calculate(state: WizardState): CalculationResult {
   if (shoreLines.length > 0 && shore === "never") {
     warnings.push("You have shore-power-only appliances but no shore-power access. Consider removing them or planning campsite stops.");
   }
-  if (max230VInverter > 2500) {
+  // High-power AC appliance warnings
+  const highBattery = highPowerAcAppliances.filter((a) => !a.shoreOnly);
+  const highShore = highPowerAcAppliances.filter((a) => a.shoreOnly);
+  if (highBattery.length > 0) {
+    const names = highBattery.map((a) => a.label).join(", ");
+    warnings.push(`High-power 230V appliances selected (${names}) — these may require a much larger inverter, battery bank and heavy-gauge cabling. Consider running them only on shore power.`);
+  }
+  if (highShore.length > 0) {
+    const names = highShore.map((a) => a.label).join(", ");
+    warnings.push(`Shore-only high-power appliances selected (${names}) — these will only work when plugged into external 230V power and are excluded from battery and inverter sizing.`);
+  }
     warnings.push("Inverter loads above 2500W draw >200A from the battery. Use 70mm² cables and a Class T fuse.");
   }
   const budget: Budget = step12.budget ?? "show-me";
