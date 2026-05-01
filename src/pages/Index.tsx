@@ -1,2 +1,2 @@
-// Re-export the Landing page as the index route.
-export { default } from "./Landing";
+// Re-export the Home page as the index route.
+export { default } from "./Home";
