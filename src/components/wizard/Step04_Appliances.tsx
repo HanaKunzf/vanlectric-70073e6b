@@ -4,13 +4,43 @@ import { en } from "@/i18n/en";
 import { StepCard } from "@/components/ui/StepCard";
 import { HelperText } from "@/components/ui/WarningBanner";
 import { AppliancesIllustration } from "@/components/illustrations/Illustrations";
-import { APPLIANCE_CATALOG, type AppliancesStep, type ApplianceEntry } from "@/types";
+import { APPLIANCE_CATALOG, type AppliancesStep, type ApplianceEntry, type PowerSource } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface Props {
   value: AppliancesStep;
   onChange: (next: AppliancesStep) => void;
 }
+
+const PowerSourceBadge = ({ source, gas }: { source: PowerSource; gas?: boolean }) => {
+  if (gas) {
+    return (
+      <span className="text-[10px] font-sans font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+        Gas
+      </span>
+    );
+  }
+  const map: Record<PowerSource, { label: string; cls: string }> = {
+    "12v": {
+      label: "12V",
+      cls: "bg-[hsl(var(--primary)/0.12)] text-primary border-[hsl(var(--primary)/0.3)]",
+    },
+    "230v-inverter": {
+      label: "230V inverter",
+      cls: "bg-[#FEF3C7] text-[#92400E] border-[#8B6914]/40",
+    },
+    "230v-shore": {
+      label: "Shore only",
+      cls: "bg-[#FEE2E2] text-[#991B1B] border-[#991B1B]/30",
+    },
+  };
+  const { label, cls } = map[source];
+  return (
+    <span className={cn("text-[10px] font-sans font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap", cls)}>
+      {label}
+    </span>
+  );
+};
 
 export const Step04_Appliances = ({ value, onChange }: Props) => {
   const t = en.steps.s4;
@@ -76,14 +106,17 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                             className="mt-1 w-4 h-4 accent-primary"
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="font-sans font-medium">{item.label}</div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-sans font-medium">{item.label}</span>
+                              <PowerSourceBadge source={item.powerSource} gas={item.id === "gas-stove"} />
+                            </div>
                             {item.hint && (
                               <div className="text-xs text-muted-foreground mt-0.5">{item.hint}</div>
                             )}
                           </div>
                         </label>
 
-                        {enabled && (
+                        {enabled && !item.informational && (
                           <div className="mt-3 ml-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                               <label className="text-xs font-sans font-semibold text-muted-foreground">
@@ -134,12 +167,18 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                           </div>
                         )}
 
-                        {enabled && item.shorePowerOnly && (
+                        {enabled && item.powerSource === "230v-shore" && (
                           <div className="mt-3 ml-7 warning-banner flex items-start gap-2 text-sm">
                             <span aria-hidden>⚠️</span>
                             <span>
-                              This appliance is best used with 230V shore power. It will be excluded from off-grid battery sizing.
+                              Shore power only. Excluded from off-grid battery sizing.
                             </span>
+                          </div>
+                        )}
+
+                        {enabled && item.powerSource === "230v-inverter" && (
+                          <div className="mt-2 ml-7 text-xs text-muted-foreground italic">
+                            Via inverter — 12% efficiency loss applied
                           </div>
                         )}
                       </div>
