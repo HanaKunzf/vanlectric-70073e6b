@@ -371,14 +371,43 @@ export function calculate(state: WizardState): CalculationResult {
     components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/25A", why: "Faster recharge for frequent shore-power use.", detail: "Waterproof, 25A.", price: 110 });
   }
 
-  // Inverter
+  // Inverter — sized only from 230V appliances run from the battery (excludes shore-only)
   const max230VInverter = lines
     .filter((l) => l.powerSource === "230v-inverter")
     .reduce((m, l) => Math.max(m, l.watts), 0);
+  let inverterSizeRecommendedW = 0;
   if (max230VInverter > 0) {
-    if (max230VInverter < 1000) components.push({ key: "inverter", category: "Inverter", name: "1000W pure sine inverter", why: "Minimum recommended size — covers laptops, kettles, small appliances cleanly.", detail: `Largest 230V load: ${max230VInverter}W.`, price: 80 });
-    else if (max230VInverter < 2500) components.push({ key: "inverter", category: "Inverter", name: "2000W pure sine inverter", why: "Handles high-draw 230V appliances.", detail: `Largest 230V load: ${max230VInverter}W.`, price: 150 });
-    else components.push({ key: "inverter", category: "Inverter", name: "3000W pure sine inverter", why: "Very high 230V draw — heavy loads.", detail: `Largest 230V load: ${max230VInverter}W. Cable sizing critical.`, price: 250 });
+    if (max230VInverter < 1000) { inverterSizeRecommendedW = 1000; components.push({ key: "inverter", category: "Inverter", name: "1000W pure sine inverter", why: "Minimum recommended size — covers laptops, kettles, small appliances cleanly.", detail: `Largest 230V load: ${max230VInverter}W. Sized only from battery-powered 230V appliances.`, price: 80 }); }
+    else if (max230VInverter < 2500) { inverterSizeRecommendedW = 2000; components.push({ key: "inverter", category: "Inverter", name: "2000W pure sine inverter", why: "Handles high-draw 230V appliances.", detail: `Largest 230V load: ${max230VInverter}W. Sized only from battery-powered 230V appliances.`, price: 150 }); }
+    else { inverterSizeRecommendedW = 3000; components.push({ key: "inverter", category: "Inverter", name: "3000W pure sine inverter", why: "Very high 230V draw — heavy loads.", detail: `Largest 230V load: ${max230VInverter}W. Cable sizing critical. Sized only from battery-powered 230V appliances.`, price: 250 }); }
+  }
+
+  // ----- AC system recommendation -----
+  const hasInverterAc = dailyWh230VInverter > 0;
+  const hasShoreOnlyAc = shoreLines.some((l) => !l.informational);
+  const acRecommendation: CalculationResult["acRecommendation"] =
+    !hasInverterAc && !hasShoreOnlyAc ? "none"
+    : hasInverterAc && hasShoreOnlyAc ? "shore-and-inverter"
+    : hasInverterAc ? "inverter-required"
+    : "shore-only";
+
+  // ----- High-power AC appliances (for warning) -----
+  const HIGH_POWER_AC_IDS = new Set([
+    "induction", "kettle", "electric-heater", "hairdryer", "microwave",
+    "toaster", "oven", "water-heater", "flow-heater", "ac",
+  ]);
+  const highPowerAcAppliances: CalculationResult["highPowerAcAppliances"] = [];
+  for (const [id, entry] of Object.entries(step4.appliances)) {
+    if (!entry.enabled) continue;
+    const def = byId.get(id);
+    if (!def) continue;
+    const watts = entry.watts ?? def.watts;
+    if (HIGH_POWER_AC_IDS.has(id) || (def.powerSource !== "12v" && watts >= 1000)) {
+      highPowerAcAppliances.push({
+        id, label: def.label, watts,
+        shoreOnly: def.powerSource === "230v-shore" || !!entry.shoreOnly,
+      });
+    }
   }
 
   // ----- Installation materials (categorised) -----
