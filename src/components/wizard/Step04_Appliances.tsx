@@ -177,8 +177,31 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                         )}
 
                         {enabled && item.powerSource === "230v-inverter" && (
-                          <div className="mt-2 ml-7 text-xs text-muted-foreground italic">
-                            Via inverter — 12% efficiency loss applied
+                          <div className="mt-3 ml-7 space-y-2">
+                            {!entry?.shoreOnly && (
+                              <div className="text-xs text-muted-foreground italic">
+                                Via inverter — 12% efficiency loss applied
+                              </div>
+                            )}
+                            <label className="flex items-start gap-2 cursor-pointer text-sm">
+                              <input
+                                type="checkbox"
+                                checked={entry?.shoreOnly ?? false}
+                                onChange={(e) =>
+                                  updateEntry(item.id, { shoreOnly: e.target.checked })
+                                }
+                                className="mt-0.5 w-4 h-4 accent-primary"
+                              />
+                              <span className="text-muted-foreground">
+                                Shore power only — exclude from battery & inverter sizing
+                              </span>
+                            </label>
+                            {entry?.shoreOnly && (
+                              <div className="warning-banner flex items-start gap-2 text-sm">
+                                <span aria-hidden>⚠️</span>
+                                <span>Excluded from off-grid battery sizing.</span>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

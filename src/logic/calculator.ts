@@ -151,7 +151,7 @@ export function calculate(state: WizardState): CalculationResult {
     const watts = entry.watts ?? def.watts;
     const hours = entry.hours ?? def.defaultHours;
 
-    if (def.powerSource === "230v-shore") {
+    if (def.powerSource === "230v-shore" || entry.shoreOnly) {
       shoreLines.push({
         id, label: def.label, powerSource: def.powerSource,
         watts, hours, wh: 0, shoreOnly: true, informational: !!def.informational,

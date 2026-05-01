@@ -59,6 +59,8 @@ export interface ApplianceEntry {
   watts?: number;
   wattsOverride?: boolean;
   shorePowerOnly?: boolean;
+  /** User flag for 230V-inverter appliances: when true, exclude from off-grid sizing and treat as shore-only. */
+  shoreOnly?: boolean;
 }
 
 export interface AppliancesStep {
