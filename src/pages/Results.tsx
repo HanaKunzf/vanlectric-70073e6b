@@ -1076,10 +1076,10 @@ export default function Results() {
             <div className="mb-5 rounded-lg border border-border bg-background/60 p-4">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div>
-                  <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">Price profile</div>
+                  <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">Component variant</div>
                   <div className="font-display text-base font-bold mt-0.5">{PROFILE_LABEL[profile]}</div>
                 </div>
-                <div className="inline-flex rounded-md border border-border overflow-hidden" role="tablist" aria-label="Price profile">
+                <div className="inline-flex rounded-md border border-border overflow-hidden" role="tablist" aria-label="Component variant">
                   {(["low", "balanced", "premium"] as PriceProfile[]).map((p) => (
                     <button
                       key={p}
