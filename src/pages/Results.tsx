@@ -131,28 +131,38 @@ const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][numb
 };
 
 // ---------- Shopping list ----------
-interface ShopRow { item: string; qty: number; estimate: number; userPrice: number }
+interface ShopRow { item: string; qty: number; estimate: number; userPrice: number; noEstimate?: boolean }
 interface ShopGroup { title: string; rows: ShopRow[] }
 
-const ShoppingList = ({ result }: { result: CalculationResult }) => {
+const ShoppingList = ({ result, profile }: { result: CalculationResult; profile: PriceProfile }) => {
   const groups: ShopGroup[] = useMemo(() => {
+    const mkComp = (c: CalculationResult["components"][number]): ShopRow => ({
+      item: componentNameForProfile(c.name, profile),
+      qty: 1,
+      estimate: adjust(c.price, profile),
+      userPrice: 0,
+    });
+    const mkMat = (m: { item: string; price: number }): ShopRow => ({
+      item: m.item,
+      qty: 1,
+      estimate: adjust(m.price, profile),
+      userPrice: 0,
+    });
     const mainComponents: ShopRow[] = result.components
       .filter((c) => !/inverter/i.test(c.category) && !/MPPT|Solar charger/i.test(c.category))
-      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+      .map(mkComp);
     const solarComponents: ShopRow[] = result.components
       .filter((c) => /MPPT|Solar charger|Solar panels/i.test(c.category))
-      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+      .map(mkComp);
     const inverterComponents: ShopRow[] = result.components
       .filter((c) => /inverter/i.test(c.category))
-      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
-    const dcMaterials = result.materialGroups.find((g) => g.key === "dc")!.items
-      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
-    const solarMaterials = result.materialGroups.find((g) => g.key === "solar")!.items
-      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
-    const shoreMaterials = result.materialGroups.find((g) => g.key === "shore")!.items
-      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
+      .map(mkComp);
+    const dcMaterials = result.materialGroups.find((g) => g.key === "dc")!.items.map(mkMat);
+    const solarMaterials = result.materialGroups.find((g) => g.key === "solar")!.items.map(mkMat);
+    const shoreGroup = result.materialGroups.find((g) => g.key === "shore")!;
+    const shoreMaterials = shoreGroup.items.map(mkMat);
     const optional: ShopRow[] = result.shoreLines.map((l) => ({
-      item: `${l.label} (shore-only appliance)`, qty: 1, estimate: 0, userPrice: 0,
+      item: `${l.label} (shore-only appliance)`, qty: 1, estimate: 0, userPrice: 0, noEstimate: true,
     }));
     const out: ShopGroup[] = [
       { title: "Main components", rows: [...mainComponents, ...inverterComponents] },
@@ -162,21 +172,31 @@ const ShoppingList = ({ result }: { result: CalculationResult }) => {
       out.push({ title: "Solar installation", rows: [...solarComponents, ...solarMaterials] });
     }
     if (shoreMaterials.length) {
-      out.push({ title: "230V shore power", rows: shoreMaterials });
+      out.push({ title: shoreGroup.title, rows: shoreMaterials });
     }
     if (optional.length) {
       out.push({ title: "Optional appliances", rows: optional });
     }
     return out;
-  }, [result]);
+  }, [result, profile]);
 
   const [groupRows, setGroupRows] = useState<ShopRow[][]>(() => groups.map((g) => g.rows));
+  // Re-sync rows when profile changes (preserves user-entered prices).
+  const profileRef = useRef(profile);
+  if (profileRef.current !== profile) {
+    profileRef.current = profile;
+    setGroupRows(groups.map((g, gi) => g.rows.map((r, ri) => {
+      const prev = groupRows[gi]?.[ri];
+      return { ...r, userPrice: prev?.userPrice ?? 0, qty: prev?.qty ?? r.qty };
+    })));
+  }
   const update = (gi: number, ri: number, patch: Partial<ShopRow>) =>
     setGroupRows((gs) => gs.map((rows, i) => i !== gi ? rows : rows.map((r, j) => j === ri ? { ...r, ...patch } : r)));
 
   const allRows = groupRows.flat();
-  const grandEstimate = allRows.reduce((s, r) => s + r.qty * r.estimate, 0);
+  const grandEstimate = allRows.reduce((s, r) => s + (r.noEstimate ? 0 : r.qty * r.estimate), 0);
   const grandUser = allRows.reduce((s, r) => s + r.qty * r.userPrice, 0);
+  const hasOptional = groups.some((g) => g.title === "Optional appliances");
 
   return (
     <div className="overflow-x-auto">
@@ -206,14 +226,16 @@ const ShoppingList = ({ result }: { result: CalculationResult }) => {
                       onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
                       className="w-full bg-background border border-border rounded px-2 py-1 text-center" />
                   </td>
-                  <td className="py-2 px-2 text-right font-mono text-muted-foreground">{r.estimate}</td>
+                  <td className="py-2 px-2 text-right font-mono text-muted-foreground">
+                    {r.noEstimate ? "—" : r.estimate}
+                  </td>
                   <td className="py-2 px-2">
                     <input type="number" min={0} value={r.userPrice || ""} placeholder="—"
                       onChange={(e) => update(gi, ri, { userPrice: Number(e.target.value) })}
                       className="w-full bg-background border border-border rounded px-2 py-1 text-right" />
                   </td>
                   <td className="py-2 pl-2 text-right font-mono font-semibold">
-                    {r.userPrice ? eur(r.qty * r.userPrice) : eur(r.qty * r.estimate)}
+                    {r.userPrice ? eur(r.qty * r.userPrice) : (r.noEstimate ? "—" : eur(r.qty * r.estimate))}
                   </td>
                 </tr>
               ))}
