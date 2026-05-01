@@ -200,6 +200,7 @@ export function calculate(state: WizardState): CalculationResult {
     lines.push({
       id, label: def.label, powerSource: def.powerSource,
       watts, hours: displayHours, wh: baseWh, shoreOnly: false, informational: false,
+      isDutyCycle: FRIDGE_IDS.has(id),
     });
     applianceSubtotalWh += baseWh;
   }
