@@ -21,9 +21,10 @@ import { cn } from "@/lib/utils";
 export default function Wizard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const incoming = (location.state as { wizard?: WizardState; resumeAtStep?: number }) || {};
+  const incoming = (location.state as { wizard?: WizardState; resumeAtStep?: number; editMode?: boolean }) || {};
   const [state, setState] = useState<WizardState>(incoming.wizard ?? initialWizardState);
   const [step, setStep] = useState(incoming.resumeAtStep ?? 1);
+  const [editMode] = useState(!!incoming.editMode);
 
   const set = <K extends keyof WizardState>(key: K, v: WizardState[K]) =>
     setState((s) => ({ ...s, [key]: v }));
@@ -50,6 +51,10 @@ export default function Wizard() {
 
   const goNext = () => {
     if (!canAdvance) return;
+    if (editMode) {
+      navigate("/results", { state: { wizard: state } });
+      return;
+    }
     if (isLast) {
       navigate("/results", { state: { wizard: state } });
       return;
@@ -59,6 +64,10 @@ export default function Wizard() {
   };
 
   const goBack = () => {
+    if (editMode) {
+      navigate("/results", { state: { wizard: state } });
+      return;
+    }
     if (step <= 1) {
       navigate("/");
       return;
