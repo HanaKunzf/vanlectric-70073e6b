@@ -17,7 +17,7 @@ interface Props {
 
 const Section = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="mb-6 last:mb-0">
-    <h3 className="font-display text-sm tracking-widest text-muted-foreground uppercase mb-3">
+    <h3 className="font-sans text-sm font-semibold tracking-wide text-muted-foreground mb-3">
       {label}
     </h3>
     {children}

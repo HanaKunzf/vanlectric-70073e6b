@@ -22,14 +22,14 @@ export default function Landing() {
 
       <main className="relative container mx-auto px-6 py-12 sm:py-20 flex flex-col items-center text-center">
         {/* tag chip */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card/60 backdrop-blur text-xs font-display tracking-widest uppercase text-muted-foreground mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card/70 backdrop-blur text-xs font-sans tracking-wide text-muted-foreground mb-8">
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
           12V · Off-Grid · DIY
         </div>
 
-        <h1 className="font-display font-bold text-4xl sm:text-6xl md:text-7xl tracking-tight uppercase max-w-4xl">
+        <h1 className="font-display font-bold text-5xl sm:text-6xl md:text-7xl tracking-tight max-w-4xl">
           <span className="block">Vanlife Electrical</span>
-          <span className="block text-primary">Calculator</span>
+          <span className="block text-primary italic">Calculator</span>
         </h1>
 
         <p className="mt-6 max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
@@ -58,7 +58,7 @@ export default function Landing() {
           to="/wizard"
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
-          className="group inline-flex items-center gap-2 bg-primary text-primary-foreground font-display uppercase tracking-widest font-semibold text-base sm:text-lg px-8 py-4 rounded-md amber-glow hover:brightness-110 active:scale-[0.98] transition-[filter,transform] min-h-[44px]"
+          className="group inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-base sm:text-lg px-8 py-4 rounded-lg hover:bg-[hsl(var(--primary-hover))] active:scale-[0.98] transition-[background-color,transform] min-h-[44px]"
         >
           {en.landing.cta}
           <ArrowRight

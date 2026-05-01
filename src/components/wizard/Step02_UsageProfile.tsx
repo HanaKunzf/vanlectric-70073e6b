@@ -29,7 +29,7 @@ export const Step02_UsageProfile = ({ value, onChange }: Props) => {
               <div className="flex items-start gap-3">
                 <span className="text-2xl leading-none">{opt.icon}</span>
                 <div>
-                  <div className="font-display text-lg sm:text-xl font-semibold uppercase tracking-wide">
+                  <div className="font-display text-xl sm:text-2xl font-semibold tracking-tight">
                     {opt.label}
                   </div>
                   <div className="text-sm text-muted-foreground mt-0.5">{opt.desc}</div>
@@ -42,10 +42,10 @@ export const Step02_UsageProfile = ({ value, onChange }: Props) => {
 
       {showJourney && (
         <div className="mt-8 pt-6 border-t border-border animate-fade-in">
-          <h3 className="font-display text-lg sm:text-xl font-semibold mb-2">
+          <h3 className="font-display text-xl sm:text-2xl font-semibold mb-2 tracking-tight">
             {t.journeyTitle}
           </h3>
-          <div className="flex items-start gap-2 text-sm text-muted-foreground border-l-2 border-primary pl-3 mb-4">
+          <div className="warning-banner mb-4 flex items-start gap-2">
             <span aria-hidden>💡</span>
             <span>{t.journeyHelper}</span>
           </div>
