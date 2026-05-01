@@ -135,7 +135,7 @@ export default function Wizard() {
                 : "bg-muted text-muted-foreground cursor-not-allowed",
             )}
           >
-            {isLast ? en.nav.finish : en.nav.next}
+            {editMode ? "Save & return" : isLast ? en.nav.finish : en.nav.next}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
