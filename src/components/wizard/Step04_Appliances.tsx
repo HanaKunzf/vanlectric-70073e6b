@@ -84,10 +84,11 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
           const isOpen = openCat === cat.id;
           const enabledCount = cat.items.filter((i) => value.appliances[i.id]?.enabled).length;
           return (
-            <div key={cat.id} className="rounded-lg border border-border bg-background/40 overflow-hidden">
+            <div key={cat.id} className="rounded-lg border border-border bg-background/40 overflow-hidden scroll-mt-24">
               <button
+                ref={(el) => { headerRefs.current[cat.id] = el; }}
                 type="button"
-                onClick={() => setOpenCat(isOpen ? "" : cat.id)}
+                onClick={() => toggleCat(cat.id)}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/40 transition-colors min-h-[44px]"
               >
                 <span className="text-xl" aria-hidden>{cat.icon}</span>
