@@ -121,6 +121,8 @@ export interface CalculationResult {
   journeyWh: number;
   requiredWh: number;
   requiredAh: number;
+  recommendedBatteryAh: number;
+  usableBatteryWh: number;
 
   // Solar
   roofArea: number;
