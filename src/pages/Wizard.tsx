@@ -21,9 +21,10 @@ import { cn } from "@/lib/utils";
 export default function Wizard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const incoming = (location.state as { wizard?: WizardState; resumeAtStep?: number }) || {};
+  const incoming = (location.state as { wizard?: WizardState; resumeAtStep?: number; editMode?: boolean }) || {};
   const [state, setState] = useState<WizardState>(incoming.wizard ?? initialWizardState);
   const [step, setStep] = useState(incoming.resumeAtStep ?? 1);
+  const [editMode] = useState(!!incoming.editMode);
 
   const set = <K extends keyof WizardState>(key: K, v: WizardState[K]) =>
     setState((s) => ({ ...s, [key]: v }));
@@ -50,6 +51,10 @@ export default function Wizard() {
 
   const goNext = () => {
     if (!canAdvance) return;
+    if (editMode) {
+      navigate("/results", { state: { wizard: state } });
+      return;
+    }
     if (isLast) {
       navigate("/results", { state: { wizard: state } });
       return;
@@ -59,6 +64,10 @@ export default function Wizard() {
   };
 
   const goBack = () => {
+    if (editMode) {
+      navigate("/results", { state: { wizard: state } });
+      return;
+    }
     if (step <= 1) {
       navigate("/");
       return;
@@ -84,6 +93,11 @@ export default function Wizard() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {editMode && (
+          <div className="mb-6 rounded-lg border-l-4 border-accent bg-accent/10 px-4 py-3 text-sm font-sans text-foreground">
+            ✏️ Editing — click {en.nav.next} to return to results
+          </div>
+        )}
         <div key={step}>
           {step === 1 && <Step01_Vehicle value={state.step1} onChange={(v) => set("step1", v)} />}
           {step === 2 && <Step02_UsageProfile value={state.step2} onChange={(v) => set("step2", v)} />}
@@ -121,7 +135,7 @@ export default function Wizard() {
                 : "bg-muted text-muted-foreground cursor-not-allowed",
             )}
           >
-            {isLast ? en.nav.finish : en.nav.next}
+            {editMode ? "Save & return" : isLast ? en.nav.finish : en.nav.next}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
