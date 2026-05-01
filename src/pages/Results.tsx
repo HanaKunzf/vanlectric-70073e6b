@@ -81,21 +81,36 @@ const LockedAction = ({ icon, label, onClick }: { icon: React.ReactNode; label: 
 );
 
 // ---------- Component card ----------
-const ComponentCard = ({ c }: { c: CalculationResult["components"][number] }) => {
+const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][number]; profile: PriceProfile }) => {
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const toggle = () => {
+    setOpen((o) => {
+      const next = !o;
+      if (next) {
+        // Keep the header in view rather than scrolling to the bottom of expanded content.
+        requestAnimationFrame(() => {
+          headerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+      }
+      return next;
+    });
+  };
+  const adjusted = adjust(c.price, profile);
+  const displayName = componentNameForProfile(c.name, profile);
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div ref={headerRef} className="rounded-lg border border-border bg-card p-4 scroll-mt-24">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">{c.category}</div>
-          <div className="font-display text-lg font-bold mt-0.5">{c.name}</div>
+          <div className="font-display text-lg font-bold mt-0.5">{displayName}</div>
           <div className="text-sm text-muted-foreground mt-1">{c.why}</div>
         </div>
-        <div className="text-right font-display text-xl font-bold text-primary whitespace-nowrap">~{eur(c.price)}</div>
+        <div className="text-right font-display text-xl font-bold text-primary whitespace-nowrap">~{eur(adjusted)}</div>
       </div>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle}
         className="mt-3 inline-flex items-center gap-1 text-xs font-sans font-semibold text-primary hover:underline"
       >
         {open ? "Hide details" : "Why this?"}
