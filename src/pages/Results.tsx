@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle } from "lucide-react";
 import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
@@ -106,21 +106,51 @@ const ComponentCard = ({ c }: { c: CalculationResult["components"][number] }) =>
 
 // ---------- Shopping list editable row ----------
 interface ShopRow { item: string; qty: number; estimate: number; userPrice: number }
+interface ShopGroup { title: string; rows: ShopRow[] }
 
 const ShoppingList = ({ result }: { result: CalculationResult }) => {
-  const initial: ShopRow[] = useMemo(
-    () => [
-      ...result.components.map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 })),
-      ...result.materials.map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 })),
-    ],
-    [result],
-  );
-  const [rows, setRows] = useState<ShopRow[]>(initial);
-  const grandEstimate = rows.reduce((s, r) => s + r.qty * r.estimate, 0);
-  const grandUser = rows.reduce((s, r) => s + r.qty * r.userPrice, 0);
+  const groups: ShopGroup[] = useMemo(() => {
+    const mainComponents: ShopRow[] = result.components
+      .filter((c) => !/inverter/i.test(c.category) && !/MPPT|Solar charger/i.test(c.category))
+      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+    const solarComponents: ShopRow[] = result.components
+      .filter((c) => /MPPT|Solar charger|Solar panels/i.test(c.category))
+      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+    const inverterComponents: ShopRow[] = result.components
+      .filter((c) => /inverter/i.test(c.category))
+      .map((c) => ({ item: c.name, qty: 1, estimate: c.price, userPrice: 0 }));
+    const dcMaterials = result.materialGroups.find((g) => g.key === "dc")!.items
+      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
+    const solarMaterials = result.materialGroups.find((g) => g.key === "solar")!.items
+      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
+    const shoreMaterials = result.materialGroups.find((g) => g.key === "shore")!.items
+      .map((m) => ({ item: m.item, qty: 1, estimate: m.price, userPrice: 0 }));
+    const optional: ShopRow[] = result.shoreLines.map((l) => ({
+      item: `${l.label} (shore-only appliance)`, qty: 1, estimate: 0, userPrice: 0,
+    }));
+    const out: ShopGroup[] = [
+      { title: "Main components", rows: [...mainComponents, ...inverterComponents] },
+      { title: "DC installation", rows: dcMaterials },
+    ];
+    if (solarMaterials.length || solarComponents.length) {
+      out.push({ title: "Solar installation", rows: [...solarComponents, ...solarMaterials] });
+    }
+    if (shoreMaterials.length) {
+      out.push({ title: "230V shore power", rows: shoreMaterials });
+    }
+    if (optional.length) {
+      out.push({ title: "Optional appliances", rows: optional });
+    }
+    return out;
+  }, [result]);
 
-  const update = (i: number, patch: Partial<ShopRow>) =>
-    setRows((rs) => rs.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const [groupRows, setGroupRows] = useState<ShopRow[][]>(() => groups.map((g) => g.rows));
+  const update = (gi: number, ri: number, patch: Partial<ShopRow>) =>
+    setGroupRows((gs) => gs.map((rows, i) => i !== gi ? rows : rows.map((r, j) => j === ri ? { ...r, ...patch } : r)));
+
+  const allRows = groupRows.flat();
+  const grandEstimate = allRows.reduce((s, r) => s + r.qty * r.estimate, 0);
+  const grandUser = allRows.reduce((s, r) => s + r.qty * r.userPrice, 0);
 
   return (
     <div className="overflow-x-auto">
@@ -135,29 +165,38 @@ const ShoppingList = ({ result }: { result: CalculationResult }) => {
           </tr>
         </thead>
         <tbody>
-          {rows.map((r, i) => (
-            <tr key={i} className="border-b border-border/60">
-              <td className="py-2 pr-3 font-sans">{r.item}</td>
-              <td className="py-2 px-2">
-                <input
-                  type="number" min={0} value={r.qty}
-                  onChange={(e) => update(i, { qty: Number(e.target.value) })}
-                  className="w-full bg-background border border-border rounded px-2 py-1 text-center"
-                />
-              </td>
-              <td className="py-2 px-2 text-right font-mono text-muted-foreground">{r.estimate}</td>
-              <td className="py-2 px-2">
-                <input
-                  type="number" min={0} value={r.userPrice || ""}
-                  placeholder="—"
-                  onChange={(e) => update(i, { userPrice: Number(e.target.value) })}
-                  className="w-full bg-background border border-border rounded px-2 py-1 text-right"
-                />
-              </td>
-              <td className="py-2 pl-2 text-right font-mono font-semibold">
-                {r.userPrice ? eur(r.qty * r.userPrice) : eur(r.qty * r.estimate)}
-              </td>
-            </tr>
+          {groups.map((g, gi) => (
+            <Fragment key={g.title}>
+              <tr className="bg-muted/40">
+                <td colSpan={5} className="py-2 px-2 font-display font-bold text-primary text-xs uppercase tracking-wider">
+                  {g.title}
+                </td>
+              </tr>
+              {groupRows[gi].map((r, ri) => (
+                <tr key={ri} className="border-b border-border/60">
+                  <td className="py-2 pr-3 font-sans">{r.item}</td>
+                  <td className="py-2 px-2">
+                    <input
+                      type="number" min={0} value={r.qty}
+                      onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
+                      className="w-full bg-background border border-border rounded px-2 py-1 text-center"
+                    />
+                  </td>
+                  <td className="py-2 px-2 text-right font-mono text-muted-foreground">{r.estimate}</td>
+                  <td className="py-2 px-2">
+                    <input
+                      type="number" min={0} value={r.userPrice || ""}
+                      placeholder="—"
+                      onChange={(e) => update(gi, ri, { userPrice: Number(e.target.value) })}
+                      className="w-full bg-background border border-border rounded px-2 py-1 text-right"
+                    />
+                  </td>
+                  <td className="py-2 pl-2 text-right font-mono font-semibold">
+                    {r.userPrice ? eur(r.qty * r.userPrice) : eur(r.qty * r.estimate)}
+                  </td>
+                </tr>
+              ))}
+            </Fragment>
           ))}
         </tbody>
         <tfoot>
@@ -459,70 +498,110 @@ export default function Results() {
             </SectionCard>
           )}
 
-          {/* Section 4+5 — Components & materials */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-            <SectionCard title="Recommended system">
-              {(() => {
-                const tight = result.recommendedSolarW < result.requiredSolarW * 1.2;
-                const customLabels = Object.entries(state.step7.obstacles ?? {})
-                  .filter(([, e]) => e && e.count > 0 && e.customSize && e.lengthCm && e.widthCm)
-                  .map(([id, e]) => {
-                    const meta = en.steps.s7.obstacles[id as keyof typeof en.steps.s7.obstacles];
-                    const name = id === "other" ? (e?.name?.trim() || meta.label) : meta.label;
-                    return name;
-                  });
-                return (
-                  <>
-                    {tight && (
-                      <div className="mb-4 rounded-lg border-l-4 border-accent bg-accent/10 p-3 text-sm leading-relaxed">
-                        ⚠️ Your roof space is tight. The calculation uses typical obstacle dimensions —
-                        your actual available area may differ depending on exact placement of windows,
-                        fans and other components. We strongly recommend measuring your roof carefully
-                        and marking out panel positions before purchasing.
-                      </div>
-                    )}
-                    {customLabels.length > 0 && (
-                      <div className="mb-4 space-y-1">
-                        {customLabels.map((n) => (
-                          <div key={n} className="text-xs font-sans text-primary">
-                            ✓ Using your custom dimensions for {n} — more accurate result.
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
-              <div className="space-y-3">
-                {result.components.map((c) => <ComponentCard key={c.key} c={c} />)}
-              </div>
-              <div className="mt-4 flex justify-between font-display font-bold text-primary border-t border-border pt-3">
-                <span>Components total</span>
-                <span>{eur(result.componentsTotal)}</span>
-              </div>
-            </SectionCard>
+          {/* Section 4 — Recommended system */}
+          <SectionCard title="Recommended system">
+            {(() => {
+              const tight = result.recommendedSolarW < result.requiredSolarW * 1.2;
+              const customLabels = Object.entries(state.step7.obstacles ?? {})
+                .filter(([, e]) => e && e.count > 0 && e.customSize && e.lengthCm && e.widthCm)
+                .map(([id, e]) => {
+                  const meta = en.steps.s7.obstacles[id as keyof typeof en.steps.s7.obstacles];
+                  const name = id === "other" ? (e?.name?.trim() || meta.label) : meta.label;
+                  return name;
+                });
+              return (
+                <>
+                  {tight && (
+                    <div className="mb-4 rounded-lg border-l-4 border-accent bg-accent/10 p-3 text-sm leading-relaxed">
+                      ⚠️ Your roof space is tight. The calculation uses typical obstacle dimensions —
+                      your actual available area may differ depending on exact placement of windows,
+                      fans and other components. We strongly recommend measuring your roof carefully
+                      and marking out panel positions before purchasing.
+                    </div>
+                  )}
+                  {customLabels.length > 0 && (
+                    <div className="mb-4 space-y-1">
+                      {customLabels.map((n) => (
+                        <div key={n} className="text-xs font-sans text-primary">
+                          ✓ Using your custom dimensions for {n} — more accurate result.
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {result.components.map((c) => <ComponentCard key={c.key} c={c} />)}
+            </div>
+            <div className="mt-4 flex justify-between font-display font-bold text-primary border-t border-border pt-3">
+              <span>Components total</span>
+              <span>{eur(result.componentsTotal)}</span>
+            </div>
+          </SectionCard>
 
-            <SectionCard title="Installation materials">
-              <ul className="text-sm space-y-1">
-                {result.materials.map((m) => (
-                  <li key={m.item} className="flex justify-between border-b border-border/60 py-1.5">
-                    <span className="font-sans">{m.item}</span>
-                    <span className="font-mono text-muted-foreground">{eur(m.price)}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 flex justify-between font-display font-bold text-primary border-t border-border pt-3">
-                <span>Materials total</span>
-                <span>{eur(result.materialsTotal)}</span>
-              </div>
-            </SectionCard>
-          </div>
+          {/* Section 5 — Installation materials & safety components */}
+          <SectionCard title="Installation materials & safety components">
+            <p className="text-sm text-muted-foreground mb-5">
+              Protection, distribution and wiring parts you'll need alongside the main components.
+              Prices are rough European market averages — adjust as you shop.
+            </p>
+
+            {result.materialGroups.map((g) => (
+              g.items.length === 0 ? null : (
+                <div key={g.key} className="mb-6 last:mb-0">
+                  <h3 className="font-display text-lg font-bold text-foreground mb-2">{g.title}</h3>
+                  <ul className="text-sm space-y-1">
+                    {g.items.map((m) => (
+                      <li key={m.item} className="flex justify-between border-b border-border/60 py-1.5">
+                        <span className="font-sans">{m.item}</span>
+                        <span className="font-mono text-muted-foreground">{eur(m.price)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-2 flex justify-between text-sm font-semibold text-primary">
+                    <span>{g.title} subtotal</span>
+                    <span className="font-mono">{eur(g.total)}</span>
+                  </div>
+
+                  {g.key === "shore" && result.shoreInstallMode !== "none" && (
+                    <>
+                      <div className="mt-4 warning-banner flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span>
+                          230V shore-power installation must include proper RCD/MCB protection and
+                          protective earth wiring. Have the final installation checked by a qualified
+                          electrician.
+                        </span>
+                      </div>
+                      <p className="mt-3 text-xs text-muted-foreground italic">
+                        If shore power is used only to charge the battery, a simpler AC setup may be
+                        sufficient. If internal 230V sockets are installed, a complete protected AC
+                        distribution system is required.
+                      </p>
+                    </>
+                  )}
+                </div>
+              )
+            ))}
+
+            <div className="mt-6 rounded-lg bg-muted/40 border border-border p-3 text-xs text-muted-foreground italic">
+              Vanlectric provides indicative sizing and shopping guidance only. It is not a final
+              electrical installation design.
+            </div>
+          </SectionCard>
 
           {/* Section 6 — Cost summary */}
           <SectionCard title="Cost summary">
             <dl className="space-y-2 text-sm max-w-md ml-auto">
               <div className="flex justify-between"><dt className="text-muted-foreground">Components total</dt><dd className="font-mono">{eur(result.componentsTotal)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Materials total</dt><dd className="font-mono">{eur(result.materialsTotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">DC installation materials</dt><dd className="font-mono">{eur(result.dcMaterialsTotal)}</dd></div>
+              {result.solarMaterialsTotal > 0 && (
+                <div className="flex justify-between"><dt className="text-muted-foreground">Solar installation materials</dt><dd className="font-mono">{eur(result.solarMaterialsTotal)}</dd></div>
+              )}
+              {result.shoreMaterialsTotal > 0 && (
+                <div className="flex justify-between"><dt className="text-muted-foreground">230V shore-power materials</dt><dd className="font-mono">{eur(result.shoreMaterialsTotal)}</dd></div>
+              )}
               <div className="border-t border-border pt-2 flex justify-between font-semibold"><dt>Subtotal</dt><dd className="font-mono">{eur(result.subtotal)}</dd></div>
               <div className="flex justify-between"><dt className="text-muted-foreground">+ 15% contingency</dt><dd className="font-mono">{eur(result.contingency)}</dd></div>
               <div className="border-t-2 border-primary pt-2 flex justify-between font-display text-xl font-bold text-primary">
@@ -531,6 +610,8 @@ export default function Results() {
             </dl>
             <p className="text-xs text-muted-foreground mt-4 italic">
               Prices are indicative European market averages. Actual prices vary by country.
+              Vanlectric provides indicative sizing and shopping guidance only — not a final
+              electrical installation design.
             </p>
           </SectionCard>
 

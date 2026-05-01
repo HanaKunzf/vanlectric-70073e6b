@@ -95,6 +95,17 @@ export interface RecommendedComponent {
 
 export interface MaterialItem { item: string; price: number; qty?: number }
 
+export type MaterialGroupKey = "dc" | "solar" | "shore";
+
+export interface MaterialGroup {
+  key: MaterialGroupKey;
+  title: string;
+  items: MaterialItem[];
+  total: number;
+}
+
+export type ShoreInstallMode = "none" | "charging-only" | "full-ac";
+
 export interface CalculationResult {
   lines: ApplianceLine[];
   shoreLines: ApplianceLine[];
@@ -128,6 +139,12 @@ export interface CalculationResult {
   components: RecommendedComponent[];
   materials: MaterialItem[];
   materialsTotal: number;
+  materialGroups: MaterialGroup[];
+  dcMaterialsTotal: number;
+  solarMaterialsTotal: number;
+  shoreMaterialsTotal: number;
+  shoreInstallMode: ShoreInstallMode;
+  hasInternal230VSockets: boolean;
   componentsTotal: number;
   subtotal: number;
   contingency: number;
@@ -338,28 +355,103 @@ export function calculate(state: WizardState): CalculationResult {
     else components.push({ key: "inverter", category: "Inverter", name: "3000W pure sine inverter", why: "Very high 230V draw — heavy loads.", detail: `Largest 230V load: ${max230VInverter}W. Cable sizing critical.`, price: 250 });
   }
 
-  // Materials
-  const materials: MaterialItem[] = [
-    { item: "Main fuse ANL/MIDI", price: 15 },
-    { item: "Fuse box", price: 20 },
-    { item: "Circuit fuses", price: 10 },
-    { item: "SmartShunt 500A", price: 60 },
-    { item: "Temperature sensor", price: 20 },
-    { item: "Battery disconnect switch", price: 15 },
-    { item: "Switch panel", price: 50 },
-    { item: "12V sockets (×2)", price: 20 },
-    { item: "USB sockets A+C (×2)", price: 25 },
-    { item: "230V sockets (×3)", price: 30 },
-    { item: "MC4 connectors", price: 10 },
-    { item: "Anderson connectors", price: 15 },
-    { item: "WAGO connectors", price: 10 },
-    { item: "Main cable 35–70mm²", price: 40 },
-    { item: "Solar cable 6mm²", price: 20 },
-    { item: "Other wiring", price: 50 },
-    { item: "Cable management", price: 15 },
-    { item: "Mounting hardware", price: 20 },
+  // ----- Installation materials (categorised) -----
+  const hasSolar = recommendedSolarW > 0;
+  const hasDcDc = frequency !== "shore-power" && frequency !== "off-grid";
+  const hasShoreCharger = shore !== "never";
+  const hasInternal230VSockets = max230VInverter > 0; // inverter implies internal 230V sockets
+  const shoreOnlyAppliances = shoreLines.length > 0;
+  const hasShorePower = hasShoreCharger || shoreOnlyAppliances;
+  const shoreInstallMode: ShoreInstallMode = !hasShorePower
+    ? "none"
+    : (shoreOnlyAppliances || hasInternal230VSockets ? "full-ac" : "charging-only");
+
+  // 1. DC protection and distribution
+  const dcItems: MaterialItem[] = [
+    { item: "Main battery fuse (ANL / MEGA / Class T)", price: 18 },
+    { item: "Battery disconnect switch", price: 20 },
+    { item: "Positive busbar", price: 15 },
+    { item: "Negative busbar", price: 12 },
+    { item: "12V fuse box (blade fuses)", price: 20 },
   ];
-  const materialsTotal = materials.reduce((s, m) => s + m.price, 0);
+  if (max230VInverter > 0) dcItems.push({ item: "Fuse for inverter feed", price: 12 });
+  if (hasSolar) dcItems.push({ item: "Fuse: MPPT → battery", price: 8 });
+  if (hasDcDc) {
+    dcItems.push({ item: "Fuse: DC-DC charger input (alternator side)", price: 8 });
+    dcItems.push({ item: "Fuse: DC-DC charger output (battery side)", price: 8 });
+  }
+  dcItems.push({ item: "SmartShunt 500A / battery monitor", price: 60 });
+  if (climate === "cold" || season === "winter" || season === "year-round") {
+    dcItems.push({ item: "Battery temperature sensor", price: 18 });
+  }
+  dcItems.push(
+    { item: "Cable lugs, heat shrink & labels", price: 25 },
+    { item: "Main cable 35–70mm²", price: 40 },
+    { item: "12V wiring (mixed gauges)", price: 50 },
+    { item: "WAGO / Anderson connectors", price: 20 },
+    { item: "Cable management & mounting hardware", price: 25 },
+  );
+
+  // 2. Solar installation
+  const solarItems: MaterialItem[] = [];
+  if (hasSolar) {
+    solarItems.push(
+      { item: "Solar mounting hardware (brackets / adhesive)", price: 35 },
+      { item: "Roof cable gland", price: 12 },
+      { item: "MC4 connectors", price: 10 },
+      { item: "Solar cable 4–6mm²", price: 20 },
+      { item: "Solar isolator / DC breaker", price: 18 },
+      { item: "MPPT controller fuse", price: 8 },
+    );
+  }
+
+  // 3. 230V shore-power installation
+  const shoreItems: MaterialItem[] = [];
+  if (shoreInstallMode === "charging-only") {
+    shoreItems.push(
+      { item: "CEE shore inlet", price: 25 },
+      { item: "Shore power hookup cable", price: 30 },
+      { item: "Small AC protection box / enclosure", price: 25 },
+      { item: "30mA RCD / RCCB", price: 35 },
+      { item: "MCB for shore charger", price: 12 },
+      { item: "Protective earth wiring", price: 15 },
+      { item: "AC cable, glands & conduits", price: 25 },
+      { item: "Professional electrician check", price: 80 },
+    );
+  } else if (shoreInstallMode === "full-ac") {
+    shoreItems.push(
+      { item: "CEE shore inlet", price: 25 },
+      { item: "Shore power hookup cable", price: 30 },
+      { item: "AC consumer unit / protection box", price: 45 },
+      { item: "30mA RCD or RCBO", price: 40 },
+      { item: "MCB for socket circuit", price: 12 },
+      { item: "MCB for shore charger", price: 12 },
+    );
+    if (max230VInverter >= 2000 || shoreOnlyAppliances) {
+      shoreItems.push({ item: "MCB for high-load shore appliances", price: 15 });
+    }
+    shoreItems.push(
+      { item: "Protective earth wiring", price: 15 },
+      { item: "Internal 230V sockets (×3)", price: 30 },
+      { item: "AC cable, conduits & junction boxes", price: 35 },
+      { item: "Labels / warning stickers", price: 8 },
+      { item: "Professional electrician inspection", price: 120 },
+    );
+  }
+
+  const dcMaterialsTotal = dcItems.reduce((s, m) => s + m.price, 0);
+  const solarMaterialsTotal = solarItems.reduce((s, m) => s + m.price, 0);
+  const shoreMaterialsTotal = shoreItems.reduce((s, m) => s + m.price, 0);
+
+  const materialGroups: MaterialGroup[] = [
+    { key: "dc", title: "DC protection and distribution", items: dcItems, total: dcMaterialsTotal },
+    { key: "solar", title: "Solar installation", items: solarItems, total: solarMaterialsTotal },
+    { key: "shore", title: "230V shore-power installation", items: shoreItems, total: shoreMaterialsTotal },
+  ];
+
+  // Flat materials list (legacy + shopping list)
+  const materials: MaterialItem[] = materialGroups.flatMap((g) => g.items);
+  const materialsTotal = dcMaterialsTotal + solarMaterialsTotal + shoreMaterialsTotal;
   const componentsTotal = components.reduce((s, c) => s + c.price, 0);
   const subtotal = componentsTotal + materialsTotal;
   const contingency = subtotal * 0.15;
@@ -400,7 +492,11 @@ export function calculate(state: WizardState): CalculationResult {
     daysAutonomy, journeyWh, requiredWh, requiredAh,
     roofArea, obstacleArea, maxSolarW, solarHours, requiredSolarW, recommendedSolarW, panelType, solarDailyWh,
     alternatorDailyWh, hasDCDC,
-    components, materials, materialsTotal, componentsTotal, subtotal, contingency, totalBudget,
+    components,
+    materials, materialsTotal,
+    materialGroups, dcMaterialsTotal, solarMaterialsTotal, shoreMaterialsTotal,
+    shoreInstallMode, hasInternal230VSockets,
+    componentsTotal, subtotal, contingency, totalBudget,
     warnings,
   };
 }
