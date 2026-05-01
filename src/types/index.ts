@@ -174,7 +174,7 @@ export interface ApplianceCategory {
 export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "fridge",
-    label: "Refrigeration",
+    label: "Cooling",
     icon: "❄️",
     items: [
       { id: "fridge-small", label: "Compressor fridge up to 40l", watts: 35, defaultHours: 8, unit: "h/day", powerSource: "12v", hint: "Best for 1–2 people with frequent shopping (every 1–2 days)" },
@@ -196,7 +196,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   },
   {
     id: "kitchen",
-    label: "Kitchen",
+    label: "Cooking",
     icon: "🍳",
     items: [
       { id: "induction", label: "Induction hob (230V)", watts: 1500, defaultHours: 0.5, unit: "h/day", powerSource: "230v-shore", shorePowerOnly: true, hint: "Best used with shore power — high load on inverter and battery" },
@@ -210,7 +210,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   },
   {
     id: "water",
-    label: "Water",
+    label: "Water Heating",
     icon: "🚿",
     items: [
       { id: "water-pump", label: "Water pump (12V)", watts: 60, defaultHours: 0.5, unit: "h/day", powerSource: "12v" },
@@ -223,8 +223,8 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   },
   {
     id: "climate",
-    label: "Heating & cooling",
-    icon: "🌡️",
+    label: "Heating & Ventilation",
+    icon: "♨️",
     items: [
       { id: "diesel-heater", label: "Diesel heater (fan only)", watts: 25, defaultHours: 6, unit: "h/day", powerSource: "12v" },
       { id: "fan", label: "Roof fan / Maxxfan", watts: 30, defaultHours: 6, unit: "h/day", powerSource: "12v" },
@@ -234,7 +234,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   },
   {
     id: "electronics",
-    label: "Electronics",
+    label: "Electronics & Work",
     icon: "💻",
     items: [
       { id: "phones", label: "Phone charging", watts: 10, defaultHours: 3, unit: "h/day", powerSource: "12v" },
@@ -250,7 +250,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   },
   {
     id: "other",
-    label: "Other",
+    label: "Tools",
     icon: "🔧",
     items: [
       { id: "hairdryer", label: "Hair dryer", watts: 1200, defaultHours: 0.1, unit: "h/day", powerSource: "230v-inverter" },

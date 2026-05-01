@@ -22,7 +22,7 @@ export const en = {
   },
   steps: {
     s1: {
-      title: "What van are you converting?",
+      title: "🚐 What van are you converting?",
       brand: "Brand",
       size: "Size",
       year: "Year",
@@ -57,7 +57,7 @@ export const en = {
       },
     },
     s2: {
-      title: "How will you use your van?",
+      title: "🏕️ How will you use your van?",
       profileOptions: {
         weekendWarrior: {
           icon: "🏕️",
@@ -86,7 +86,7 @@ export const en = {
       },
     },
     s3: {
-      title: "What's your typical climate?",
+      title: "🌤️ What's your typical climate?",
       helper:
         "Cold weather reduces battery capacity by up to 30% and increases heater use. Hot climates push fridge and ventilation.",
       options: {
@@ -109,7 +109,7 @@ export const en = {
       },
     },
     s4: {
-      title: "Which appliances will you use?",
+      title: "🔌 Which appliances will you use?",
       helper:
         "Pick everything you'll use regularly. Adjust hours per day if your usage differs from the default.",
       hoursLabel: "h/day",
@@ -117,7 +117,7 @@ export const en = {
       overrideLabel: "Custom wattage",
     },
     s5: {
-      title: "How often will you drive?",
+      title: "🛣️ How often will you drive?",
       helper:
         "Driving recharges your batteries via the alternator. The more you drive, the smaller your solar/battery setup needs to be.",
       frequencyOptions: {
@@ -149,7 +149,7 @@ export const en = {
       },
     },
     s6: {
-      title: "Will you have shore power access?",
+      title: "⚡ Will you have shore power access?",
       helper:
         "Shore power (campsite hookup) lets you recharge without solar or driving — and run high-draw appliances directly.",
       options: {
@@ -172,7 +172,7 @@ export const en = {
       },
     },
     s7: {
-      title: "Tell us about your roof",
+      title: "🏠 Tell us about your roof",
       obstaclesTitle: "What's already on your roof? (select all that apply)",
       obstacles: {
         vents: { icon: "🌀", label: "Vents / fans" },
@@ -198,7 +198,7 @@ export const en = {
         "A pop-top roof significantly reduces the surface available for solar panels.",
     },
     s8: {
-      title: "How many people will live in the van?",
+      title: "👥 How many people will live in the van?",
       helper:
         "More people = more phones, more lights, more water pumping, more cooking. We'll scale loads accordingly.",
       options: {
@@ -209,7 +209,7 @@ export const en = {
       },
     },
     s9: {
-      title: "Will you work remotely from the van?",
+      title: "💻 Will you work remotely from the van?",
       helper:
         "Remote work means laptops, screens, routers and Starlink — significant continuous loads during the day.",
       options: {
@@ -229,7 +229,7 @@ export const en = {
       },
     },
     s10: {
-      title: "What seasons will you use the van?",
+      title: "🍂 What seasons will you use the van?",
       helper:
         "Solar production drops to ~20% in winter at northern latitudes. Year-round users need significantly more battery.",
       options: {
@@ -252,7 +252,7 @@ export const en = {
       },
     },
     s11: {
-      title: "How well insulated is your van?",
+      title: "🧱 How well insulated is your van?",
       helper:
         "Better insulation drastically reduces heating and cooling loads — and therefore battery needs.",
       options: {
@@ -273,7 +273,7 @@ export const en = {
         "Poor insulation can double your heating energy needs in winter.",
     },
     s12: {
-      title: "What's your budget for the electrical system?",
+      title: "💰 What's your budget for the electrical system?",
       helper:
         "This is just the electrical setup (batteries, solar, inverter, charger, cables). Not the full van conversion.",
       options: {

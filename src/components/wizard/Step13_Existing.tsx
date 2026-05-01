@@ -26,7 +26,7 @@ export const Step13_Existing = ({ value = {}, onChange }: Props) => {
   };
 
   return (
-    <StepCard title="Do you already have any components?">
+    <StepCard title="🔧 Do you already have any components?">
       <HelperText>Optional — skip if you're starting from scratch</HelperText>
 
       <div className="relative">
