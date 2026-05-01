@@ -7,6 +7,7 @@ import { FEATURES } from "@/config/features";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
 import { ProModal } from "@/components/ui/ProModal";
+import { EmailReportModal } from "@/components/ui/EmailReportModal";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
@@ -198,16 +199,16 @@ const EditChips = ({ state }: { state: WizardState }) => {
   return (
     <section className="step-card p-5 sm:p-6">
       <h2 className="font-display text-lg font-bold text-primary mb-3 normal-case">Edit your inputs</h2>
-      <div className="flex sm:flex-wrap gap-2 overflow-x-auto sm:overflow-visible -mx-1 px-1 pb-1 sm:pb-0">
+      <div className="flex flex-wrap gap-2">
         {EDIT_CHIPS.map((c) => (
           <button
             key={c.step}
             type="button"
             onClick={() => editStep(c.step)}
-            className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-background text-foreground hover:border-primary hover:bg-primary/5 transition-colors font-sans text-xs font-semibold whitespace-nowrap"
+            className="basis-[calc((100%-1rem)/3)] sm:basis-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-background text-foreground hover:border-primary hover:bg-primary/5 transition-colors font-sans text-xs font-semibold"
           >
             <span aria-hidden>{c.emoji}</span>
-            <span>{c.label}</span>
+            <span className="truncate">{c.label}</span>
           </button>
         ))}
       </div>
@@ -313,6 +314,7 @@ export default function Results() {
   const state: WizardState = (location.state as { wizard?: WizardState })?.wizard ?? initialWizardState;
   const result = useMemo(() => calculate(state), [state]);
   const [proOpen, setProOpen] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
 
   const goBack = () => navigate("/wizard", { state: { resumeAtStep: 13, wizard: state } });
   const recalculate = () => navigate("/wizard", { state: { resumeAtStep: 4, wizard: state } });
