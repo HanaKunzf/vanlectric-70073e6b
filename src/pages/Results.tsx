@@ -92,6 +92,11 @@ const ComponentCard = ({ c }: { c: CalculationResult["components"][number] }) =>
           {c.detail}
         </div>
       )}
+      {c.note && (
+        <div className="mt-3 text-sm bg-accent/10 border-l-4 border-accent rounded-md p-3 text-foreground">
+          {c.note}
+        </div>
+      )}
     </div>
   );
 };
