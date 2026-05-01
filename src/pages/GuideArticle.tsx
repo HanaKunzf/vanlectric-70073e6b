@@ -18,7 +18,8 @@ const PlannerCta = () => (
     </div>
     <Link
       to="/planner"
-      className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold px-5 py-2.5 rounded-md hover:bg-[hsl(var(--primary-hover))]"
+      data-prose-cta
+      className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold px-5 py-2.5 rounded-md no-underline hover:bg-[hsl(var(--primary-hover))]"
     >
       Open planner <ArrowRight className="w-4 h-4" />
     </Link>

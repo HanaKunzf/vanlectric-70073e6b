@@ -157,7 +157,7 @@
   .prose-vanlectric ol {
     @apply list-decimal pl-5 space-y-1.5 text-foreground/85;
   }
-  .prose-vanlectric a {
+  .prose-vanlectric a:not(.not-prose):not([data-prose-cta]) {
     @apply text-primary underline underline-offset-2 hover:text-[hsl(var(--primary-hover))];
   }
   .prose-vanlectric strong {
