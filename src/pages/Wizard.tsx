@@ -96,7 +96,7 @@ export default function Wizard() {
           <button
             type="button"
             onClick={() => navigate("/", { replace: true })}
-            className="text-[11px] sm:text-xs font-sans text-muted-foreground hover:text-primary hover:underline transition-colors whitespace-nowrap"
+            className="text-xs sm:text-sm font-sans font-medium text-foreground/75 hover:text-primary hover:underline transition-colors whitespace-nowrap"
             aria-label="Start over"
           >
             Start over
@@ -145,7 +145,7 @@ export default function Wizard() {
               "inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-lg font-sans font-semibold text-sm min-h-[44px] transition-[background-color,transform,opacity]",
               canAdvance
                 ? "bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] active:scale-[0.98]"
-                : "bg-muted text-muted-foreground cursor-not-allowed",
+                : "bg-border text-foreground/50 cursor-not-allowed",
             )}
           >
             {editMode ? "Save & return" : isLast ? en.nav.finish : en.nav.next}
