@@ -133,6 +133,8 @@ export const initialWizardState: WizardState = {
 export const TOTAL_STEPS = 12;
 
 // Default appliance catalog with categories and base wattage.
+export type PowerSource = "12v" | "230v-inverter" | "230v-shore";
+
 export interface ApplianceDef {
   id: string;
   label: string;
@@ -141,6 +143,9 @@ export interface ApplianceDef {
   unit?: "h/day" | "uses/day" | "min/day";
   hint?: string;
   shorePowerOnly?: boolean;
+  powerSource: PowerSource;
+  /** Informational item with no electrical load (e.g. gas stove). Hides hours/watts inputs. */
+  informational?: boolean;
 }
 
 export interface ApplianceCategory {
