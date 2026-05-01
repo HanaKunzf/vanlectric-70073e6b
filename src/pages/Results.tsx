@@ -825,7 +825,7 @@ export default function Results() {
                   </tr>
                   {result.hasInverterLoad && (
                     <tr>
-                      <td colSpan={4} className="text-right text-muted-foreground text-xs">Inverter losses (+12%) — included above</td>
+                      <td colSpan={4} className="text-right text-muted-foreground text-xs">Inverter losses (~90% efficiency) — included above</td>
                       <td className="pl-2 text-right font-mono text-xs text-muted-foreground">+{fmt(result.inverterLossWh)}</td>
                     </tr>
                   )}
