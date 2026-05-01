@@ -29,9 +29,10 @@ export const SelectButton = ({
         padding,
         fullWidth && "w-full",
         selected
-          ? "border-primary bg-primary/10 text-foreground amber-glow"
-          : "border-border bg-card text-foreground hover:border-primary/60 hover:bg-card/80",
+          ? "border-primary bg-[hsl(var(--selected-bg))] text-foreground"
+          : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-card/80",
       )}
+      style={selected ? { boxShadow: "var(--shadow-card)" } : undefined}
     >
       <div className="flex items-center gap-3">
         <span
