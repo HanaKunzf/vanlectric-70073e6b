@@ -462,6 +462,37 @@ export default function Results() {
           {/* Section 4+5 — Components & materials */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             <SectionCard title="Recommended system">
+              {(() => {
+                const tight = result.recommendedSolarW < result.requiredSolarW * 1.2;
+                const customLabels = Object.entries(state.step7.obstacles ?? {})
+                  .filter(([, e]) => e && e.count > 0 && e.customSize && e.lengthCm && e.widthCm)
+                  .map(([id, e]) => {
+                    const meta = en.steps.s7.obstacles[id as keyof typeof en.steps.s7.obstacles];
+                    const name = id === "other" ? (e?.name?.trim() || meta.label) : meta.label;
+                    return name;
+                  });
+                return (
+                  <>
+                    {tight && (
+                      <div className="mb-4 rounded-lg border-l-4 border-accent bg-accent/10 p-3 text-sm leading-relaxed">
+                        ⚠️ Your roof space is tight. The calculation uses typical obstacle dimensions —
+                        your actual available area may differ depending on exact placement of windows,
+                        fans and other components. We strongly recommend measuring your roof carefully
+                        and marking out panel positions before purchasing.
+                      </div>
+                    )}
+                    {customLabels.length > 0 && (
+                      <div className="mb-4 space-y-1">
+                        {customLabels.map((n) => (
+                          <div key={n} className="text-xs font-sans text-primary">
+                            ✓ Using your custom dimensions for {n} — more accurate result.
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
               <div className="space-y-3">
                 {result.components.map((c) => <ComponentCard key={c.key} c={c} />)}
               </div>
