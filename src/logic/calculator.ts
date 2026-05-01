@@ -184,6 +184,8 @@ export function calculate(state: WizardState): CalculationResult {
   const lines: ApplianceLine[] = [];
   const shoreLines: ApplianceLine[] = [];
   let applianceSubtotalWh = 0;
+  let dailyWh12V = 0;
+  let dailyWh230VInverter = 0; // battery-side Wh after inverter losses
   let inverterLossWh = 0;
   let hasInverterLoad = false;
 
