@@ -11,7 +11,18 @@ interface Props {
   onChange: (next: RoofStep) => void;
 }
 
-const COUNTS: ObstacleCount[] = [0, 1, 2, 3];
+const OBSTACLE_MAX: Record<RoofObstacleId, 1 | 2 | 3> = {
+  "small-window": 3,
+  "large-window": 2,
+  "fan": 2,
+  "gps-antenna": 2,
+  "satellite": 1,
+  "solar-shower": 1,
+  "rack": 1,
+  "ac": 1,
+  "tent": 1,
+  "other": 3,
+};
 
 export const Step07_Roof = ({ value, onChange }: Props) => {
   const t = en.steps.s7;
@@ -71,7 +82,7 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
                   <div className="text-xs text-muted-foreground">{meta.defaultText}</div>
                 </div>
                 <div className="flex gap-1" role="group" aria-label={t.countLabel}>
-                  {COUNTS.map((c) => {
+                  {Array.from({ length: OBSTACLE_MAX[id] + 1 }, (_, c) => c as ObstacleCount).map((c) => {
                     const selected = entry.count === c;
                     return (
                       <button
