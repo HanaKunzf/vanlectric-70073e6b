@@ -946,35 +946,42 @@ export default function Results() {
               g.items.length === 0 ? null : (
                 <div key={g.key} className="mb-6 last:mb-0">
                   <h3 className="font-display text-lg font-bold text-foreground mb-2">{g.title}</h3>
+
+                  {g.key === "shore" && result.shoreInstallMode === "charging-only" && (
+                    <p className="mb-3 text-sm text-muted-foreground italic">
+                      Because you only need shore power for battery charging, this estimate uses
+                      a simpler shore charging setup.
+                    </p>
+                  )}
+                  {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
+                    <p className="mb-3 text-sm text-muted-foreground italic">
+                      Because you selected 230V shore-only appliances, this estimate includes a
+                      protected internal 230V distribution system.
+                    </p>
+                  )}
+
                   <ul className="text-sm space-y-1">
                     {g.items.map((m) => (
                       <li key={m.item} className="flex justify-between border-b border-border/60 py-1.5">
                         <span className="font-sans">{m.item}</span>
-                        <span className="font-mono text-muted-foreground">{eur(m.price)}</span>
+                        <span className="font-mono text-muted-foreground">{eur(adjust(m.price, profile))}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="mt-2 flex justify-between text-sm font-semibold text-primary">
                     <span>{g.title} subtotal</span>
-                    <span className="font-mono">{eur(g.total)}</span>
+                    <span className="font-mono">{eur(adjust(g.total, profile))}</span>
                   </div>
 
-                  {g.key === "shore" && result.shoreInstallMode !== "none" && (
-                    <>
-                      <div className="mt-4 warning-banner flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        <span>
-                          230V shore-power installation must include proper RCD/MCB protection and
-                          protective earth wiring. Have the final installation checked by a qualified
-                          electrician.
-                        </span>
-                      </div>
-                      <p className="mt-3 text-xs text-muted-foreground italic">
-                        If shore power is used only to charge the battery, a simpler AC setup may be
-                        sufficient. If internal 230V sockets are installed, a complete protected AC
-                        distribution system is required.
-                      </p>
-                    </>
+                  {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
+                    <div className="mt-4 warning-banner flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>
+                        230V shore-power installation must include proper RCD/MCB protection and
+                        protective earth wiring. Have the final installation checked by a qualified
+                        electrician.
+                      </span>
+                    </div>
                   )}
                 </div>
               )
@@ -988,19 +995,52 @@ export default function Results() {
 
           {/* 10. Cost summary */}
           <SectionCard title="Cost summary">
+            <div className="mb-5 rounded-lg border border-border bg-background/60 p-4">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <div className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">Price profile</div>
+                  <div className="font-display text-base font-bold mt-0.5">{PROFILE_LABEL[profile]}</div>
+                </div>
+                <div className="inline-flex rounded-md border border-border overflow-hidden" role="tablist" aria-label="Price profile">
+                  {(["low", "balanced", "premium"] as PriceProfile[]).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      role="tab"
+                      aria-selected={profile === p}
+                      onClick={() => setProfile(p)}
+                      className={cn(
+                        "px-3 py-2 text-xs font-sans font-semibold transition-colors",
+                        profile === p
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card text-muted-foreground hover:text-primary",
+                      )}
+                    >
+                      {PROFILE_LABEL[p]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Price profiles are rough market estimates. Low-cost means budget-friendly components,
+                Balanced means good value, Premium means higher-end brands such as Victron or similar.
+                Profiles affect estimated prices only — not technical sizing.
+              </p>
+            </div>
+
             <dl className="space-y-2 text-sm max-w-md ml-auto">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Components total</dt><dd className="font-mono">{eur(result.componentsTotal)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">DC installation materials</dt><dd className="font-mono">{eur(result.dcMaterialsTotal)}</dd></div>
-              {result.solarMaterialsTotal > 0 && (
-                <div className="flex justify-between"><dt className="text-muted-foreground">Solar installation materials</dt><dd className="font-mono">{eur(result.solarMaterialsTotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Components total</dt><dd className="font-mono">{eur(adjComponentsTotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">DC installation materials</dt><dd className="font-mono">{eur(adjDcTotal)}</dd></div>
+              {adjSolarTotal > 0 && (
+                <div className="flex justify-between"><dt className="text-muted-foreground">Solar installation materials</dt><dd className="font-mono">{eur(adjSolarTotal)}</dd></div>
               )}
-              {result.shoreMaterialsTotal > 0 && (
-                <div className="flex justify-between"><dt className="text-muted-foreground">230V shore-power materials</dt><dd className="font-mono">{eur(result.shoreMaterialsTotal)}</dd></div>
+              {adjShoreTotal > 0 && (
+                <div className="flex justify-between"><dt className="text-muted-foreground">{shoreGroupTitle}</dt><dd className="font-mono">{eur(adjShoreTotal)}</dd></div>
               )}
-              <div className="border-t border-border pt-2 flex justify-between font-semibold"><dt>Subtotal</dt><dd className="font-mono">{eur(result.subtotal)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">+ 15% contingency</dt><dd className="font-mono">{eur(result.contingency)}</dd></div>
+              <div className="border-t border-border pt-2 flex justify-between font-semibold"><dt>Subtotal</dt><dd className="font-mono">{eur(adjSubtotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">+ 15% contingency</dt><dd className="font-mono">{eur(adjContingency)}</dd></div>
               <div className="border-t-2 border-primary pt-2 flex justify-between font-display text-xl font-bold text-primary">
-                <dt>Recommended budget</dt><dd className="font-mono">{eur(result.totalBudget)}</dd>
+                <dt>Recommended budget</dt><dd className="font-mono">{eur(adjTotalBudget)}</dd>
               </div>
             </dl>
             <p className="text-xs text-muted-foreground mt-4 italic">
