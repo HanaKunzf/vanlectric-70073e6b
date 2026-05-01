@@ -213,7 +213,7 @@ export default function GuideArticle() {
     <SiteLayout title={`${guide.title} — Vanlectric`} description={guide.description}>
       <PageHero eyebrow="Guide" title={guide.title} subtitle={guide.description} />
       <Prose>
-        <Link to="/guides" className="inline-flex items-center gap-1 text-sm text-muted-foreground no-underline hover:text-primary">
+        <Link to="/guides" data-prose-cta className="inline-flex items-center gap-1 text-sm text-muted-foreground no-underline hover:text-primary">
           <ArrowLeft className="w-4 h-4" /> All guides
         </Link>
         {guide.body}
