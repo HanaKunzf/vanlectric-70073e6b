@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { en } from "@/i18n/en";
 import heroImage from "@/assets/hero-van-mountains.png";
+import { SiteFooter } from "@/components/ui/Footer";
 
 export default function Landing() {
   const [hover, setHover] = useState(false);
@@ -28,8 +29,8 @@ export default function Landing() {
         </div>
 
         <h1 className="font-display font-bold text-5xl sm:text-6xl md:text-7xl tracking-tight max-w-4xl">
-          <span className="block">Vanlife Electrical</span>
-          <span className="block text-primary italic">Calculator</span>
+          <span className="block text-primary italic">Vanlectric</span>
+          <span className="block text-3xl sm:text-4xl md:text-5xl mt-2">Vanlife Electrical Calculator</span>
         </h1>
 
         <p className="mt-6 max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
