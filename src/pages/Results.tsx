@@ -528,17 +528,34 @@ export default function Results() {
           {/* Section 9 — Actions */}
           <SectionCard title="Next steps">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setEmailOpen(true)}
+                className="sm:col-span-2 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors min-h-[44px] font-sans font-semibold text-sm"
+              >
+                <Mail className="w-4 h-4" />
+                Email me report
+                <span className="ml-1 text-[10px] font-bold border border-primary-foreground/60 rounded px-1.5 py-0.5">FREE</span>
+              </button>
               <LockedAction icon={<FileText className="w-4 h-4" />} label="Download PDF" onClick={() => setProOpen(true)} />
               <LockedAction icon={<FileSpreadsheet className="w-4 h-4" />} label="Download Excel" onClick={() => setProOpen(true)} />
-              <LockedAction icon={<Mail className="w-4 h-4" />} label="Email report" onClick={() => setProOpen(true)} />
               <LockedAction icon={<Save className="w-4 h-4" />} label="Save design" onClick={() => setProOpen(true)} />
               <button
                 type="button"
                 onClick={recalculate}
-                className="sm:col-span-2 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors min-h-[44px] font-sans font-semibold text-sm"
+                className="sm:col-span-2 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-border bg-card text-foreground hover:border-primary hover:text-primary transition-colors min-h-[44px] font-sans font-semibold text-sm"
               >
                 <RotateCcw className="w-4 h-4" />
                 Recalculate (back to appliances)
+              </button>
+            </div>
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => navigate("/", { replace: true })}
+                className="text-xs font-sans text-muted-foreground hover:text-primary hover:underline transition-colors"
+              >
+                ↺ Start a new calculation
               </button>
             </div>
           </SectionCard>
@@ -558,6 +575,7 @@ export default function Results() {
         </div>
       </footer>
       <ProModal open={proOpen} onClose={() => setProOpen(false)} />
+      <EmailReportModal open={emailOpen} onClose={() => setEmailOpen(false)} />
     </div>
   );
 }
