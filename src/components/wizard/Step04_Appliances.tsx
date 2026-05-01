@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronDown, ChevronRight, Settings2 } from "lucide-react";
 import { en } from "@/i18n/en";
 import { StepCard } from "@/components/ui/StepCard";
@@ -46,6 +46,24 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
   const t = en.steps.s4;
   const [openCat, setOpenCat] = useState<string>(APPLIANCE_CATALOG[0].id);
   const [overrideOpen, setOverrideOpen] = useState<Record<string, boolean>>({});
+  const headerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  const toggleCat = (catId: string) => {
+    const willOpen = openCat !== catId;
+    setOpenCat(willOpen ? catId : "");
+    if (willOpen) {
+      // Keep the category header anchored at the top so the first items are
+      // visible immediately, instead of the page settling at the bottom of
+      // the newly expanded list.
+      requestAnimationFrame(() => {
+        const el = headerRefs.current[catId];
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const target = window.scrollY + rect.top - 80; // leave room for sticky header
+        window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
+      });
+    }
+  };
 
   const updateEntry = (id: string, patch: Partial<ApplianceEntry>, shorePowerOnly?: boolean) => {
     const current = value.appliances[id] ?? { enabled: false };
@@ -66,10 +84,11 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
           const isOpen = openCat === cat.id;
           const enabledCount = cat.items.filter((i) => value.appliances[i.id]?.enabled).length;
           return (
-            <div key={cat.id} className="rounded-lg border border-border bg-background/40 overflow-hidden">
+            <div key={cat.id} className="rounded-lg border border-border bg-background/40 overflow-hidden scroll-mt-24">
               <button
+                ref={(el) => { headerRefs.current[cat.id] = el; }}
                 type="button"
-                onClick={() => setOpenCat(isOpen ? "" : cat.id)}
+                onClick={() => toggleCat(cat.id)}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/40 transition-colors min-h-[44px]"
               >
                 <span className="text-xl" aria-hidden>{cat.icon}</span>
@@ -180,7 +199,7 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                           <div className="mt-3 ml-7 space-y-2">
                             {!entry?.shoreOnly && (
                               <div className="text-xs text-muted-foreground italic">
-                                Via inverter — 12% efficiency loss applied
+                                Via inverter — ~90% efficiency, losses applied to battery draw
                               </div>
                             )}
                             <label className="flex items-start gap-2 cursor-pointer text-sm">
