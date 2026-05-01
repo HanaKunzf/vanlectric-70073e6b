@@ -95,6 +95,17 @@ export interface RecommendedComponent {
 
 export interface MaterialItem { item: string; price: number; qty?: number }
 
+export type MaterialGroupKey = "dc" | "solar" | "shore";
+
+export interface MaterialGroup {
+  key: MaterialGroupKey;
+  title: string;
+  items: MaterialItem[];
+  total: number;
+}
+
+export type ShoreInstallMode = "none" | "charging-only" | "full-ac";
+
 export interface CalculationResult {
   lines: ApplianceLine[];
   shoreLines: ApplianceLine[];
