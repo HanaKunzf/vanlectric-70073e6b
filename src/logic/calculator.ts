@@ -450,10 +450,13 @@ export function calculate(state: WizardState): CalculationResult {
   const solarMaterialsTotal = solarItems.reduce((s, m) => s + m.price, 0);
   const shoreMaterialsTotal = shoreItems.reduce((s, m) => s + m.price, 0);
 
+  const shoreTitle = shoreInstallMode === "charging-only"
+    ? "Shore charging setup"
+    : "230V shore-power installation";
   const materialGroups: MaterialGroup[] = [
     { key: "dc", title: "DC protection and distribution", items: dcItems, total: dcMaterialsTotal },
     { key: "solar", title: "Solar installation", items: solarItems, total: solarMaterialsTotal },
-    { key: "shore", title: "230V shore-power installation", items: shoreItems, total: shoreMaterialsTotal },
+    { key: "shore", title: shoreTitle, items: shoreItems, total: shoreMaterialsTotal },
   ];
 
   // Flat materials list (legacy + shopping list)
