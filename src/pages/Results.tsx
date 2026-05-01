@@ -1064,10 +1064,15 @@ export default function Results() {
 
           {/* 11. Shopping list */}
           <SectionCard title="Shopping list">
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-sm text-muted-foreground mb-2">
               Fill in real prices as you shop — totals update automatically.
             </p>
-            <ShoppingList result={result} />
+            {result.shoreLines.length > 0 && (
+              <p className="text-xs text-muted-foreground italic mb-4">
+                Appliance purchase prices are not estimated. Add your own prices if you plan to buy them.
+              </p>
+            )}
+            <ShoppingList result={result} profile={profile} />
           </SectionCard>
 
           {/* 12. Confidence */}
