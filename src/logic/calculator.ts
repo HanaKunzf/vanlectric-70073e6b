@@ -548,7 +548,10 @@ export function calculate(state: WizardState): CalculationResult {
 
   return {
     lines, shoreLines,
-    applianceSubtotalWh, inverterLossWh, remoteWorkWh: rwWh, reserveWh, totalDailyWh, hasInverterLoad,
+    applianceSubtotalWh, dailyWh12V, dailyWh230VInverter,
+    inverterLossWh, remoteWorkWh: rwWh, reserveWh, totalDailyWh, hasInverterLoad,
+    inverterPeakW: max230VInverter, inverterSizeRecommendedW,
+    acRecommendation, highPowerAcAppliances,
     daysAutonomy, journeyWh, requiredWh, requiredAh, recommendedBatteryAh, usableBatteryWh,
     roofArea, obstacleArea, maxSolarW, solarHours, requiredSolarW, recommendedSolarW, panelType, solarDailyWh,
     alternatorDailyWh, hasDCDC,
