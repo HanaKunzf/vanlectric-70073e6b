@@ -921,11 +921,11 @@ export default function Results() {
               );
             })()}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {result.components.map((c) => <ComponentCard key={c.key} c={c} />)}
+              {result.components.map((c) => <ComponentCard key={c.key} c={c} profile={profile} />)}
             </div>
             <div className="mt-4 flex justify-between font-display font-bold text-primary border-t border-border pt-3">
               <span>Components total</span>
-              <span>{eur(result.componentsTotal)}</span>
+              <span>{eur(adjComponentsTotal)}</span>
             </div>
           </SectionCard>
 
