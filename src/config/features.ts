@@ -1,15 +1,17 @@
 // Feature flags — flip these to unlock phases without code changes.
 export const FEATURES = {
-  PDF_EXPORT: false,        // Phase 2
-  EXISTING_COMPONENTS: false, // Phase 2 PRO
-  EXCEL_EXPORT: false,      // Phase 2
-  EMAIL_REPORT: false,      // Phase 2
-  SAVE_DESIGNS: false,      // Phase 3
-  USER_ACCOUNTS: false,     // Phase 3
-  COMPARE_DESIGNS: false,   // Phase 3
-  PRO_TIER: false,          // Phase 2
-  AFFILIATE_LINKS: false,   // Phase 4
-  WIRING_DIAGRAM: false,    // Phase 4
+  PDF_EXPORT: false,
+  EXISTING_COMPONENTS: false,
+  EXCEL_EXPORT: false,
+  EMAIL_REPORT: false,
+  SAVE_DESIGNS: false,
+  USER_ACCOUNTS: false,
+  COMPARE_DESIGNS: false,
+  SCENARIO_COMPARISON: false,
+  INSTALLER_EXPORT: false,
+  PRO_TIER: false,
+  AFFILIATE_LINKS: false,
+  WIRING_DIAGRAM: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURES;
