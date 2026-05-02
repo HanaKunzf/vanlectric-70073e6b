@@ -32,7 +32,7 @@ export const Step01_Vehicle = ({ value, onChange }: Props) => {
   return (
     <StepCard title={t.title} illustration={<VanIllustration className="w-full h-full" />}>
       <Section label={t.brand}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {(Object.keys(t.brandOptions) as VehicleBrand[]).map((brand) => (
             <SelectButton
               key={brand}
@@ -56,7 +56,7 @@ export const Step01_Vehicle = ({ value, onChange }: Props) => {
       </Section>
 
       <Section label={t.size}>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-2.5">
           {(Object.keys(t.sizeOptions) as VehicleSize[]).map((s) => (
             <SelectButton
               key={s}
@@ -71,7 +71,7 @@ export const Step01_Vehicle = ({ value, onChange }: Props) => {
       </Section>
 
       <Section label={t.year}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
           {(Object.keys(t.yearOptions) as VehicleYear[]).map((y) => (
             <SelectButton
               key={y}
@@ -86,7 +86,7 @@ export const Step01_Vehicle = ({ value, onChange }: Props) => {
       </Section>
 
       <Section label={t.engine}>
-        <div className="grid grid-cols-1 gap-2.5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
           {(Object.keys(t.engineOptions) as VehicleEngine[]).map((e) => (
             <SelectButton
               key={e}
