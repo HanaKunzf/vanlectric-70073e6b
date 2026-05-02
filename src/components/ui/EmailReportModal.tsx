@@ -44,6 +44,8 @@ export const EmailReportModal = ({ open, onClose, calculation }: EmailReportModa
   const canSubmit =
     isValidEmail(email) && reportConsent && status !== "loading";
 
+  // Report email is sent via server-side PHP endpoint /api/send-report.php.
+  // No API keys are exposed in frontend.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
@@ -57,6 +59,10 @@ export const EmailReportModal = ({ open, onClose, calculation }: EmailReportModa
     });
     if (result.success) {
       setStatus("success");
+      // Auto-close the modal after the user has seen the confirmation.
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } else {
       setStatus("error");
       setErrorMsg("Something went wrong. Please try again.");
