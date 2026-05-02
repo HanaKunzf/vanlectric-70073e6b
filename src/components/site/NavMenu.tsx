@@ -158,9 +158,10 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
           <Link
             to="/"
             onClick={onClose}
-            className="font-display italic font-bold text-lg text-primary"
+            className="flex items-center"
+            aria-label="Vanlectric home"
           >
-            Vanlectric
+            <img src="/logo-transparent.png" alt="Vanlectric" className="h-7 w-auto" />
           </Link>
           <button
             ref={firstFocusableRef}
@@ -174,7 +175,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
         </div>
 
         {/* Primary nav */}
-        <nav className="flex-1 flex flex-col px-6 py-3 min-h-0">
+        <nav className="flex-1 flex flex-col px-6 py-2 min-h-0 overflow-y-auto">
           <ul className="flex-1 flex flex-col justify-center divide-y divide-border">
             {mobilePrimary.map((item) => (
               <li key={item.to + item.label}>
@@ -182,7 +183,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
                   to={item.to}
                   onClick={onClose}
                   className={cn(
-                    "block py-3 font-display font-semibold text-[22px] leading-tight tracking-tight text-primary",
+                    "block py-2.5 font-display font-semibold text-[20px] leading-tight tracking-tight text-primary",
                     "transition-colors hover:text-[hsl(var(--primary-hover))]",
                     isActive(item.to) && "text-accent",
                   )}
