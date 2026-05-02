@@ -22,6 +22,7 @@ import { initialWizardState, TOTAL_STEPS, type WizardState } from "@/types";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
 import { Seo } from "@/components/site/SiteLayout";
+import { NavMenu } from "@/components/site/NavMenu";
 
 export default function Wizard() {
   const navigate = useNavigate();
