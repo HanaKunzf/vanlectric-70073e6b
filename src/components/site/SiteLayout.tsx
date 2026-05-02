@@ -108,6 +108,8 @@ export const SiteLayout = ({
         jsonLd={jsonLd}
       />
       <SiteHeader />
+      {/* Spacer matching fixed header height to prevent content from sliding under */}
+      <div aria-hidden className="h-16 md:h-[72px]" style={{ marginTop: "env(safe-area-inset-top)" }} />
       <main className="flex-1">{children}</main>
       <SiteFooterFull />
       <BackToTop />
