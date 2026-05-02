@@ -201,7 +201,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "fridge",
     label: "Cooling",
-    icon: "❄️",
+    icon: "ac",
     items: [
       { id: "fridge-small", label: "Compressor fridge up to 40l", watts: 35, defaultHours: 8, unit: "h/day", powerSource: "12v", hint: "Best for 1–2 people with frequent shopping (every 1–2 days)" },
       { id: "fridge-medium", label: "Compressor fridge 40–60l", watts: 45, defaultHours: 8, unit: "h/day", powerSource: "12v", hint: "Good for 1–2 people with less frequent shopping, or 2–3 people daily" },
@@ -213,7 +213,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "kitchen",
     label: "Cooking",
-    icon: "🍳",
+    icon: "cooking",
     items: [
       { id: "induction", label: "Induction hob (230V)", watts: 1500, defaultHours: 0.5, unit: "h/day", powerSource: "230v-shore", shorePowerOnly: true, hint: "Best used with shore power — high load on inverter and battery" },
       { id: "kettle", label: "Electric kettle", watts: 1200, defaultHours: 0.2, unit: "h/day", powerSource: "230v-inverter" },
@@ -227,7 +227,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "climate",
     label: "Heating & Ventilation",
-    icon: "♨️",
+    icon: "heating",
     items: [
       { id: "diesel-heater", label: "Diesel heater (fan only)", watts: 25, defaultHours: 6, unit: "h/day", powerSource: "12v" },
       { id: "fan", label: "Roof fan / Maxxfan", watts: 30, defaultHours: 6, unit: "h/day", powerSource: "12v" },
@@ -238,7 +238,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "water",
     label: "Water Heating",
-    icon: "🚿",
+    icon: "shower",
     items: [
       { id: "water-pump", label: "Water pump (12V)", watts: 60, defaultHours: 0.5, unit: "h/day", powerSource: "12v" },
       { id: "water-heater", label: "Electric water heater", watts: 1000, defaultHours: 0.5, unit: "h/day", powerSource: "230v-shore", shorePowerOnly: true },
@@ -251,7 +251,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "electronics",
     label: "Electronics & Work",
-    icon: "💻",
+    icon: "electronics",
     items: [
       { id: "phones", label: "Phone charging", watts: 10, defaultHours: 3, unit: "h/day", powerSource: "12v" },
       { id: "laptop", label: "Laptop", watts: 60, defaultHours: 4, unit: "h/day", powerSource: "230v-inverter" },
@@ -265,7 +265,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "entertainment",
     label: "Entertainment",
-    icon: "🎵",
+    icon: "entertainment",
     items: [
       { id: "tv", label: "TV (12V)", watts: 35, defaultHours: 2, unit: "h/day", powerSource: "12v" },
       { id: "speakers", label: "Bluetooth speakers", watts: 15, defaultHours: 2, unit: "h/day", powerSource: "12v" },
@@ -274,7 +274,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "tools",
     label: "Tools",
-    icon: "🔧",
+    icon: "tools",
     items: [
       { id: "vacuum", label: "12V vacuum", watts: 100, defaultHours: 0.1, unit: "h/day", powerSource: "12v" },
       { id: "tools", label: "Power tools (occasional)", watts: 600, defaultHours: 0.2, unit: "h/day", powerSource: "230v-inverter" },
@@ -283,7 +283,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "lighting",
     label: "Lighting",
-    icon: "💡",
+    icon: "lighting",
     items: [
       { id: "lights-led", label: "LED lights (interior)", watts: 15, defaultHours: 4, unit: "h/day", powerSource: "12v" },
       { id: "lights-outdoor", label: "Outdoor / awning lights", watts: 10, defaultHours: 2, unit: "h/day", powerSource: "12v" },
@@ -292,7 +292,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "sport",
     label: "Sport & Outdoor",
-    icon: "🚴",
+    icon: "sport",
     items: [
       { id: "ebike", label: "E-bike charger", watts: 100, defaultHours: 3, unit: "h/day", powerSource: "12v" },
       { id: "escooter", label: "E-scooter charger", watts: 100, defaultHours: 3, unit: "h/day", powerSource: "12v" },
@@ -301,7 +301,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "personal-care",
     label: "Personal Care",
-    icon: "💇",
+    icon: "personalCare",
     items: [
       { id: "hairdryer", label: "Hair dryer", watts: 1200, defaultHours: 0.1, unit: "h/day", powerSource: "230v-inverter" },
       { id: "straightener", label: "Hair straightener (230V)", watts: 150, defaultHours: 0.25, unit: "h/day", powerSource: "230v-inverter" },
