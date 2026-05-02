@@ -3,6 +3,7 @@ import { SelectButton } from "@/components/ui/SelectButton";
 import { StepCard } from "@/components/ui/StepCard";
 import { WarningBanner } from "@/components/ui/WarningBanner";
 import { RoofIllustration } from "@/components/illustrations/Illustrations";
+import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 import type { RoofObstacleEntry, RoofObstacleId, RoofStep, RoofType, ObstacleCount } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -76,7 +77,7 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
           return (
             <div key={id} className="rounded-lg border border-border bg-card">
               <div className="flex items-center gap-3 p-3">
-                <span className="text-xl" aria-hidden>{meta.icon}</span>
+                <BrandIcon name={meta.icon as IconKey} size="md" tone="primary" />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-sans font-semibold">{meta.label}</div>
                   <div className="text-xs text-muted-foreground">{meta.defaultText}</div>
