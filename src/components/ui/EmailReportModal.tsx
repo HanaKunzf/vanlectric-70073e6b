@@ -1,27 +1,12 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { X, Mail, Check } from "lucide-react";
+import { useEffect } from "react";
+import { X, Mail } from "lucide-react";
 
 interface EmailReportModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-const STORAGE_KEY = "vec_email_report_requests";
-
 export const EmailReportModal = ({ open, onClose }: EmailReportModalProps) => {
-  const [email, setEmail] = useState("");
-  const [consent, setConsent] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      setEmail("");
-      setConsent(false);
-      setConfirmed(false);
-    }
-  }, [open]);
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -31,20 +16,6 @@ export const EmailReportModal = ({ open, onClose }: EmailReportModalProps) => {
   }, [open, onClose]);
 
   if (!open) return null;
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = email.trim();
-    if (!trimmed || !trimmed.includes("@") || !consent) return;
-    try {
-      const existing: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-      if (!existing.includes(trimmed)) existing.push(trimmed);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
-    } catch {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([trimmed]));
-    }
-    setConfirmed(true);
-  };
 
   return (
     <div
@@ -66,70 +37,38 @@ export const EmailReportModal = ({ open, onClose }: EmailReportModalProps) => {
           <X className="w-5 h-5" />
         </button>
 
-        {!confirmed ? (
-          <>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary mb-2 tracking-tight">
-              Email me the report
-            </h2>
-            <div className="h-px w-12 bg-primary/40 mb-4" />
-            <p className="text-sm text-foreground/90 leading-relaxed mb-5">
-              We'll save your email and send you the full report when our PRO email feature
-              launches. Free — no account required.
-            </p>
+        <div className="flex items-center gap-3 mb-3">
+          <Mail className="w-6 h-6 text-primary" strokeWidth={1.75} />
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary tracking-tight">
+            Email report — coming soon
+          </h2>
+        </div>
+        <div className="h-px w-12 bg-primary/40 mb-4" />
 
-            <form onSubmit={submit} className="flex flex-col gap-3">
-              <input
-                type="email"
-                required
-                autoFocus
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <label className="flex items-start gap-2 text-xs font-sans text-foreground/85 leading-relaxed cursor-pointer">
-                <input
-                  type="checkbox"
-                  required
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-border text-primary accent-primary focus:ring-primary"
-                />
-                <span>
-                  I agree to receive occasional emails about Vanlectric PRO launch and updates.
-                  I can unsubscribe anytime.{" "}
-                  <Link to="/privacy" className="text-primary hover:underline" onClick={onClose}>
-                    Privacy Policy
-                  </Link>
-                </span>
-              </label>
-              <button
-                type="submit"
-                disabled={!consent || !email.includes("@")}
-                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Mail className="w-4 h-4" /> Send me the report
-              </button>
-            </form>
-          </>
-        ) : (
-          <div className="text-center py-4">
-            <div className="mb-3 flex justify-center" aria-hidden>
-              <Check className="w-8 h-8 text-primary" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
-            </div>
-            <p className="font-display text-xl font-bold text-primary mb-2">Thanks!</p>
-            <p className="text-sm text-muted-foreground mb-5">
-              We'll notify you when PRO launches with your full report.
-            </p>
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px]"
-            >
-              Close
-            </button>
-          </div>
-        )}
+        <p className="text-sm text-foreground/90 leading-relaxed mb-3">
+          We're preparing email reports for the final Vanlectric launch. For now, your full
+          result is available directly on this page.
+        </p>
+        <p className="text-xs text-muted-foreground leading-relaxed mb-6">
+          Once vanlectric.com is live, you'll be able to send the report to your inbox.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px]"
+          >
+            Got it
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-border bg-card text-foreground hover:border-primary hover:text-primary transition-colors font-sans font-semibold text-sm min-h-[44px]"
+          >
+            Back to results
+          </button>
+        </div>
       </div>
     </div>
   );
