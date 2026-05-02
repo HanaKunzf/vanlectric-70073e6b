@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Zap, Pencil } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil } from "lucide-react";
 import { saveLastCalculation, clearLastCalculation, hasLastCalculation } from "@/services/localCalculation";
 import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
 import { BackToTop } from "@/components/ui/BackToTop";
@@ -22,6 +22,7 @@ import { initialWizardState, TOTAL_STEPS, type WizardState } from "@/types";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
 import { Seo } from "@/components/site/SiteLayout";
+import { NavMenu } from "@/components/site/NavMenu";
 
 export default function Wizard() {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export default function Wizard() {
   const [step, setStep] = useState(incoming.resumeAtStep ?? 1);
   const [editMode] = useState(!!incoming.editMode);
   const [confirmStartNew, setConfirmStartNew] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Auto-save wizard state to localStorage on every change (free-tier persistence).
   // Also keeps `currentStep` in sync so we can resume at the right place.
@@ -101,15 +103,16 @@ export default function Wizard() {
         title="Campervan Electrical System Calculator — Vanlectric"
         description="Answer simple questions about your van, appliances, travel style and roof space to get a practical electrical system recommendation."
       />
-      <header className="relative md:sticky md:top-0 z-30 border-b border-border bg-background/85 md:backdrop-blur">
-        <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors" aria-label="Home">
-            <Zap className="w-5 h-5 text-primary" />
-            <span className="hidden sm:inline font-display text-base font-semibold tracking-tight">
-              {en.app.name}
-            </span>
+      <header
+        className="fixed top-0 left-0 right-0 z-40 border-b border-border bg-background/85 backdrop-blur"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3 sm:gap-4">
+          <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors shrink-0" aria-label="Home">
+            <img src="/logo-transparent.png" alt="Vanlectric" className="h-8 sm:h-9 w-auto" decoding="async" />
+            <span className="sr-only">{en.app.name}</span>
           </Link>
-          <div className="flex-1 max-w-md ml-auto">
+          <div className="flex-1 max-w-md ml-auto min-w-0">
             <ProgressBar current={step} />
           </div>
           <button
@@ -122,13 +125,25 @@ export default function Wizard() {
                 navigate("/", { replace: true });
               }
             }}
-            className="text-xs sm:text-sm font-sans font-medium text-foreground/75 hover:text-primary hover:underline transition-colors whitespace-nowrap"
+            className="hidden sm:inline text-xs sm:text-sm font-sans font-medium text-foreground/75 hover:text-primary hover:underline transition-colors whitespace-nowrap"
             aria-label="Start over"
           >
             Start over
           </button>
+          <button
+            type="button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-haspopup="dialog"
+            onClick={() => setMenuOpen((v) => !v)}
+            className="inline-flex items-center px-3 py-2 rounded-md text-sm font-sans font-semibold text-primary transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 shrink-0"
+          >
+            Menu
+          </button>
         </div>
       </header>
+      {/* Spacer to compensate fixed header */}
+      <div aria-hidden className="h-[60px] sm:h-[64px]" style={{ marginTop: "env(safe-area-inset-top)" }} />
 
       <main
         className="flex-1 mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-10"
@@ -197,6 +212,7 @@ export default function Wizard() {
           navigate("/", { replace: true });
         }}
       />
+      <NavMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );
 }
