@@ -287,8 +287,122 @@ export default function Guide() {
           </Note>
         </Section>
 
-        {/* 12. Examples */}
-        <Section id="examples" number={12} title="Typical system examples">
+        {/* 12. Cable sizing chart */}
+        <Section id="cable-chart" number={12} title="Cable sizing chart">
+          <p>
+            Choosing the right cable size is important for safety and performance. In campervan
+            systems, cable size depends mainly on <strong>current (A)</strong>,{" "}
+            <strong>cable length</strong>, and acceptable <strong>voltage drop</strong>. The
+            chart below is a simple guide for common 12V DC circuits.
+          </p>
+
+          <div className="not-prose">
+            <h3 className="font-display font-bold text-lg text-primary mt-2 mb-2">
+              12V DC cable sizing (mm²)
+            </h3>
+            <div className="overflow-x-auto rounded-lg border border-border bg-background/60">
+              <table className="w-full text-sm font-sans border-collapse">
+                <thead>
+                  <tr className="bg-primary/10 text-left">
+                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">Current</th>
+                    <th className="px-3 py-2 font-semibold text-primary">Typical use</th>
+                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">
+                      Short<br /><span className="text-xs font-normal text-muted-foreground">≤ 2 m</span>
+                    </th>
+                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">
+                      Medium<br /><span className="text-xs font-normal text-muted-foreground">2–4 m</span>
+                    </th>
+                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">
+                      Long<br /><span className="text-xs font-normal text-muted-foreground">4–6 m</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { a: "5A", use: "Lights, USB chargers", s: "1.0", m: "1.5", l: "2.5" },
+                    { a: "10A", use: "Fan, water pump, small fridge", s: "1.5", m: "2.5", l: "4" },
+                    { a: "15A", use: "Fridge, sockets, small DC loads", s: "2.5", m: "4", l: "6" },
+                    { a: "20A", use: "Larger DC loads", s: "4", m: "6", l: "10" },
+                    { a: "30A", use: "DC-DC charger, larger circuits", s: "6", m: "10", l: "16" },
+                    { a: "40A", use: "Small inverter feed, heavy DC", s: "10", m: "16", l: "25" },
+                    { a: "50A", use: "Larger inverter, short battery links", s: "16", m: "25", l: "35" },
+                    { a: "100A", use: "Battery / inverter main cables", s: "35", m: "50", l: "70" },
+                  ].map((row) => (
+                    <tr key={row.a} className="border-t border-border">
+                      <td className="px-3 py-2 font-display font-bold text-primary whitespace-nowrap">{row.a}</td>
+                      <td className="px-3 py-2">{row.use}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{row.s} mm²</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{row.m} mm²</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{row.l} mm²</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground italic mt-2">
+              Values are practical guidelines for 12V DC at ~3% voltage drop. Always verify
+              against the real run length and conditions.
+            </p>
+          </div>
+
+          <div className="not-prose">
+            <h3 className="font-display font-bold text-lg text-primary mt-5 mb-2">
+              Typical cable sizes for common campervan circuits
+            </h3>
+            <div className="overflow-x-auto rounded-lg border border-border bg-background/60">
+              <table className="w-full text-sm font-sans border-collapse">
+                <thead>
+                  <tr className="bg-primary/10 text-left">
+                    <th className="px-3 py-2 font-semibold text-primary">Circuit</th>
+                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">Typical size</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ["LED lights", "1.0–1.5 mm²"],
+                    ["Water pump", "2.5 mm²"],
+                    ["Roof fan", "2.5 mm²"],
+                    ["12V sockets", "2.5–4 mm²"],
+                    ["Compressor fridge", "2.5–4 mm²"],
+                    ["Solar panel → MPPT", "4–6 mm²"],
+                    ["MPPT → battery", "6–10 mm²"],
+                    ["DC-DC charger 30A", "6–10 mm²"],
+                    ["Shore charger DC output", "Usually 6–10 mm² (depends on charger current)"],
+                    ["1000W inverter", "25–35 mm²"],
+                    ["Battery interconnects", "35–70 mm² (depends on current and length)"],
+                  ].map(([circuit, size]) => (
+                    <tr key={circuit} className="border-t border-border">
+                      <td className="px-3 py-2">{circuit}</td>
+                      <td className="px-3 py-2 whitespace-nowrap font-medium">{size}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <Note>
+            Always size cables based on the real current, the full cable run length, and the
+            allowed voltage drop. Fuse size protects the cable, so cable sizing should be
+            checked <strong>before</strong> choosing the fuse.
+          </Note>
+
+          <div className="rounded-lg border-2 border-primary bg-primary/5 p-4 not-prose">
+            <div className="text-xs font-sans uppercase tracking-[0.18em] text-accent font-semibold mb-2">
+              Quick rule of thumb
+            </div>
+            <ul className="space-y-1 text-sm font-sans">
+              <li>• <strong>Small circuits:</strong> 1.0–2.5 mm²</li>
+              <li>• <strong>Medium 12V appliance circuits:</strong> 2.5–6 mm²</li>
+              <li>• <strong>Chargers and high-current circuits:</strong> 6–16 mm²</li>
+              <li>• <strong>Battery and inverter cables:</strong> 25 mm² and above</li>
+            </ul>
+          </div>
+        </Section>
+
+        {/* 13. Examples */}
+        <Section id="examples" number={13} title="Typical system examples">
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 not-prose">
             <div className="rounded-lg border border-border bg-background/60 p-4">
               <div className="text-xs uppercase tracking-wider text-accent font-sans font-semibold">A</div>
