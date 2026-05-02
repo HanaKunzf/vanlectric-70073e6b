@@ -1095,6 +1095,17 @@ export default function Results() {
 
           {/* 4. Daily consumption */}
           <SectionCard title="Daily consumption">
+            <div className="-mt-3 mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-sans">
+              <Link
+                to="/calculation-logic#daily-consumption"
+                className="text-primary hover:underline inline-flex items-center gap-1"
+              >
+                <span aria-hidden>ℹ️</span> Why doesn't this always equal W × 24 h?
+              </Link>
+              <span className="text-muted-foreground">
+                Fridge runtime uses duty cycle based on climate and insulation.
+              </span>
+            </div>
             {/* Energy split breakdown — 12V vs 230V via inverter vs losses */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
               <div className="rounded-lg bg-background/60 border border-border p-3">
