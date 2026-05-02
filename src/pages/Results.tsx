@@ -1570,7 +1570,11 @@ export default function Results() {
         </div>
       </footer>
       <ProModal open={proOpen} onClose={() => setProOpen(false)} />
-      <EmailReportModal open={emailOpen} onClose={() => setEmailOpen(false)} />
+      <EmailReportModal
+        open={emailOpen}
+        onClose={() => setEmailOpen(false)}
+        calculation={{ wizard: state, result, profile }}
+      />
       <ConfirmStartNewModal
         open={confirmStartNew}
         onOpenChange={setConfirmStartNew}
