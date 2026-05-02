@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { ProModal } from "@/components/ui/ProModal";
 import { EmailReportModal } from "@/components/ui/EmailReportModal";
 import { Seo } from "@/components/site/SiteLayout";
+import { BackToTop } from "@/components/ui/BackToTop";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
