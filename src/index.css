@@ -126,6 +126,18 @@
     /* Long words/labels (vehicle names, cable specs) must never push layout */
     overflow-wrap: anywhere;
     word-break: normal;
+    hyphens: none;
+  }
+
+  /* Prevent short common words ("people", "Couple") from being broken mid-word.
+     overflow-wrap: anywhere is reserved for genuinely overflowing tokens. */
+  button, label, h1, h2, h3, h4, h5, h6, p, span, div {
+    box-sizing: border-box;
+  }
+
+  img, svg, video, canvas {
+    max-width: 100%;
+    height: auto;
   }
 
   /* Tables that must remain table-like: scroll inside their wrapper, not the page */

@@ -20,11 +20,11 @@ export const Step08_People = ({ value, onChange }: Props) => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {counts.map((c) => (
           <SelectButton key={c} selected={value.people === c} onClick={() => onChange({ people: c })} size="md">
-            <div className="flex items-start gap-3">
+            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-start sm:gap-3">
               <BrandIcon name={t.options[c].icon as IconKey} size="md" tone="primary" />
-              <div>
-                <div className="font-display text-lg font-semibold">{t.options[c].label}</div>
-                <div className="text-sm text-muted-foreground mt-0.5">{t.options[c].desc}</div>
+              <div className="min-w-0">
+                <div className="font-display text-base sm:text-lg font-semibold leading-tight">{t.options[c].label}</div>
+                <div className="text-sm text-muted-foreground mt-0.5 leading-snug">{t.options[c].desc}</div>
               </div>
             </div>
           </SelectButton>
