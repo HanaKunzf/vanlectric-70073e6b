@@ -597,8 +597,27 @@ const ExistingSystemSection = ({ state, result }: { state: WizardState; result: 
 
 // ---------- Autonomy formatting ----------
 const formatDays = (d: number): string => {
-  if (!Number.isFinite(d) || d > 30) return "Potentially continuous in good conditions";
+  if (!Number.isFinite(d) || d > 30) return "Continuous";
   return `${d.toFixed(1)} days`;
+};
+
+type AutonomyDisplay = { title: string; helper: string; isQualitative: boolean };
+const formatAutonomy = (d: number, dailyWh: number, fallbackHelper: string): AutonomyDisplay => {
+  if (dailyWh < 1) {
+    return {
+      title: "No off-grid load detected",
+      helper: "Your selected appliances do not create a meaningful daily battery load.",
+      isQualitative: true,
+    };
+  }
+  if (!Number.isFinite(d) || d > 30) {
+    return {
+      title: "Continuous in good conditions",
+      helper: "Your charging sources can cover your estimated daily consumption.",
+      isQualitative: true,
+    };
+  }
+  return { title: `${d.toFixed(1)} days`, helper: fallbackHelper, isQualitative: false };
 };
 
 // ---------- Autonomy Section ----------
@@ -610,30 +629,62 @@ const AutonomySection = ({ result }: { result: CalculationResult }) => {
   const dailyBalance = result.solarDailyWh + result.alternatorDailyWh - result.totalDailyWh;
   const positive = dailyBalance >= 0;
 
+  const cards: { label: string; data: AutonomyDisplay }[] = [
+    {
+      label: "Without charging",
+      data: formatAutonomy(noCharge, result.totalDailyWh, "Battery only — no solar, no driving."),
+    },
+    {
+      label: "With average solar",
+      data: formatAutonomy(withSolar, result.totalDailyWh, `~${fmt(result.solarDailyWh)} Wh/day from solar.`),
+    },
+    {
+      label: "With solar + driving",
+      data: formatAutonomy(
+        withAll,
+        result.totalDailyWh,
+        result.alternatorDailyWh > 0
+          ? `+~${fmt(result.alternatorDailyWh)} Wh/day from alternator.`
+          : "No alternator charging in your profile."
+      ),
+    },
+  ];
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: "clamp(1.25rem, 2vw, 1.75rem)",
+    lineHeight: 1.2,
+  };
+
   return (
     <SectionCard title="Your off-grid autonomy">
       <p className="text-sm text-muted-foreground mb-4">
         Estimated days you can stay parked before recharging — based on your usable battery capacity
-        (~{fmt(result.usableBatteryWh)} Wh) and daily consumption (~{fmt(result.totalDailyWh)} Wh).
+        and daily consumption{" "}
+        <span className="text-xs opacity-80">
+          (~{fmt(result.usableBatteryWh)} Wh usable battery, ~{fmt(result.totalDailyWh)} Wh/day consumption)
+        </span>
+        .
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="rounded-lg border border-border bg-background/60 p-4">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground font-sans font-semibold">Without charging</div>
-          <div className="font-display text-2xl font-bold text-foreground mt-1">{formatDays(noCharge)}</div>
-          <div className="text-xs text-muted-foreground mt-1">Battery only — no solar, no driving.</div>
-        </div>
-        <div className="rounded-lg border border-border bg-background/60 p-4">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground font-sans font-semibold">With average solar</div>
-          <div className="font-display text-2xl font-bold text-foreground mt-1">{formatDays(withSolar)}</div>
-          <div className="text-xs text-muted-foreground mt-1">~{fmt(result.solarDailyWh)} Wh/day from solar.</div>
-        </div>
-        <div className="rounded-lg border border-border bg-background/60 p-4">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground font-sans font-semibold">With solar + driving</div>
-          <div className="font-display text-2xl font-bold text-foreground mt-1">{formatDays(withAll)}</div>
-          <div className="text-xs text-muted-foreground mt-1">
-            {result.alternatorDailyWh > 0 ? `+~${fmt(result.alternatorDailyWh)} Wh/day from alternator.` : "No alternator charging in your profile."}
+      <div
+        className="grid gap-3"
+        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
+      >
+        {cards.map((c) => (
+          <div key={c.label} className="rounded-lg border border-border bg-background/60 p-4 flex flex-col">
+            <div className="text-[13px] uppercase tracking-wider text-muted-foreground font-sans font-semibold">
+              {c.label}
+            </div>
+            <div
+              className="font-display font-bold text-foreground mt-1.5 text-balance"
+              style={titleStyle}
+            >
+              {c.data.title}
+            </div>
+            <div className="text-[15px] leading-snug text-muted-foreground mt-2">
+              {c.data.helper}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
       <div className={cn("mt-5 rounded-lg p-3 text-sm border-l-4",
         positive ? "bg-primary/5 border-primary text-foreground" : "bg-accent/10 border-accent text-foreground")}>
