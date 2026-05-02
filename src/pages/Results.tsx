@@ -1270,6 +1270,29 @@ export default function Results() {
                     <span className="font-mono">{eur(adjust(g.total, profile))}</span>
                   </div>
 
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                    {g.key === "dc" && (
+                      <Link to="/guide#fuses" className="text-primary hover:underline">
+                        Learn how fuses protect cables →
+                      </Link>
+                    )}
+                    {g.key === "solar" && (
+                      <Link to="/guide#solar" className="text-primary hover:underline">
+                        Learn how solar charging works →
+                      </Link>
+                    )}
+                    {g.key === "shore" && (
+                      <Link to="/guide#shore" className="text-primary hover:underline">
+                        Learn how shore power works →
+                      </Link>
+                    )}
+                    {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
+                      <Link to="/guide#ac-system" className="text-primary hover:underline">
+                        Learn about 230V safety →
+                      </Link>
+                    )}
+                  </div>
+
                   {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
                     <div className="mt-4 warning-banner flex items-start gap-2">
                       <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
