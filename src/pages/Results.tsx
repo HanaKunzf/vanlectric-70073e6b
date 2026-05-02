@@ -88,6 +88,7 @@ const COMPONENT_GUIDE_LINK: Record<string, { label: string; hash: string }> = {
   mppt: { label: "Learn how solar charging works", hash: "#solar" },
   dcdc: { label: "Learn how alternator charging works", hash: "#dcdc" },
   shore: { label: "Learn how shore power works", hash: "#shore" },
+  "shore-circuit": { label: "Learn how shore power works", hash: "#shore" },
   inverter: { label: "Learn what an inverter does", hash: "#inverter" },
   battery: { label: "Learn about battery banks", hash: "#battery" },
 };
