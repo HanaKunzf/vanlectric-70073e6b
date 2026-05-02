@@ -152,9 +152,9 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
 
   const renderItem = (item: MenuItem) => {
     const baseTitle =
-      "block font-display font-semibold text-base sm:text-lg leading-snug transition-colors duration-150";
+      "block font-display font-semibold text-[15px] sm:text-lg leading-snug transition-colors duration-150";
     const baseDesc =
-      "mt-0.5 text-xs sm:text-sm font-sans leading-relaxed text-muted-foreground";
+      "mt-0.5 text-[11.5px] sm:text-sm font-sans leading-snug sm:leading-relaxed text-muted-foreground";
 
     if (item.disabled) {
       return (
