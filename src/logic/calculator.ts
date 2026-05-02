@@ -516,8 +516,10 @@ export function calculate(state: WizardState): CalculationResult {
       { item: "AC consumer unit / protection box", price: 45 },
       { item: "30mA RCD or RCBO", price: 40 },
       { item: "MCB for socket circuit", price: 12 },
-      { item: "MCB for shore charger", price: 12 },
     );
+    if (wantsShoreCharger) {
+      shoreItems.push({ item: "MCB for shore charger", price: 12 });
+    }
     if (max230VInverter >= 2000 || shoreOnlyAppliances) {
       shoreItems.push({ item: "MCB for high-load shore appliances", price: 15 });
     }
