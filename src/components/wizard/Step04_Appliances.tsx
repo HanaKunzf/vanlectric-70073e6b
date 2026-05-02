@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 interface Props {
   value: AppliancesStep;
   onChange: (next: AppliancesStep) => void;
+  /** Vehicle engine type from Step 1 — used for cross-step contextual warnings (e.g. petrol + diesel heater). */
+  vehicleEngine?: "petrol" | "diesel-old" | "diesel-euro6" | "unknown";
 }
 
 const PowerSourceBadge = ({ source, gas }: { source: PowerSource; gas?: boolean }) => {
@@ -43,7 +45,7 @@ const PowerSourceBadge = ({ source, gas }: { source: PowerSource; gas?: boolean 
   );
 };
 
-export const Step04_Appliances = ({ value, onChange }: Props) => {
+export const Step04_Appliances = ({ value, onChange, vehicleEngine }: Props) => {
   const t = en.steps.s4;
   const [openCat, setOpenCat] = useState<string>(APPLIANCE_CATALOG[0].id);
   const [overrideOpen, setOverrideOpen] = useState<Record<string, boolean>>({});
@@ -222,6 +224,17 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                                 <span>Excluded from off-grid battery sizing.</span>
                               </div>
                             )}
+                          </div>
+                        )}
+
+                        {enabled && item.id === "diesel-heater" && vehicleEngine === "petrol" && (
+                          <div className="mt-3 ml-7 warning-banner flex items-start gap-2 text-sm">
+                            <BrandIcon name="warning" size="xs" />
+                            <span>
+                              Your van appears to have a petrol engine. A diesel heater normally
+                              cannot draw fuel from the vehicle tank. You will likely need a
+                              separate diesel tank for the heater.
+                            </span>
                           </div>
                         )}
                       </div>

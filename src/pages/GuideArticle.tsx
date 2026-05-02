@@ -1,4 +1,5 @@
 import { Link, useParams, Navigate } from "react-router-dom";
+import { PlannerLink } from "@/components/ui/PlannerLink";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { SiteLayout, PageHero, Prose } from "@/components/site/SiteLayout";
 import { ReactNode } from "react";
@@ -16,13 +17,13 @@ const PlannerCta = () => (
       <div className="font-display font-semibold text-lg">Apply this to your van</div>
       <p className="text-sm text-muted-foreground">Use the Vanlectric planner to size your real system.</p>
     </div>
-    <Link
+    <PlannerLink
       to="/planner"
       data-prose-cta
       className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold px-5 py-2.5 rounded-md no-underline hover:bg-[hsl(var(--primary-hover))]"
     >
       Open planner <ArrowRight className="w-4 h-4" />
-    </Link>
+    </PlannerLink>
   </div>
 );
 

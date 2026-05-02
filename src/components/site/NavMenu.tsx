@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PlannerLink } from "@/components/ui/PlannerLink";
 
 interface NavMenuProps {
   open: boolean;
@@ -204,6 +205,13 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
         <a key={item.label} href={item.to} onClick={onClose} className={linkClass}>
           {content}
         </a>
+      );
+    }
+    if (item.to === "/planner") {
+      return (
+        <PlannerLink key={item.to + item.label} to={item.to} onClick={onClose} className={linkClass}>
+          {content}
+        </PlannerLink>
       );
     }
     return (

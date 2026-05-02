@@ -1,11 +1,26 @@
-// Local-only persistence for the user's last calculation.
-// Free-tier feature: stores the wizard state on this device/browser only.
+// Local-only persistence for the user's calculator progress (free tier).
+// Stores the wizard state on this device/browser only.
 // Designed to be replaceable later with a Supabase-backed user-account flow.
 
 import { initialWizardState, type WizardState } from "@/types";
 
-const STATE_KEY = "vanlectric_last_calculation";
-const SAVED_AT_KEY = "vanlectric_last_calculation_saved_at";
+// New unified key (stores draft + current step + flags).
+const DRAFT_KEY = "vanlectric_planner_draft";
+// Legacy keys (older free-tier saves) — read on load for backward compat.
+const LEGACY_STATE_KEY = "vanlectric_last_calculation";
+const LEGACY_SAVED_AT_KEY = "vanlectric_last_calculation_saved_at";
+
+export interface PlannerDraft {
+  wizardState: WizardState;
+  /** 1..TOTAL_STEPS — last step the user was working on */
+  currentStep: number;
+  /** Step numbers the user has clicked Next on at least once */
+  completedSteps: number[];
+  /** ISO timestamp */
+  updatedAt: string;
+  /** True once the user has reached the results page with this draft */
+  hasResults: boolean;
+}
 
 const isBrowser = () => typeof window !== "undefined" && !!window.localStorage;
 
@@ -28,57 +43,99 @@ function sanitize(state: WizardState): WizardState {
   };
 }
 
-export function saveLastCalculation(state: WizardState): void {
+function readDraft(): PlannerDraft | null {
+  if (!isBrowser()) return null;
+  try {
+    const raw = window.localStorage.getItem(DRAFT_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<PlannerDraft>;
+      if (parsed && parsed.wizardState) {
+        return {
+          wizardState: { ...initialWizardState, ...parsed.wizardState } as WizardState,
+          currentStep: parsed.currentStep ?? 1,
+          completedSteps: Array.isArray(parsed.completedSteps) ? parsed.completedSteps : [],
+          updatedAt: parsed.updatedAt ?? new Date().toISOString(),
+          hasResults: !!parsed.hasResults,
+        };
+      }
+    }
+    // Legacy fallback: a previous version stored only the wizard state.
+    const legacy = window.localStorage.getItem(LEGACY_STATE_KEY);
+    if (legacy) {
+      const ws = { ...initialWizardState, ...(JSON.parse(legacy) as Partial<WizardState>) } as WizardState;
+      const at = window.localStorage.getItem(LEGACY_SAVED_AT_KEY) ?? new Date().toISOString();
+      return { wizardState: ws, currentStep: 1, completedSteps: [], updatedAt: at, hasResults: false };
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function writeDraft(d: PlannerDraft): void {
   if (!isBrowser()) return;
   try {
-    const safe = sanitize(state);
-    window.localStorage.setItem(STATE_KEY, JSON.stringify(safe));
-    window.localStorage.setItem(SAVED_AT_KEY, new Date().toISOString());
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
   } catch {
-    // Quota / private mode — fail silently.
+    /* quota / private mode */
   }
 }
 
+export interface SaveOptions {
+  currentStep?: number;
+  markStepCompleted?: number;
+  hasResults?: boolean;
+}
+
+/**
+ * Persist the current wizard progress. Merges with any existing draft so that
+ * partial updates (e.g. only currentStep changed) don't drop other fields.
+ */
+export function saveLastCalculation(state: WizardState, opts: SaveOptions = {}): void {
+  if (!isBrowser()) return;
+  const existing = readDraft();
+  const completed = new Set(existing?.completedSteps ?? []);
+  if (opts.markStepCompleted) completed.add(opts.markStepCompleted);
+  const draft: PlannerDraft = {
+    wizardState: sanitize(state),
+    currentStep: opts.currentStep ?? existing?.currentStep ?? 1,
+    completedSteps: Array.from(completed).sort((a, b) => a - b),
+    updatedAt: new Date().toISOString(),
+    hasResults: opts.hasResults ?? existing?.hasResults ?? false,
+  };
+  writeDraft(draft);
+}
+
 export function loadLastCalculation(): WizardState | null {
-  if (!isBrowser()) return null;
-  try {
-    const raw = window.localStorage.getItem(STATE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<WizardState>;
-    // Merge with defaults to be resilient to schema additions.
-    return { ...initialWizardState, ...parsed } as WizardState;
-  } catch {
-    return null;
-  }
+  return readDraft()?.wizardState ?? null;
+}
+
+export function loadPlannerDraft(): PlannerDraft | null {
+  return readDraft();
 }
 
 export function clearLastCalculation(): void {
   if (!isBrowser()) return;
   try {
-    window.localStorage.removeItem(STATE_KEY);
-    window.localStorage.removeItem(SAVED_AT_KEY);
+    window.localStorage.removeItem(DRAFT_KEY);
+    window.localStorage.removeItem(LEGACY_STATE_KEY);
+    window.localStorage.removeItem(LEGACY_SAVED_AT_KEY);
   } catch {
     /* ignore */
   }
 }
 
 export function hasLastCalculation(): boolean {
-  if (!isBrowser()) return false;
-  try {
-    return !!window.localStorage.getItem(STATE_KEY);
-  } catch {
-    return false;
-  }
+  return readDraft() !== null;
 }
 
 export function getLastCalculationSavedAt(): Date | null {
-  if (!isBrowser()) return null;
-  try {
-    const raw = window.localStorage.getItem(SAVED_AT_KEY);
-    if (!raw) return null;
-    const d = new Date(raw);
-    return isNaN(d.getTime()) ? null : d;
-  } catch {
-    return null;
-  }
+  const d = readDraft();
+  if (!d) return null;
+  const date = new Date(d.updatedAt);
+  return isNaN(date.getTime()) ? null : date;
+}
+
+export function markResultsReached(state: WizardState): void {
+  saveLastCalculation(state, { hasResults: true });
 }

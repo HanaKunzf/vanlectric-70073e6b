@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { PlannerLink } from "@/components/ui/PlannerLink";
 
 export const SiteFooterFull = () => (
   <footer className="border-t border-border bg-card/40 mt-16">
@@ -12,7 +13,7 @@ export const SiteFooterFull = () => (
       <div>
         <div className="font-semibold text-foreground mb-2">Product</div>
         <ul className="space-y-1.5 text-muted-foreground">
-          <li><Link to="/planner" className="hover:text-primary transition-colors">Planner</Link></li>
+          <li><PlannerLink to="/planner" className="hover:text-primary transition-colors">Planner</PlannerLink></li>
           <li><Link to="/how-it-works" className="hover:text-primary transition-colors">How it works</Link></li>
           <li><Link to="/examples" className="hover:text-primary transition-colors">Example setups</Link></li>
           <li><Link to="/checklist" className="hover:text-primary transition-colors">Checklist</Link></li>

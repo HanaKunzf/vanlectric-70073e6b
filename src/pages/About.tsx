@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { PlannerLink } from "@/components/ui/PlannerLink";
 import { SiteLayout, PageHero, Prose } from "@/components/site/SiteLayout";
 
 export default function About() {
@@ -24,7 +25,7 @@ export default function About() {
           The tool is free, requires no account, and works on a phone in the van.
         </p>
         <p>
-          <Link to="/planner">Try the planner</Link> · <Link to="/resources">Browse resources</Link> ·{" "}
+          <PlannerLink to="/planner">Try the planner</PlannerLink> · <Link to="/resources">Browse resources</Link> ·{" "}
           <Link to="/contact">Get in touch</Link>
         </p>
       </Prose>
