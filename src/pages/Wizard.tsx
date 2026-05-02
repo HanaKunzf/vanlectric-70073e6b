@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Zap, Pencil } from "lucide-react";
+import { saveLastCalculation, clearLastCalculation, hasLastCalculation } from "@/services/localCalculation";
+import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Step01_Vehicle, isStep1Valid } from "@/components/wizard/Step01_Vehicle";
