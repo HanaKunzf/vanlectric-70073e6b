@@ -1,7 +1,7 @@
 import { en } from "@/i18n/en";
 import { SelectButton } from "@/components/ui/SelectButton";
-import { VanIllustration } from "@/components/illustrations/Illustrations";
 import { StepCard } from "@/components/ui/StepCard";
+import vanImage from "@/assets/step1-van.png";
 import type {
   VehicleBrand,
   VehicleEngine,
