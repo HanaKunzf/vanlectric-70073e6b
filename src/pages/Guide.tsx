@@ -101,8 +101,8 @@ export default function Guide() {
 
   return (
     <SiteLayout
-      title="Van Electrical System Guide — Vanlectric"
-      description="Vanlectric Electrical Guide — Learn 12V, 230V, solar, batteries and shore power for campervans."
+      title="Campervan Electrical Basics — 12V, 230V, Current, Voltage and Fuses"
+      description="Learn the basics of campervan electrics: voltage, current, watts, fuses, cable sizing, RCDs, batteries and safe 230V shore power."
     >
       <PageHero
         eyebrow="Electrical Guide"

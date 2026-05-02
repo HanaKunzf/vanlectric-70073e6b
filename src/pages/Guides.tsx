@@ -33,8 +33,8 @@ export const guides = [
 export default function Guides() {
   return (
     <SiteLayout
-      title="Campervan electrical guides — Vanlectric"
-      description="Beginner-friendly guides on campervan batteries, solar, shore power, inverters and component tiers, written for DIY van builders."
+      title="Vanlife Electrical Guides — Vanlectric"
+      description="Simple guides explaining 12V systems, 230V shore power, cable sizing, fuses, batteries, solar panels and campervan electrical safety."
     >
       <PageHero
         eyebrow="Guides"
