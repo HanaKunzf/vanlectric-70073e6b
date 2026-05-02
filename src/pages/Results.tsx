@@ -409,7 +409,7 @@ const ShoppingList = ({ result, profile, state }: { result: CalculationResult; p
             <ul className="sm:hidden space-y-3">
               {rows.map((r, ri) => (
                 <li key={ri} className="rounded-md border border-border bg-card/60 p-3">
-                  <div className="font-sans text-sm font-medium">{r.item}</div>
+                  <div className="font-sans text-sm font-medium break-words">{r.item}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">
                     Est. {r.noEstimate ? "—" : eur(r.estimate)}
                   </div>
