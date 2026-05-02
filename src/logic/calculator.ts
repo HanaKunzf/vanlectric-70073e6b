@@ -365,9 +365,9 @@ export function calculate(state: WizardState): CalculationResult {
 
   // Shore power charger
   const shore: ShorePowerAccess = step6.shorePower ?? "never";
-  if (shore === "occasionally") {
-    components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/17A", why: "Tops up your bank when at a campsite.", detail: "Waterproof, compact.", price: 90 });
-  } else if (shore === "regularly" || shore === "home") {
+  if (shore === "rare" || shore === "occasional") {
+    components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/17A", why: "Tops up your bank when you connect to a plug.", detail: "Waterproof, compact.", price: 90 });
+  } else if (shore === "frequent" || shore === "home-between-trips") {
     components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/25A", why: "Faster recharge for frequent shore-power use.", detail: "Waterproof, 25A.", price: 110 });
   }
 
