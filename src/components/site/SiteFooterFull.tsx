@@ -21,6 +21,7 @@ export const SiteFooterFull = () => (
       <div>
         <div className="font-semibold text-foreground mb-2">Learn</div>
         <ul className="space-y-1.5 text-muted-foreground">
+          <li><Link to="/guide" className="hover:text-primary">Guide</Link></li>
           <li><Link to="/guides" className="hover:text-primary">Guides</Link></li>
           <li><Link to="/guides/battery-sizing" className="hover:text-primary">Battery sizing</Link></li>
           <li><Link to="/guides/solar-sizing" className="hover:text-primary">Solar sizing</Link></li>

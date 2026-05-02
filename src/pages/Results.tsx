@@ -81,6 +81,15 @@ const LockedAction = ({ icon, label, onClick }: { icon: React.ReactNode; label: 
 );
 
 // ---------- Component card ----------
+const COMPONENT_GUIDE_LINK: Record<string, { label: string; hash: string }> = {
+  solar: { label: "Learn how solar charging works", hash: "#solar" },
+  mppt: { label: "Learn how solar charging works", hash: "#solar" },
+  dcdc: { label: "Learn how alternator charging works", hash: "#dcdc" },
+  shore: { label: "Learn how shore power works", hash: "#shore" },
+  inverter: { label: "Learn what an inverter does", hash: "#inverter" },
+  battery: { label: "Learn about battery banks", hash: "#battery" },
+};
+
 const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][number]; profile: PriceProfile }) => {
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -98,6 +107,7 @@ const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][numb
   };
   const adjusted = adjust(c.price, profile);
   const displayName = componentNameForProfile(c.name, profile);
+  const guide = COMPONENT_GUIDE_LINK[c.key];
   return (
     <div ref={headerRef} className="rounded-lg border border-border bg-card p-4 scroll-mt-24">
       <div className="flex items-start justify-between gap-3">
@@ -108,14 +118,24 @@ const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][numb
         </div>
         <div className="text-right font-display text-xl font-bold text-primary whitespace-nowrap">~{eur(adjusted)}</div>
       </div>
-      <button
-        type="button"
-        onClick={toggle}
-        className="mt-3 inline-flex items-center gap-1 text-xs font-sans font-semibold text-primary hover:underline"
-      >
-        {open ? "Hide details" : "Why this?"}
-        {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-      </button>
+      <div className="mt-3 flex items-center gap-3 flex-wrap">
+        <button
+          type="button"
+          onClick={toggle}
+          className="inline-flex items-center gap-1 text-xs font-sans font-semibold text-primary hover:underline"
+        >
+          {open ? "Hide details" : "Why this?"}
+          {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        </button>
+        {guide && (
+          <Link
+            to={`/guide${guide.hash}`}
+            className="text-xs font-sans text-primary hover:underline"
+          >
+            {guide.label} →
+          </Link>
+        )}
+      </div>
       {open && (
         <div className="mt-2 text-sm text-muted-foreground bg-background/60 rounded-md p-3 border border-border">
           {c.detail}
@@ -132,9 +152,30 @@ const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][numb
 
 // ---------- Shopping list ----------
 interface ShopRow { item: string; qty: number; estimate: number; userPrice: number; noEstimate?: boolean }
-interface ShopGroup { title: string; rows: ShopRow[] }
+interface ShopGroup { key: string; title: string; description: string; rows: ShopRow[]; warning?: string }
 
-const ShoppingList = ({ result, profile }: { result: CalculationResult; profile: PriceProfile }) => {
+// Match a material item label to a logical shopping group.
+const classifyMaterial = (label: string): string => {
+  const l = label.toLowerCase();
+  // Solar
+  if (/solar|mppt|mc4|roof cable gland|solar isolator|dc breaker/.test(l)) return "solar";
+  // DC-DC
+  if (/dc-dc|alternator side|battery side/.test(l)) return "dcdc";
+  // Shore charging-only specifics (charger feed, simple AC box)
+  if (/cee shore inlet|shore power hookup|shore charger|mcb for shore/.test(l)) return "shore";
+  // 230V AC distribution
+  if (/rcd|rcbo|consumer unit|mcb for socket|mcb for high|internal 230v|labels \/ warning|professional electrician|protective earth|ac protection box|small ac protection|ac cable, glands|ac cable, conduits|inverter feed/.test(l))
+    return "ac";
+  // Battery connection & protection
+  if (/main battery fuse|battery disconnect|busbar|smartshunt|battery monitor|temperature sensor|cable lugs|battery labels/.test(l))
+    return "battery";
+  // 12V distribution
+  if (/12v fuse box|12v wiring|wago|anderson|cable management|mounting hardware/.test(l)) return "dc12v";
+  // General wiring fall-through
+  return "general";
+};
+
+const ShoppingList = ({ result, profile, state }: { result: CalculationResult; profile: PriceProfile; state: WizardState }) => {
   const groups: ShopGroup[] = useMemo(() => {
     const mkComp = (c: CalculationResult["components"][number]): ShopRow => ({
       item: componentNameForProfile(c.name, profile),
@@ -148,43 +189,153 @@ const ShoppingList = ({ result, profile }: { result: CalculationResult; profile:
       estimate: adjust(m.price, profile),
       userPrice: 0,
     });
-    const mainComponents: ShopRow[] = result.components
-      .filter((c) => !/inverter/i.test(c.category) && !/MPPT|Solar charger/i.test(c.category))
-      .map(mkComp);
-    const solarComponents: ShopRow[] = result.components
-      .filter((c) => /MPPT|Solar charger|Solar panels/i.test(c.category))
-      .map(mkComp);
-    const inverterComponents: ShopRow[] = result.components
-      .filter((c) => /inverter/i.test(c.category))
-      .map(mkComp);
-    const dcMaterials = result.materialGroups.find((g) => g.key === "dc")!.items.map(mkMat);
-    const solarMaterials = result.materialGroups.find((g) => g.key === "solar")!.items.map(mkMat);
-    const shoreGroup = result.materialGroups.find((g) => g.key === "shore")!;
-    const shoreMaterials = shoreGroup.items.map(mkMat);
+
+    // Group components by key
+    const compsByKey: Record<string, ShopRow[]> = {};
+    for (const c of result.components) {
+      const k = c.key; // battery|solar|mppt|dcdc|shore|inverter
+      (compsByKey[k] ||= []).push(mkComp(c));
+    }
+
+    // Group materials by classification
+    const matBuckets: Record<string, ShopRow[]> = {
+      battery: [], solar: [], dcdc: [], shore: [], ac: [], dc12v: [], general: [],
+    };
+    for (const g of result.materialGroups) {
+      for (const m of g.items) {
+        const bucket = classifyMaterial(m.item);
+        matBuckets[bucket].push(mkMat(m));
+      }
+    }
+
+    // Battery connection & protection
+    const battery: ShopRow[] = [...(compsByKey.battery ?? []), ...matBuckets.battery];
+
+    // Solar charging
+    const solar: ShopRow[] = [...(compsByKey.solar ?? []), ...(compsByKey.mppt ?? []), ...matBuckets.solar];
+
+    // DC-DC
+    const dcdc: ShopRow[] = [...(compsByKey.dcdc ?? []), ...matBuckets.dcdc];
+
+    // Shore charging
+    const shore: ShopRow[] = [...(compsByKey.shore ?? []), ...matBuckets.shore];
+
+    // 230V AC distribution: only when full-AC mode or inverter present, otherwise the
+    // "ac" bucket should be empty anyway.
+    const ac: ShopRow[] = [...(compsByKey.inverter ?? []), ...matBuckets.ac];
+
+    // 12V distribution
+    const dc12v: ShopRow[] = [...matBuckets.dc12v];
+    // Add convenience items often needed (12V sockets / USB / switch panel) as
+    // simple suggestions priced from profile baselines.
+    dc12v.push(
+      { item: "12V cigarette / DIN sockets (×2)", qty: 1, estimate: adjust(15, profile), userPrice: 0 },
+      { item: "USB sockets (×2)", qty: 1, estimate: adjust(15, profile), userPrice: 0 },
+      { item: "Switch panel & switches", qty: 1, estimate: adjust(20, profile), userPrice: 0 },
+    );
+
+    // Appliance circuits — derived from enabled 12V appliances
+    const enabledIds = Object.entries(state.step4.appliances)
+      .filter(([, e]) => e.enabled)
+      .map(([id]) => id);
+    const circuitMap: Array<{ match: (id: string) => boolean; label: string }> = [
+      { match: (id) => /^lights-/.test(id), label: "LED lighting circuit (cable + fuse)" },
+      { match: (id) => id === "water-pump" || id === "shower-pump", label: "Water pump circuit (cable + fuse)" },
+      { match: (id) => id === "fan", label: "Roof fan circuit (cable + fuse)" },
+      { match: (id) => /^fridge/.test(id), label: "Fridge circuit (cable + fuse)" },
+      { match: (id) => id === "diesel-heater", label: "Diesel heater circuit (cable + fuse)" },
+      { match: (id) => id === "router" || id === "starlink", label: "Router / Starlink circuit (cable + fuse)" },
+    ];
+    const circuits: ShopRow[] = circuitMap
+      .filter((c) => enabledIds.some(c.match))
+      .map((c) => ({ item: c.label, qty: 1, estimate: adjust(8, profile), userPrice: 0 }));
+
+    // General wiring & install
+    const general: ShopRow[] = [
+      ...matBuckets.general,
+      { item: "Cable glands & grommets", qty: 1, estimate: adjust(10, profile), userPrice: 0 },
+      { item: "Cable conduits & loom", qty: 1, estimate: adjust(15, profile), userPrice: 0 },
+      { item: "Cable ties (assorted)", qty: 1, estimate: adjust(6, profile), userPrice: 0 },
+      { item: "Heat shrink (assorted)", qty: 1, estimate: adjust(8, profile), userPrice: 0 },
+      { item: "Terminal blocks / Wago set", qty: 1, estimate: adjust(12, profile), userPrice: 0 },
+      { item: "Mounting screws & hardware", qty: 1, estimate: adjust(10, profile), userPrice: 0 },
+      { item: "Labels", qty: 1, estimate: adjust(5, profile), userPrice: 0 },
+    ];
+
+    // Optional shore-only appliances (no estimate)
     const optional: ShopRow[] = result.shoreLines.map((l) => ({
       item: `${l.label} (shore-only appliance)`, qty: 1, estimate: 0, userPrice: 0, noEstimate: true,
     }));
+
     const out: ShopGroup[] = [
-      { title: "Main components", rows: [...mainComponents, ...inverterComponents] },
-      { title: "DC installation", rows: dcMaterials },
+      {
+        key: "battery", title: "1. Battery connection & protection",
+        description: "Battery bank and the protection that surrounds it.",
+        rows: battery,
+      },
+      {
+        key: "solar", title: "2. Solar charging system",
+        description: "Solar panels, MPPT and roof-side wiring.",
+        rows: solar,
+      },
     ];
-    if (solarMaterials.length || solarComponents.length) {
-      out.push({ title: "Solar installation", rows: [...solarComponents, ...solarMaterials] });
+    if (dcdc.length > 0) {
+      out.push({
+        key: "dcdc", title: "3. DC-DC charging system",
+        description: "Charging the house battery from the alternator while driving.",
+        rows: dcdc,
+      });
     }
-    if (shoreMaterials.length) {
-      out.push({ title: shoreGroup.title, rows: shoreMaterials });
+    if (shore.length > 0) {
+      out.push({
+        key: "shore", title: "4. Shore charging system",
+        description: "Charging the battery from a 230V hookup.",
+        rows: shore,
+      });
     }
-    if (optional.length) {
-      out.push({ title: "Optional appliances", rows: optional });
+    if (ac.length > 0) {
+      out.push({
+        key: "ac", title: "5. 230V AC distribution system",
+        description: "Internal 230V sockets, inverter feed and AC protection.",
+        rows: ac,
+        warning:
+          "230V AC systems can be dangerous. Always use proper RCD/MCB protection and have the final installation checked by a qualified electrician.",
+      });
+    }
+    out.push({
+      key: "dc12v", title: "6. 12V distribution system",
+      description: "Low-voltage circuits, sockets and switch panel.",
+      rows: dc12v,
+    });
+    if (circuits.length > 0) {
+      out.push({
+        key: "circuits", title: "7. Appliance circuits",
+        description: "Cabling and fuses for the appliances you selected.",
+        rows: circuits,
+      });
+    }
+    out.push({
+      key: "general", title: "8. General wiring & installation materials",
+      description: "Common materials used across the whole system.",
+      rows: general,
+    });
+    if (optional.length > 0) {
+      out.push({
+        key: "optional", title: "Optional appliances",
+        description: "Shore-only appliances — purchase prices not estimated.",
+        rows: optional,
+      });
     }
     return out;
-  }, [result, profile]);
+  }, [result, profile, state.step4.appliances]);
 
   const [groupRows, setGroupRows] = useState<ShopRow[][]>(() => groups.map((g) => g.rows));
-  // Re-sync rows when profile changes (preserves user-entered prices).
+  // Re-sync rows when profile/groups change (preserves user-entered prices where indices align).
   const profileRef = useRef(profile);
-  if (profileRef.current !== profile) {
+  const groupsLenRef = useRef(groups.length);
+  if (profileRef.current !== profile || groupsLenRef.current !== groups.length) {
     profileRef.current = profile;
+    groupsLenRef.current = groups.length;
     setGroupRows(groups.map((g, gi) => g.rows.map((r, ri) => {
       const prev = groupRows[gi]?.[ri];
       return { ...r, userPrice: prev?.userPrice ?? 0, qty: prev?.qty ?? r.qty };
@@ -193,66 +344,134 @@ const ShoppingList = ({ result, profile }: { result: CalculationResult; profile:
   const update = (gi: number, ri: number, patch: Partial<ShopRow>) =>
     setGroupRows((gs) => gs.map((rows, i) => i !== gi ? rows : rows.map((r, j) => j === ri ? { ...r, ...patch } : r)));
 
-  const allRows = groupRows.flat();
-  const grandEstimate = allRows.reduce((s, r) => s + (r.noEstimate ? 0 : r.qty * r.estimate), 0);
-  const grandUser = allRows.reduce((s, r) => s + r.qty * r.userPrice, 0);
-  const hasOptional = groups.some((g) => g.title === "Optional appliances");
+  const subtotalFor = (rows: ShopRow[]) =>
+    rows.reduce((s, r) => s + (r.noEstimate ? 0 : r.qty * (r.userPrice || r.estimate)), 0);
+  const grand = groupRows.reduce((s, rows) => s + subtotalFor(rows), 0);
+  const contingency = Math.round(grand * 0.15);
+  const recommended = grand + contingency;
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead className="text-left text-muted-foreground font-sans font-semibold border-b border-border">
-          <tr>
-            <th className="py-2 pr-3">Item</th>
-            <th className="py-2 px-2 w-16 text-center">Qty</th>
-            <th className="py-2 px-2 w-24 text-right">Est. €</th>
-            <th className="py-2 px-2 w-28 text-right">Your €</th>
-            <th className="py-2 pl-2 w-24 text-right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {groups.map((g, gi) => (
-            <Fragment key={g.title}>
-              <tr className="bg-muted/40">
-                <td colSpan={5} className="py-2 px-2 font-display font-bold text-primary text-xs uppercase tracking-wider">
-                  {g.title}
-                </td>
-              </tr>
-              {groupRows[gi].map((r, ri) => (
-                <tr key={ri} className="border-b border-border/60">
-                  <td className="py-2 pr-3 font-sans">{r.item}</td>
-                  <td className="py-2 px-2">
-                    <input type="number" min={0} value={r.qty}
-                      onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
-                      className="w-full bg-background border border-border rounded px-2 py-1 text-center" />
-                  </td>
-                  <td className="py-2 px-2 text-right font-mono text-muted-foreground">
-                    {r.noEstimate ? "—" : r.estimate}
-                  </td>
-                  <td className="py-2 px-2">
-                    <input type="number" min={0} value={r.userPrice || ""} placeholder="—"
-                      onChange={(e) => update(gi, ri, { userPrice: Number(e.target.value) })}
-                      className="w-full bg-background border border-border rounded px-2 py-1 text-right" />
-                  </td>
-                  <td className="py-2 pl-2 text-right font-mono font-semibold">
-                    {r.userPrice ? eur(r.qty * r.userPrice) : (r.noEstimate ? "—" : eur(r.qty * r.estimate))}
-                  </td>
-                </tr>
+    <div className="space-y-6">
+      {groups.map((g, gi) => {
+        const rows = groupRows[gi] ?? g.rows;
+        const subtotal = subtotalFor(rows);
+        return (
+          <div key={g.key} className="rounded-lg border border-border bg-background/40 p-4 sm:p-5">
+            <h3 className="font-display text-lg sm:text-xl font-bold text-primary">{g.title}</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 mb-3">{g.description}</p>
+
+            {g.warning && (
+              <div className="warning-banner flex items-start gap-2 mb-3">
+                <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>{g.warning}</span>
+              </div>
+            )}
+
+            {/* Desktop / tablet table */}
+            <div className="hidden sm:block">
+              <table className="w-full text-sm">
+                <thead className="text-left text-muted-foreground font-sans font-semibold border-b border-border">
+                  <tr>
+                    <th className="py-2 pr-3">Item</th>
+                    <th className="py-2 px-2 w-16 text-center">Qty</th>
+                    <th className="py-2 px-2 w-24 text-right">Est. €</th>
+                    <th className="py-2 px-2 w-28 text-right">Your €</th>
+                    <th className="py-2 pl-2 w-24 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r, ri) => (
+                    <tr key={ri} className="border-b border-border/60">
+                      <td className="py-2 pr-3 font-sans">{r.item}</td>
+                      <td className="py-2 px-2">
+                        <input type="number" min={0} value={r.qty}
+                          onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
+                          className="w-full bg-background border border-border rounded px-2 py-1 text-center" />
+                      </td>
+                      <td className="py-2 px-2 text-right font-mono text-muted-foreground">
+                        {r.noEstimate ? "—" : r.estimate}
+                      </td>
+                      <td className="py-2 px-2">
+                        <input type="number" min={0} value={r.userPrice || ""} placeholder="—"
+                          onChange={(e) => update(gi, ri, { userPrice: Number(e.target.value) })}
+                          className="w-full bg-background border border-border rounded px-2 py-1 text-right" />
+                      </td>
+                      <td className="py-2 pl-2 text-right font-mono font-semibold">
+                        {r.userPrice ? eur(r.qty * r.userPrice) : (r.noEstimate ? "—" : eur(r.qty * r.estimate))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile stacked rows */}
+            <ul className="sm:hidden space-y-3">
+              {rows.map((r, ri) => (
+                <li key={ri} className="rounded-md border border-border bg-card/60 p-3">
+                  <div className="font-sans text-sm font-medium">{r.item}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    Est. {r.noEstimate ? "—" : eur(r.estimate)}
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <label className="text-xs font-sans text-muted-foreground">
+                      Qty
+                      <input type="number" min={0} value={r.qty}
+                        onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
+                        className="mt-1 w-full bg-background border border-border rounded px-2 py-1.5 text-center" />
+                    </label>
+                    <label className="text-xs font-sans text-muted-foreground">
+                      Your €
+                      <input type="number" min={0} value={r.userPrice || ""} placeholder="—"
+                        onChange={(e) => update(gi, ri, { userPrice: Number(e.target.value) })}
+                        className="mt-1 w-full bg-background border border-border rounded px-2 py-1.5 text-right" />
+                    </label>
+                  </div>
+                  <div className="mt-2 flex justify-between text-sm">
+                    <span className="text-muted-foreground">Line total</span>
+                    <span className="font-mono font-semibold">
+                      {r.userPrice ? eur(r.qty * r.userPrice) : (r.noEstimate ? "—" : eur(r.qty * r.estimate))}
+                    </span>
+                  </div>
+                </li>
               ))}
-            </Fragment>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr className="font-semibold">
-            <td className="pt-3 pr-3 text-right" colSpan={4}>Estimate total</td>
-            <td className="pt-3 pl-2 text-right font-mono">{eur(grandEstimate)}</td>
-          </tr>
-          <tr className="font-bold text-primary">
-            <td className="pr-3 text-right" colSpan={4}>Your total</td>
-            <td className="pl-2 text-right font-mono">{grandUser ? eur(grandUser) : "—"}</td>
-          </tr>
-        </tfoot>
-      </table>
+            </ul>
+
+            <div className="mt-3 flex justify-between text-sm font-semibold text-primary border-t border-border pt-2">
+              <span>{g.title.replace(/^\d+\.\s*/, "")} subtotal</span>
+              <span className="font-mono">{eur(subtotal)}</span>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Totals */}
+      <div className="rounded-lg border border-primary bg-primary/5 p-4 sm:p-5">
+        <dl className="space-y-1.5 text-sm">
+          {groups.map((g, gi) => {
+            const sub = subtotalFor(groupRows[gi] ?? g.rows);
+            if (g.key === "optional" || sub === 0) return null;
+            return (
+              <div key={g.key} className="flex justify-between">
+                <dt className="text-muted-foreground">{g.title.replace(/^\d+\.\s*/, "")} total</dt>
+                <dd className="font-mono">{eur(sub)}</dd>
+              </div>
+            );
+          })}
+          <div className="border-t border-border pt-2 flex justify-between font-semibold">
+            <dt>Subtotal</dt>
+            <dd className="font-mono">{eur(grand)}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">+ 15% contingency</dt>
+            <dd className="font-mono">{eur(contingency)}</dd>
+          </div>
+          <div className="border-t-2 border-primary pt-2 flex justify-between font-display text-lg sm:text-xl font-bold text-primary">
+            <dt>Recommended budget</dt>
+            <dd className="font-mono">{eur(recommended)}</dd>
+          </div>
+        </dl>
+      </div>
     </div>
   );
 };
@@ -1051,6 +1270,29 @@ export default function Results() {
                     <span className="font-mono">{eur(adjust(g.total, profile))}</span>
                   </div>
 
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                    {g.key === "dc" && (
+                      <Link to="/guide#fuses" className="text-primary hover:underline">
+                        Learn how fuses protect cables →
+                      </Link>
+                    )}
+                    {g.key === "solar" && (
+                      <Link to="/guide#solar" className="text-primary hover:underline">
+                        Learn how solar charging works →
+                      </Link>
+                    )}
+                    {g.key === "shore" && (
+                      <Link to="/guide#shore" className="text-primary hover:underline">
+                        Learn how shore power works →
+                      </Link>
+                    )}
+                    {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
+                      <Link to="/guide#ac-system" className="text-primary hover:underline">
+                        Learn about 230V safety →
+                      </Link>
+                    )}
+                  </div>
+
                   {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
                     <div className="mt-4 warning-banner flex items-start gap-2">
                       <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -1153,7 +1395,7 @@ export default function Results() {
                 Appliance purchase prices are not estimated. Add your own prices if you plan to buy them.
               </p>
             )}
-            <ShoppingList result={result} profile={profile} />
+            <ShoppingList result={result} profile={profile} state={state} />
           </SectionCard>
 
           {/* 12. Confidence */}
