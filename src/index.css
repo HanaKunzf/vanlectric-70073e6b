@@ -100,6 +100,14 @@
 
   html {
     /* Field Notes is a light theme — do not force .dark */
+    scroll-padding-top: 0px;
+  }
+
+  @media (min-width: 768px) {
+    html {
+      /* Account for sticky header height on tablet/desktop so anchor jumps don't hide content */
+      scroll-padding-top: 88px;
+    }
   }
 
   html, body {
