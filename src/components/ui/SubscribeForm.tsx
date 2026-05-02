@@ -85,8 +85,12 @@ export const SubscribeForm = ({
           className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary/40"
         />
         <span>
-          I agree that Vanlectric may store my email to notify me about this feature. I can
-          unsubscribe at any time.
+          I agree to receive occasional emails about Vanlectric PRO launch and updates. I can
+          unsubscribe anytime.{" "}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+            Privacy Policy
+          </a>
+          .
         </span>
       </label>
 
