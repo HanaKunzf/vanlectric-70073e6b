@@ -13,7 +13,7 @@ import { BackToTop } from "@/components/ui/BackToTop";
 import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 import { LocalSaveNotice } from "@/components/ui/LocalSaveNotice";
 import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
-import { saveLastCalculation, clearLastCalculation, hasLastCalculation, loadLastCalculation } from "@/services/localCalculation";
+import { saveLastCalculation, clearLastCalculation, hasLastCalculation, loadLastCalculation, markResultsReached } from "@/services/localCalculation";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
@@ -1019,8 +1019,9 @@ export default function Results() {
   const [confirmStartNew, setConfirmStartNew] = useState(false);
 
   // Persist whatever the user has reached on this device (free-tier local save).
+  // Mark hasResults=true so the planner-entry modal can offer "View results".
   useEffect(() => {
-    saveLastCalculation(state);
+    markResultsReached(state);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
