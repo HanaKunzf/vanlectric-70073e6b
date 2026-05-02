@@ -381,8 +381,8 @@ const ShoppingList = ({ result, profile, state }: { result: CalculationResult; p
                 </thead>
                 <tbody>
                   {rows.map((r, ri) => (
-                    <tr key={ri} className="border-b border-border/60">
-                      <td className="py-2 pr-3 font-sans">{r.item}</td>
+                    <tr key={ri} className="border-b border-border/60 align-top">
+                      <td className="py-2 pr-3 font-sans break-words">{r.item}</td>
                       <td className="py-2 px-2">
                         <input type="number" min={0} value={r.qty}
                           onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
