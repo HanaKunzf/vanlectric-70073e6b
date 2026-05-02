@@ -535,6 +535,13 @@ export function calculate(state: WizardState): CalculationResult {
   if (shoreLines.length > 0 && shore === "never") {
     warnings.push("You have shore-power-only appliances but no shore-power access. Consider removing them or planning campsite stops.");
   }
+  if (shore === "frequent") {
+    warnings.push("Your system can rely more on shore recharging, so off-grid autonomy requirements are lower.");
+  } else if (shore === "never") {
+    warnings.push("Your system is sized more conservatively because you do not plan to rely on shore power.");
+  } else if (shore === "home-between-trips") {
+    warnings.push("Your system assumes you can recharge at home between trips, but still needs to cover your off-grid stay.");
+  }
   // High-power AC appliance warnings
   const highBattery = highPowerAcAppliances.filter((a) => !a.shoreOnly);
   const highShore = highPowerAcAppliances.filter((a) => a.shoreOnly);
