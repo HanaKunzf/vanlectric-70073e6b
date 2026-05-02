@@ -12,29 +12,29 @@ export const SiteFooterFull = () => (
       <div>
         <div className="font-semibold text-foreground mb-2">Product</div>
         <ul className="space-y-1.5 text-muted-foreground">
-          <li><Link to="/planner" className="hover:text-primary">Planner</Link></li>
-          <li><Link to="/how-it-works" className="hover:text-primary">How it works</Link></li>
-          <li><Link to="/examples" className="hover:text-primary">Example setups</Link></li>
-          <li><Link to="/checklist" className="hover:text-primary">Checklist</Link></li>
+          <li><Link to="/planner" className="hover:text-primary transition-colors">Planner</Link></li>
+          <li><Link to="/how-it-works" className="hover:text-primary transition-colors">How it works</Link></li>
+          <li><Link to="/examples" className="hover:text-primary transition-colors">Example setups</Link></li>
+          <li><Link to="/checklist" className="hover:text-primary transition-colors">Checklist</Link></li>
         </ul>
       </div>
       <div>
         <div className="font-semibold text-foreground mb-2">Learn</div>
         <ul className="space-y-1.5 text-muted-foreground">
-          <li><Link to="/electrical-guide" className="hover:text-primary">Electrical Guide</Link></li>
-          <li><Link to="/resources" className="hover:text-primary">Resources</Link></li>
-          <li><Link to="/resources/battery-sizing" className="hover:text-primary">Battery sizing</Link></li>
-          <li><Link to="/resources/solar-sizing" className="hover:text-primary">Solar sizing</Link></li>
-          <li><Link to="/resources/shore-vs-inverter" className="hover:text-primary">Shore vs inverter</Link></li>
+          <li><Link to="/electrical-guide" className="hover:text-primary transition-colors">Electrical Guide</Link></li>
+          <li><Link to="/resources" className="hover:text-primary transition-colors">Resources</Link></li>
+          <li><Link to="/resources/battery-sizing" className="hover:text-primary transition-colors">Battery sizing</Link></li>
+          <li><Link to="/resources/solar-sizing" className="hover:text-primary transition-colors">Solar sizing</Link></li>
+          <li><Link to="/resources/shore-vs-inverter" className="hover:text-primary transition-colors">Shore vs inverter</Link></li>
         </ul>
       </div>
       <div>
         <div className="font-semibold text-foreground mb-2">Company</div>
         <ul className="space-y-1.5 text-muted-foreground">
-          <li><Link to="/about" className="hover:text-primary">About</Link></li>
-          <li><Link to="/contact" className="hover:text-primary">Contact</Link></li>
-          <li><Link to="/disclaimer" className="hover:text-primary">Disclaimer</Link></li>
-          <li><Link to="/privacy" className="hover:text-primary">Privacy</Link></li>
+          <li><Link to="/about" className="hover:text-primary transition-colors">About</Link></li>
+          <li><Link to="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
+          <li><Link to="/disclaimer" className="hover:text-primary transition-colors">Disclaimer</Link></li>
+          <li><Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link></li>
         </ul>
       </div>
     </div>
