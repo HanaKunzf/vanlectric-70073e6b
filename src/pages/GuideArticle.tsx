@@ -207,14 +207,14 @@ const guides: Record<string, Guide> = {
 export default function GuideArticle() {
   const { slug } = useParams<{ slug: string }>();
   const guide = slug ? guides[slug] : undefined;
-  if (!guide) return <Navigate to="/guides" replace />;
+  if (!guide) return <Navigate to="/resources" replace />;
 
   return (
     <SiteLayout title={`${guide.title} — Vanlectric`} description={guide.description}>
-      <PageHero eyebrow="Guide" title={guide.title} subtitle={guide.description} />
+      <PageHero eyebrow="Resources" title={guide.title} subtitle={guide.description} />
       <Prose>
-        <Link to="/guides" data-prose-cta className="inline-flex items-center gap-1 text-sm text-muted-foreground no-underline hover:text-primary">
-          <ArrowLeft className="w-4 h-4" /> All guides
+        <Link to="/resources" data-prose-cta className="inline-flex items-center gap-1 text-sm text-muted-foreground no-underline hover:text-primary">
+          <ArrowLeft className="w-4 h-4" /> All resources
         </Link>
         {guide.body}
       </Prose>
