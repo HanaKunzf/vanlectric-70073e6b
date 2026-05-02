@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Zap, Pencil } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil } from "lucide-react";
 import { saveLastCalculation, clearLastCalculation, hasLastCalculation } from "@/services/localCalculation";
 import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
 import { BackToTop } from "@/components/ui/BackToTop";
