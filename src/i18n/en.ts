@@ -174,6 +174,23 @@ export const en = {
           desc: "I mainly use the van for weekends and recharge at home afterwards.",
         },
       },
+      chargingTitle: "Do you want shore power to charge your leisure battery?",
+      chargingHelper:
+        "A 230V shore circuit gives you wall sockets in the van. A shore battery charger is a separate device that recharges your leisure battery from that 230V supply.",
+      chargingOptions: {
+        "charge-battery": {
+          label: "Yes — charge my battery from shore power",
+          desc: "Recommended if you regularly connect to a plug.",
+        },
+        "ac-only": {
+          label: "No — I only want 230V sockets for shore appliances",
+          desc: "Creates a separate 230V circuit, but does not recharge the leisure battery.",
+        },
+        "not-sure": {
+          label: "Not sure — show both options",
+          desc: "We'll include the charger as recommended, but explain that it is optional.",
+        },
+      },
     },
     s7: {
       title: "🏠 Tell us about your roof",
