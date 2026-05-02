@@ -220,7 +220,7 @@ export default function GuideArticle() {
       publisher: {
         "@type": "Organization",
         name: "Vanlectric",
-        logo: { "@type": "ImageObject", url: "https://vanlectric.com/logo.svg" },
+        logo: { "@type": "ImageObject", url: "https://vanlectric.com/logo-transparent.png" },
       },
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
       dateModified: new Date().toISOString().slice(0, 10),
