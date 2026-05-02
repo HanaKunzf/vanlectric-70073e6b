@@ -149,25 +149,29 @@ export const en = {
       },
     },
     s6: {
-      title: "⚡ Will you have shore power access?",
+      title: "⚡ After how many days do you usually connect to shore power?",
       helper:
-        "Shore power (campsite hookup) lets you recharge without solar or driving — and run high-draw appliances directly.",
+        "Shore power means a 230V hookup at home, campsite, workshop, family house or another reliable plug.",
       options: {
         never: {
           label: "Never / almost never",
-          desc: "I want full energy autonomy",
+          desc: "I want the system to work off-grid without relying on a plug.",
         },
-        occasionally: {
-          label: "Occasionally",
-          desc: "A few times per month at campsites",
+        frequent: {
+          label: "Every 1–2 days",
+          desc: "I usually reach a plug very often.",
         },
-        regularly: {
-          label: "Regularly",
-          desc: "I plan to use campsites most weeks",
+        occasional: {
+          label: "Every 3–5 days",
+          desc: "I can usually recharge during longer trips.",
         },
-        home: {
-          label: "I park at home with a plug",
-          desc: "The van charges from my house between trips",
+        rare: {
+          label: "Once per week or less",
+          desc: "I may connect sometimes, but I do not want to depend on it.",
+        },
+        "home-between-trips": {
+          label: "At home between trips",
+          desc: "I mainly use the van for weekends and recharge at home afterwards.",
         },
       },
     },
