@@ -2,6 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooterFull } from "./SiteFooterFull";
+import { BackToTop } from "@/components/ui/BackToTop";
 
 const SITE_URL = "https://vanlectric.com";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.svg`;
@@ -109,6 +110,7 @@ export const SiteLayout = ({
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooterFull />
+      <BackToTop />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Zap } from "lucide-react";
+import { BackToTop } from "@/components/ui/BackToTop";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Step01_Vehicle, isStep1Valid } from "@/components/wizard/Step01_Vehicle";
 import { Step02_UsageProfile, isStep2Valid } from "@/components/wizard/Step02_UsageProfile";
@@ -87,7 +88,7 @@ export default function Wizard() {
         title="Campervan Electrical System Calculator — Vanlectric"
         description="Answer simple questions about your van, appliances, travel style and roof space to get a practical electrical system recommendation."
       />
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
+      <header className="relative md:sticky md:top-0 z-30 border-b border-border bg-background/85 md:backdrop-blur">
         <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors" aria-label="Home">
             <Zap className="w-5 h-5 text-primary" />
@@ -158,6 +159,7 @@ export default function Wizard() {
           </button>
         </div>
       </footer>
+      <BackToTop bottomOffset={72} />
     </div>
   );
 }

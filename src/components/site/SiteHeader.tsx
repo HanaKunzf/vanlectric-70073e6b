@@ -1,13 +1,27 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavMenu } from "./NavMenu";
 
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur">
+      <header
+        className={`relative md:sticky md:top-0 z-50 w-full bg-background/85 md:backdrop-blur transition-shadow duration-200 border-b ${
+          scrolled
+            ? "border-border/80 md:shadow-[0_1px_0_0_hsl(var(--border)),0_4px_12px_-6px_rgba(0,0,0,0.08)]"
+            : "border-border"
+        }`}
+      >
         <div className="container mx-auto px-4 h-16 lg:h-20 flex items-center justify-between gap-3">
           {/* Logo */}
           <Link
