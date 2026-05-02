@@ -225,7 +225,7 @@ const ShoppingList = ({ result, profile, state }: { result: CalculationResult; p
 
     // 230V AC distribution: only when full-AC mode or inverter present, otherwise the
     // "ac" bucket should be empty anyway.
-    const ac: ShopRow[] = [...(compsByKey.inverter ?? []), ...matBuckets.ac];
+    const ac: ShopRow[] = [...(compsByKey.inverter ?? []), ...(compsByKey["shore-circuit"] ?? []), ...matBuckets.ac];
 
     // 12V distribution
     const dc12v: ShopRow[] = [...matBuckets.dc12v];
