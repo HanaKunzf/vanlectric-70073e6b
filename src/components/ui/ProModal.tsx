@@ -2,12 +2,15 @@ import { useEffect } from "react";
 import { X, Lock } from "lucide-react";
 import { SubscribeForm } from "@/components/ui/SubscribeForm";
 
+import type { SubscribeSource } from "@/services/subscribe";
+
 interface ProModalProps {
   open: boolean;
   onClose: () => void;
+  source?: SubscribeSource;
 }
 
-export const ProModal = ({ open, onClose }: ProModalProps) => {
+export const ProModal = ({ open, onClose, source = "PRO coming soon" }: ProModalProps) => {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
