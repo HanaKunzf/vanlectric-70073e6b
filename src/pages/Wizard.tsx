@@ -152,7 +152,10 @@ export default function Wizard() {
         </div>
       </main>
 
-      <footer className="sticky bottom-0 border-t border-border bg-background/85 backdrop-blur">
+      <footer
+        className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/90 backdrop-blur shadow-[0_-2px_12px_-6px_rgba(45,74,62,0.15)]"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
         <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
           <button
             type="button"
