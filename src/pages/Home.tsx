@@ -15,43 +15,45 @@ export default function Home() {
       <section className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" aria-hidden />
         <div className="absolute inset-0 pointer-events-none" style={{ background: "var(--gradient-hero)" }} aria-hidden />
-        <div className="relative container mx-auto px-4 py-12 sm:py-20 max-w-5xl text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card/70 backdrop-blur text-xs font-sans tracking-wide text-muted-foreground mb-6">
+        <div className="relative container mx-auto px-4 pt-8 pb-6 sm:pt-12 sm:pb-10 max-w-5xl text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card/70 backdrop-blur text-xs font-sans tracking-wide text-muted-foreground mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             12V · Off-grid · DIY campervan electrics
           </div>
-          <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight">
-            <span className="block text-primary italic">Vanlectric</span>
-            <span className="block text-2xl sm:text-3xl md:text-4xl mt-3 text-foreground">
+          <h1 className="font-display font-bold tracking-tight">
+            <span className="block text-primary italic text-5xl sm:text-6xl md:text-7xl leading-[1.05]">
+              Vanlectric
+            </span>
+            <span className="block text-lg sm:text-xl md:text-2xl mt-2 text-foreground font-semibold leading-snug">
               Plan your campervan electrical system with confidence.
             </span>
           </h1>
-          <p className="mt-5 max-w-2xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed">
-            Vanlectric helps you size your <strong>battery capacity</strong>, <strong>solar array</strong>,{" "}
-            <strong>inverter</strong> and <strong>shore power</strong> needs, and gives you an{" "}
-            <strong>indicative component shopping list</strong> — all in about 10 minutes.
+          <p className="mt-3 max-w-2xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed">
+            Size your <strong>battery</strong>, <strong>solar</strong>, <strong>inverter</strong> and{" "}
+            <strong>shore power</strong> — with an indicative component shopping list, in about 10 minutes.
           </p>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/planner"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-base px-7 py-3.5 rounded-lg hover:bg-[hsl(var(--primary-hover))] active:scale-[0.98] transition"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-base px-6 py-3 rounded-lg hover:bg-[hsl(var(--primary-hover))] active:scale-[0.98] transition"
             >
               Start planning <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/electrical-guide"
-              className="inline-flex items-center gap-2 border border-border bg-card text-foreground font-sans font-semibold text-base px-7 py-3.5 rounded-lg hover:bg-card/70 transition"
+              className="inline-flex items-center gap-2 border border-border bg-card text-foreground font-sans font-semibold text-base px-6 py-3 rounded-lg hover:bg-card/70 transition"
             >
               <BookOpen className="w-4 h-4" /> Electrical Guide
             </Link>
           </div>
 
-          <div className="mt-10 flex justify-center">
+          <div className="mt-6 flex justify-center">
             <img
               src={heroImage}
               alt="Pencil sketch of a campervan parked in a mountain landscape"
-              className="w-auto max-h-[260px] sm:max-h-[340px] object-contain"
+              className="w-auto max-h-[200px] sm:max-h-[260px] md:max-h-[300px] object-contain"
+              loading="eager"
             />
           </div>
         </div>
