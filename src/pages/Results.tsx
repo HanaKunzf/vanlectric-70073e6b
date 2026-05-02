@@ -1570,6 +1570,15 @@ export default function Results() {
       </footer>
       <ProModal open={proOpen} onClose={() => setProOpen(false)} />
       <EmailReportModal open={emailOpen} onClose={() => setEmailOpen(false)} />
+      <ConfirmStartNewModal
+        open={confirmStartNew}
+        onOpenChange={setConfirmStartNew}
+        onConfirm={() => {
+          clearLastCalculation();
+          setConfirmStartNew(false);
+          navigate("/", { replace: true });
+        }}
+      />
       <BackToTop />
     </div>
   );
