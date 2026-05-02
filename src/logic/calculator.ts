@@ -363,12 +363,21 @@ export function calculate(state: WizardState): CalculationResult {
     });
   }
 
-  // Shore power charger
+  // Shore battery charger — only when user explicitly wants battery charging from shore,
+  // or is unsure (then labelled optional). "ac-only" or "never" → no charger.
   const shore: ShorePowerAccess = step6.shorePower ?? "never";
-  if (shore === "rare" || shore === "occasional") {
-    components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/17A", why: "Tops up your bank when you connect to a plug.", detail: "Waterproof, compact.", price: 90 });
-  } else if (shore === "frequent" || shore === "home-between-trips") {
-    components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/25A", why: "Faster recharge for frequent shore-power use.", detail: "Waterproof, 25A.", price: 110 });
+  const shoreCharging = step6.shoreCharging ?? (shore === "never" ? "none" : "charge-battery");
+  const wantsShoreCharger = shoreCharging === "charge-battery" || shoreCharging === "not-sure";
+  if (wantsShoreCharger && shore !== "never") {
+    const optional = shoreCharging === "not-sure";
+    const fast = shore === "frequent" || shore === "home-between-trips";
+    const charger: RecommendedComponent = fast
+      ? { key: "shore", category: "Shore battery charger", name: "Victron Blue Smart IP67 12/25A", why: "Charges your leisure battery from 230V shore power.", detail: "Faster recharge for frequent shore-power use. Waterproof, 25A.", price: 110 }
+      : { key: "shore", category: "Shore battery charger", name: "Victron Blue Smart IP67 12/17A", why: "Charges your leisure battery from 230V shore power.", detail: "Tops up your bank when you connect to a plug. Waterproof, compact.", price: 90 };
+    if (optional) {
+      charger.note = "Recommended / optional — you can omit this if you only want 230V sockets and do not need to charge the leisure battery from shore power.";
+    }
+    components.push(charger);
   }
 
   // Inverter — sized only from 230V appliances run from the battery (excludes shore-only)
@@ -380,6 +389,28 @@ export function calculate(state: WizardState): CalculationResult {
     if (max230VInverter < 1000) { inverterSizeRecommendedW = 1000; components.push({ key: "inverter", category: "Inverter", name: "1000W pure sine inverter", why: "Minimum recommended size — covers laptops, kettles, small appliances cleanly.", detail: `Largest 230V load: ${max230VInverter}W. Sized only from battery-powered 230V appliances.`, price: 80 }); }
     else if (max230VInverter < 2500) { inverterSizeRecommendedW = 2000; components.push({ key: "inverter", category: "Inverter", name: "2000W pure sine inverter", why: "Handles high-draw 230V appliances.", detail: `Largest 230V load: ${max230VInverter}W. Sized only from battery-powered 230V appliances.`, price: 150 }); }
     else { inverterSizeRecommendedW = 3000; components.push({ key: "inverter", category: "Inverter", name: "3000W pure sine inverter", why: "Very high 230V draw — heavy loads.", detail: `Largest 230V load: ${max230VInverter}W. Cable sizing critical. Sized only from battery-powered 230V appliances.`, price: 250 }); }
+  }
+
+  // ----- Shore-only appliances detection -----
+  const hasShoreOnlyAppliances = shoreLines.some((l) => !l.informational);
+
+  // ----- 230V shore power circuit (separate from shore battery charger) -----
+  if (hasShoreOnlyAppliances || shore !== "never") {
+    const required = hasShoreOnlyAppliances;
+    components.push({
+      key: "shore-circuit",
+      category: "230V shore power circuit",
+      name: "230V shore hookup + protected AC circuit",
+      why: required
+        ? "Required for shore-only appliances and campsite/home hookup use."
+        : "Useful for campsite/home hookup — adds 230V sockets in the van.",
+      detail:
+        "Includes: external shore inlet, RCD/RCBO protection, MCB / circuit breaker, 230V sockets, 3-core cable, protective earth and an installation enclosure. 230V AC installation should be designed or checked by a qualified electrician.",
+      price: 130,
+      note: required
+        ? "Required: you selected shore-only appliances, which can only run when plugged into 230V."
+        : undefined,
+    });
   }
 
   // ----- AC system recommendation -----
@@ -413,15 +444,18 @@ export function calculate(state: WizardState): CalculationResult {
   // ----- Installation materials (categorised) -----
   const hasSolar = recommendedSolarW > 0;
   const hasDcDc = frequency !== "shore-power" && frequency !== "off-grid";
-  const hasShoreCharger = shore !== "never";
   const hasInternal230VSockets = max230VInverter > 0; // inverter implies internal 230V sockets (informational)
-  const shoreOnlyAppliances = shoreLines.length > 0;
-  const hasShorePower = hasShoreCharger || shoreOnlyAppliances;
-  // Full 230V install only required when user has actual shore-only appliances.
-  // If shore is only used to charge the battery, a simpler setup is enough.
-  const shoreInstallMode: ShoreInstallMode = !hasShorePower
-    ? "none"
-    : (shoreOnlyAppliances ? "full-ac" : "charging-only");
+  const shoreOnlyAppliances = hasShoreOnlyAppliances;
+  // Determine the shore install scope:
+  //  - "full-ac": user has shore-only appliances, OR explicitly chose "ac-only" (sockets in van)
+  //  - "charging-only": shore charger only (charge battery from a plug)
+  //  - "none": neither
+  const needsFullAc = shoreOnlyAppliances || (shore !== "never" && shoreCharging === "ac-only");
+  const shoreInstallMode: ShoreInstallMode = needsFullAc
+    ? "full-ac"
+    : wantsShoreCharger
+    ? "charging-only"
+    : "none";
 
   // 1. DC protection and distribution
   const dcItems: MaterialItem[] = [
@@ -482,8 +516,10 @@ export function calculate(state: WizardState): CalculationResult {
       { item: "AC consumer unit / protection box", price: 45 },
       { item: "30mA RCD or RCBO", price: 40 },
       { item: "MCB for socket circuit", price: 12 },
-      { item: "MCB for shore charger", price: 12 },
     );
+    if (wantsShoreCharger) {
+      shoreItems.push({ item: "MCB for shore charger", price: 12 });
+    }
     if (max230VInverter >= 2000 || shoreOnlyAppliances) {
       shoreItems.push({ item: "MCB for high-load shore appliances", price: 15 });
     }
@@ -532,8 +568,11 @@ export function calculate(state: WizardState): CalculationResult {
       `Your climate and season combination (${climate} / ${season}) uses a conservative worst-case of ${solarHours} solar hours/day. Your solar panels (~${maxSolarW.toFixed(0)}W) will cover your needs on sunny days. For cloudy periods, plan for alternator top-ups or shore power. If you travel mainly in summer, reconsider your season selection for a more realistic estimate.`
     );
   }
-  if (shoreLines.length > 0 && shore === "never") {
-    warnings.push("You have shore-power-only appliances but no shore-power access. Consider removing them or planning campsite stops.");
+  if (hasShoreOnlyAppliances && shore === "never") {
+    warnings.push("⚠️ You selected shore-only appliances, but also selected that you will never use shore power. These appliances will not be usable unless you add a 230V shore hookup or remove them from your list.");
+  }
+  if (shore !== "never" && shoreCharging === "ac-only") {
+    warnings.push("You selected a 230V shore circuit only. Your leisure battery will not recharge from shore power unless you add a shore battery charger.");
   }
   if (shore === "frequent") {
     warnings.push("Your system can rely more on shore recharging, so off-grid autonomy requirements are lower.");

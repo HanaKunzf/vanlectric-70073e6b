@@ -88,6 +88,7 @@ const COMPONENT_GUIDE_LINK: Record<string, { label: string; hash: string }> = {
   mppt: { label: "Learn how solar charging works", hash: "#solar" },
   dcdc: { label: "Learn how alternator charging works", hash: "#dcdc" },
   shore: { label: "Learn how shore power works", hash: "#shore" },
+  "shore-circuit": { label: "Learn how shore power works", hash: "#shore" },
   inverter: { label: "Learn what an inverter does", hash: "#inverter" },
   battery: { label: "Learn about battery banks", hash: "#battery" },
 };
@@ -224,7 +225,7 @@ const ShoppingList = ({ result, profile, state }: { result: CalculationResult; p
 
     // 230V AC distribution: only when full-AC mode or inverter present, otherwise the
     // "ac" bucket should be empty anyway.
-    const ac: ShopRow[] = [...(compsByKey.inverter ?? []), ...matBuckets.ac];
+    const ac: ShopRow[] = [...(compsByKey.inverter ?? []), ...(compsByKey["shore-circuit"] ?? []), ...matBuckets.ac];
 
     // 12V distribution
     const dc12v: ShopRow[] = [...matBuckets.dc12v];

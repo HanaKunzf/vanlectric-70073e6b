@@ -90,8 +90,16 @@ export interface DrivingStep {
   duration?: DrivingDuration;
 }
 
+export type ShoreChargingPreference =
+  | "charge-battery"
+  | "ac-only"
+  | "not-sure"
+  | "none";
+
 export interface ShoreStep {
   shorePower?: ShorePowerAccess;
+  /** When shorePower !== "never": user's preference about charging the battery from shore. */
+  shoreCharging?: ShoreChargingPreference;
 }
 
 export interface RoofStep {
