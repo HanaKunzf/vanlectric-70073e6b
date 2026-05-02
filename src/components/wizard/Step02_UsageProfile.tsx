@@ -49,7 +49,7 @@ export const Step02_UsageProfile = ({ value, onChange }: Props) => {
             <span aria-hidden>💡</span>
             <span>{t.journeyHelper}</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
             {(Object.keys(t.journeyOptions) as JourneyDuration[]).map((j) => {
               const opt = t.journeyOptions[j];
               return (
