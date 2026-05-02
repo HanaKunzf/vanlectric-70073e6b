@@ -1,30 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowRight, Battery, Sun, Plug, Calculator, ShieldCheck, BookOpen } from "lucide-react";
 import { SiteLayout, Seo } from "@/components/site/SiteLayout";
 import heroImage from "@/assets/hero-van-mountains.png";
 import { ContinueLastCard } from "@/components/ui/ContinueLastCard";
-import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
-import { hasLastCalculation, clearLastCalculation } from "@/services/localCalculation";
+import { PlannerLink } from "@/components/ui/PlannerLink";
+import { hasLastCalculation } from "@/services/localCalculation";
 
 export default function Home() {
-  const navigate = useNavigate();
   const [hasSaved, setHasSaved] = useState<boolean>(() => hasLastCalculation());
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  const handleStartPlanning = (e: React.MouseEvent) => {
-    if (hasSaved) {
-      e.preventDefault();
-      setConfirmOpen(true);
-    }
-  };
-
-  const onConfirmStartNew = () => {
-    clearLastCalculation();
-    setHasSaved(false);
-    setConfirmOpen(false);
-    navigate("/planner");
-  };
 
   return (
     <SiteLayout>
@@ -56,13 +40,12 @@ export default function Home() {
           </p>
 
           <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
+            <PlannerLink
               to="/planner"
-              onClick={handleStartPlanning}
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-base px-6 py-3 rounded-lg hover:bg-[hsl(var(--primary-hover))] active:scale-[0.98] transition"
             >
               Start planning <ArrowRight className="w-4 h-4" />
-            </Link>
+            </PlannerLink>
             <Link
               to="/electrical-guide"
               className="inline-flex items-center gap-2 border border-border bg-card text-foreground font-sans font-semibold text-base px-6 py-3 rounded-lg hover:bg-card/70 transition"
@@ -147,21 +130,14 @@ export default function Home() {
         </div>
 
         <div className="mt-10 text-center">
-          <Link
+          <PlannerLink
             to="/planner"
-            onClick={handleStartPlanning}
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-base px-7 py-3.5 rounded-lg hover:bg-[hsl(var(--primary-hover))]"
           >
             Start planning your van <ArrowRight className="w-4 h-4" />
-          </Link>
+          </PlannerLink>
         </div>
       </section>
-
-      <ConfirmStartNewModal
-        open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        onConfirm={onConfirmStartNew}
-      />
     </SiteLayout>
   );
 }
