@@ -129,7 +129,7 @@ const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][numb
         </button>
         {guide && (
           <Link
-            to={`/guide${guide.hash}`}
+            to={`/electrical-guide${guide.hash}`}
             className="text-xs font-sans text-primary hover:underline"
           >
             {guide.label} →
