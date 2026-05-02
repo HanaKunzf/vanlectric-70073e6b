@@ -1508,8 +1508,8 @@ export default function Results() {
           {/* 15. Actions */}
           <SectionCard title="Next steps">
             <p className="text-xs text-muted-foreground/90 font-sans mb-4 leading-relaxed">
-              Beta note: email reports and exports are coming soon. Your calculation is fully
-              visible on this page.
+              Beta note: PDF/Excel exports and saved designs are coming soon in PRO. Your
+              calculation is fully visible on this page.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
@@ -1519,7 +1519,6 @@ export default function Results() {
               >
                 <Mail className="w-4 h-4" />
                 Email me report
-                <span className="ml-1 text-[10px] font-bold border border-primary-foreground/60 rounded px-1.5 py-0.5">COMING SOON</span>
               </button>
               <LockedAction icon={<FileText className="w-4 h-4" />} label="Download PDF" onClick={() => setProOpen(true)} />
               <LockedAction icon={<FileSpreadsheet className="w-4 h-4" />} label="Download Excel" onClick={() => setProOpen(true)} />
