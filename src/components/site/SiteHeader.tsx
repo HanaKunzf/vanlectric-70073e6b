@@ -67,27 +67,6 @@ export const SiteHeader = () => {
             <span className="sr-only">Vanlectric</span>
           </Link>
 
-          {/* Desktop inline nav (lg+) */}
-          <nav
-            aria-label="Primary"
-            className="hidden lg:flex items-center gap-1 min-w-0 flex-1 justify-end mr-2"
-          >
-            {desktopLinks.slice(1).map((item) => (
-              <Link
-                key={item.to + item.label}
-                to={item.to}
-                className={cn(
-                  "px-3 py-2 rounded-md text-sm font-sans font-medium whitespace-nowrap",
-                  "text-primary/85 hover:text-accent transition-colors",
-                  "outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
-                  isActive(item.to) && "text-accent",
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
           {/* Right side: CTA + Menu */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <PlannerLink
