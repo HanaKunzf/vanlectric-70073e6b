@@ -102,7 +102,7 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
               </button>
 
               {isOpen && (
-                <div className="px-4 pb-4 pt-1 space-y-2 animate-fade-in">
+                <div className="px-4 pb-4 pt-1 grid grid-cols-1 lg:grid-cols-2 gap-2 animate-fade-in">
                   {cat.items.map((item) => {
                     const entry = value.appliances[item.id];
                     const enabled = entry?.enabled ?? false;
