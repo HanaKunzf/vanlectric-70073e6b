@@ -78,8 +78,9 @@ const TOC: Array<{ id: string; label: string }> = [
   { id: "fuses", label: "9. Fuses and protection" },
   { id: "rcd", label: "10. RCD / RCBO / MCB basics" },
   { id: "cables", label: "11. Cable sizing basics" },
-  { id: "examples", label: "12. Typical system examples" },
-  { id: "checklist", label: "13. Before you buy" },
+  { id: "cable-chart", label: "12. Cable sizing chart" },
+  { id: "examples", label: "13. Typical system examples" },
+  { id: "checklist", label: "14. Before you buy" },
   { id: "basics", label: "Electrical basics in your pocket" },
 ];
 
