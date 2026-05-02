@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { X, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavMenuProps {
@@ -8,39 +8,100 @@ interface NavMenuProps {
   onClose: () => void;
 }
 
-const mobilePrimary = [
-  { to: "/planner", label: "Start planning" },
-  { to: "/electrical-guide", label: "Electrical Guide" },
-  { to: "/electrical-guide#basics", label: "Learn the basics" },
-  { to: "/electrical-guide#big-picture", label: "Components & systems" },
-  { to: "/electrical-guide#cable-chart", label: "Cable sizing" },
-  { to: "/checklist", label: "Before you buy" },
-];
+type MenuItem = {
+  to: string;
+  label: string;
+  description: string;
+  external?: boolean;
+  badge?: string;
+  disabled?: boolean;
+};
 
-const utility = [
-  { to: "/about", label: "About" },
-  { to: "mailto:hello@vanlectric.com", label: "Contact", external: true },
-  { to: "/privacy", label: "Privacy" },
-];
+type MenuSection = {
+  heading: string;
+  items: MenuItem[];
+};
 
-const learnLinks = [
-  { to: "/electrical-guide", label: "Electrical Guide" },
-  { to: "/electrical-guide#basics", label: "Learn the basics" },
-  { to: "/electrical-guide#big-picture", label: "Components & systems" },
-  { to: "/electrical-guide#cable-chart", label: "Cable sizing" },
-  { to: "/checklist", label: "Before you buy" },
-];
-
-const planLinks = [
-  { to: "/planner", label: "Start planning" },
-  { to: "/planner", label: "Recalculate" },
-  { to: "#", label: "Saved designs", muted: "PRO — coming soon" },
+const sections: MenuSection[] = [
+  {
+    heading: "Plan",
+    items: [
+      {
+        to: "/planner",
+        label: "Start planning",
+        description: "Build your campervan electrical system estimate step by step.",
+      },
+      {
+        to: "/planner",
+        label: "Recalculate",
+        description: "Adjust your previous inputs and update the result.",
+      },
+      {
+        to: "#",
+        label: "Saved designs",
+        description: "Save and compare your electrical plans.",
+        badge: "PRO — Coming soon",
+        disabled: true,
+      },
+    ],
+  },
+  {
+    heading: "Learn",
+    items: [
+      {
+        to: "/electrical-guide",
+        label: "Electrical Guide",
+        description: "Understand the main parts of a campervan electrical system.",
+      },
+      {
+        to: "/electrical-guide#basics",
+        label: "Learn the basics",
+        description: "A simple introduction to batteries, solar, chargers and inverters.",
+      },
+      {
+        to: "/electrical-guide#big-picture",
+        label: "Components & systems",
+        description: "See what each component does and why it matters.",
+      },
+      {
+        to: "/electrical-guide#cable-chart",
+        label: "Cable sizing",
+        description: "Learn why cable size, fuse size and distance matter.",
+      },
+      {
+        to: "/checklist",
+        label: "Before you buy",
+        description: "Checklist of things to verify before ordering components.",
+      },
+    ],
+  },
+  {
+    heading: "About",
+    items: [
+      {
+        to: "/about",
+        label: "About",
+        description: "Why Vanlectric exists and what it helps you do.",
+      },
+      {
+        to: "mailto:hello@vanlectric.com",
+        label: "Contact",
+        description: "Get in touch with questions or feedback.",
+        external: true,
+      },
+      {
+        to: "/privacy",
+        label: "Privacy",
+        description: "How Vanlectric handles data and cookies.",
+      },
+    ],
+  },
 ];
 
 export const NavMenu = ({ open, onClose }: NavMenuProps) => {
   const location = useLocation();
   const panelRef = useRef<HTMLDivElement>(null);
-  const firstFocusableRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close on route change
   useEffect(() => {
@@ -74,8 +135,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
     };
     document.addEventListener("keydown", onKey);
 
-    // initial focus
-    setTimeout(() => firstFocusableRef.current?.focus(), 50);
+    setTimeout(() => closeButtonRef.current?.focus(), 50);
 
     return () => {
       document.body.style.overflow = prevOverflow;
@@ -84,35 +144,71 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
   }, [open, onClose]);
 
   const isActive = (to: string) => {
-    const [path] = to.split("#");
-    return location.pathname === path;
+    if (!to || to === "#") return false;
+    const [path, hash] = to.split("#");
+    if (hash) return location.pathname === path && location.hash === `#${hash}`;
+    return location.pathname === path && !location.hash;
   };
 
-  const renderLink = (
-    item: { to: string; label: string; external?: boolean },
-    className: string,
-    activeClass = "",
-  ) => {
+  const renderItem = (item: MenuItem) => {
+    const baseTitle =
+      "block font-display font-semibold text-base sm:text-lg leading-snug transition-colors duration-150";
+    const baseDesc =
+      "mt-0.5 text-xs sm:text-sm font-sans leading-relaxed text-muted-foreground";
+
+    if (item.disabled) {
+      return (
+        <div
+          key={item.label}
+          className="block py-2.5 px-2 -mx-2 rounded-md cursor-not-allowed select-none"
+          aria-disabled="true"
+        >
+          <span className={cn(baseTitle, "text-foreground/40")}>
+            {item.label}
+            {item.badge && (
+              <span className="ml-2 inline-block align-middle text-[10px] font-sans uppercase tracking-[0.15em] text-accent/80 font-semibold">
+                {item.badge}
+              </span>
+            )}
+          </span>
+          <span className={cn(baseDesc, "text-muted-foreground/70")}>{item.description}</span>
+        </div>
+      );
+    }
+
+    const titleClass = cn(
+      baseTitle,
+      "text-primary group-hover:text-accent group-focus-visible:text-accent",
+      isActive(item.to) && "text-accent",
+    );
+
+    const content = (
+      <>
+        <span className={titleClass}>
+          {item.label}
+          {item.badge && (
+            <span className="ml-2 inline-block align-middle text-[10px] font-sans uppercase tracking-[0.15em] text-accent font-semibold">
+              {item.badge}
+            </span>
+          )}
+        </span>
+        <span className={baseDesc}>{item.description}</span>
+      </>
+    );
+
+    const linkClass =
+      "group block py-2.5 px-2 -mx-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-accent/40 transition-colors";
+
     if (item.external) {
       return (
-        <a
-          key={item.label}
-          href={item.to}
-          className={className}
-          onClick={onClose}
-        >
-          {item.label}
+        <a key={item.label} href={item.to} onClick={onClose} className={linkClass}>
+          {content}
         </a>
       );
     }
     return (
-      <Link
-        key={item.to + item.label}
-        to={item.to}
-        onClick={onClose}
-        className={cn(className, isActive(item.to) && activeClass)}
-      >
-        {item.label}
+      <Link key={item.to + item.label} to={item.to} onClick={onClose} className={linkClass}>
+        {content}
       </Link>
     );
   };
@@ -130,278 +226,76 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
         aria-label="Close menu"
         tabIndex={-1}
         onClick={onClose}
-        className={cn(
-          "absolute inset-0 w-full h-full",
-          "bg-[hsl(var(--background)/0.55)] backdrop-blur-md",
-          "transition-opacity duration-200 motion-reduce:transition-none",
-        )}
+        className="absolute inset-0 w-full h-full bg-[hsl(var(--background)/0.55)] backdrop-blur-md transition-opacity duration-200 motion-reduce:transition-none"
       />
 
-      {/* MOBILE: full-screen overlay */}
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Site navigation"
-        className={cn(
-          "md:hidden absolute inset-0 flex flex-col bg-background",
-          "transition-all duration-200 motion-reduce:transition-none",
-          open ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0",
-        )}
-        style={{
-          paddingTop: "env(safe-area-inset-top)",
-          paddingBottom: "env(safe-area-inset-bottom)",
-        }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 h-14 border-b border-border flex-shrink-0">
-          <Link
-            to="/"
-            onClick={onClose}
-            className="flex items-center"
-            aria-label="Vanlectric home"
-          >
-            <img src="/logo-transparent.png" alt="Vanlectric" className="h-9 w-auto" decoding="async" />
-          </Link>
-          <button
-            ref={firstFocusableRef}
-            type="button"
-            aria-label="Close menu"
-            onClick={onClose}
-            className="p-2 -mr-2 rounded-md text-primary hover:bg-card transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        {/* Primary nav */}
-        <nav className="flex-1 flex flex-col px-6 py-2 min-h-0 overflow-y-auto">
-          <ul className="flex-1 flex flex-col justify-center divide-y divide-border">
-            {mobilePrimary.map((item) => (
-              <li key={item.to + item.label}>
-                <Link
-                  to={item.to}
-                  onClick={onClose}
-                  className={cn(
-                    "block py-2.5 font-display font-semibold text-[20px] leading-tight tracking-tight text-primary",
-                    "transition-colors hover:text-accent",
-                    isActive(item.to) && "text-accent",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* Utility */}
-          <div className="pt-3 pb-2 mt-2 border-t border-border flex items-center justify-center gap-5 text-xs font-sans text-muted-foreground flex-shrink-0">
-            {utility.map((u) =>
-              u.external ? (
-                <a key={u.label} href={u.to} onClick={onClose} className="hover:text-accent transition-colors">
-                  {u.label}
-                </a>
-              ) : (
-                <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-accent transition-colors">
-                  {u.label}
-                </Link>
-              ),
-            )}
-          </div>
-        </nav>
-      </div>
-
-      {/* TABLET: centered floating panel (2 columns) */}
+      {/* Panel: same concept across breakpoints, sized responsively */}
       <div
         className={cn(
-          "hidden md:flex lg:hidden absolute inset-0 items-start justify-center px-6 pt-20",
+          "absolute inset-0 flex items-start justify-center md:justify-end px-0 md:px-6 pt-0 md:pt-16",
           "transition-all duration-200 motion-reduce:transition-none",
           open ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0",
         )}
       >
         <div
+          ref={panelRef}
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"
-          className="w-[90%] max-w-[760px] rounded-2xl border border-border bg-card shadow-[var(--shadow-card-hover)] overflow-hidden"
+          className={cn(
+            "w-full md:max-w-[920px]",
+            "bg-card md:rounded-2xl md:border md:border-border md:shadow-[var(--shadow-card-hover)]",
+            "h-screen md:h-auto md:max-h-[calc(100vh-6rem)] flex flex-col overflow-hidden",
+          )}
+          style={{
+            paddingTop: "env(safe-area-inset-top)",
+            paddingBottom: "env(safe-area-inset-bottom)",
+          }}
         >
-          <div className="flex items-center justify-between px-6 h-14 border-b border-border">
-            <span className="font-display italic font-bold text-base text-primary">Vanlectric</span>
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 sm:px-7 h-14 border-b border-border flex-shrink-0">
+            <Link
+              to="/"
+              onClick={onClose}
+              className="flex items-center outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded-md"
+              aria-label="Vanlectric home"
+            >
+              <img
+                src="/logo-transparent.png"
+                alt="Vanlectric"
+                className="h-8 w-auto"
+                decoding="async"
+              />
+            </Link>
             <button
+              ref={closeButtonRef}
               type="button"
               aria-label="Close menu"
               onClick={onClose}
-              className="p-2 -mr-2 rounded-md text-primary hover:bg-background transition-colors"
+              className="p-2 -mr-2 rounded-md text-primary transition-colors duration-150 hover:text-accent focus-visible:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" aria-hidden />
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-8 p-7">
-            <div>
-              <div className="text-[11px] font-sans uppercase tracking-[0.2em] text-accent font-semibold mb-3">
-                Learn
-              </div>
-              <ul className="space-y-2.5">
-                {learnLinks.map((l) =>
-                  renderLink(
-                    l,
-                    "block font-display font-semibold text-lg text-primary hover:text-accent transition-colors",
-                    "text-accent",
-                  ),
-                )}
-              </ul>
-            </div>
-            <div className="flex flex-col">
-              <div className="text-[11px] font-sans uppercase tracking-[0.2em] text-accent font-semibold mb-3">
-                Featured
-              </div>
-              <p className="text-sm font-sans text-foreground/80 leading-relaxed mb-4">
-                Plan your campervan electrical system with clear guidance, realistic sizing and a practical shopping list.
-              </p>
-              <Link
-                to="/planner"
-                onClick={onClose}
-                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm px-4 py-2.5 rounded-md hover:bg-[hsl(var(--primary-hover))] transition-colors"
-              >
-                Start planning <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/electrical-guide"
-                onClick={onClose}
-                className="mt-3 text-sm font-sans text-primary underline underline-offset-2 hover:text-accent"
-              >
-                Read the Electrical Guide
-              </Link>
-              <div className="mt-6 pt-4 border-t border-border flex flex-wrap gap-x-4 gap-y-2 text-xs font-sans text-muted-foreground">
-                {utility.map((u) =>
-                  u.external ? (
-                    <a key={u.label} href={u.to} onClick={onClose} className="hover:text-accent transition-colors">
-                      {u.label}
-                    </a>
-                  ) : (
-                    <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-accent transition-colors">
-                      {u.label}
-                    </Link>
-                  ),
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* DESKTOP: floating mega-menu (3 columns) */}
-      <div
-        className={cn(
-          "hidden lg:flex absolute inset-0 items-start justify-end px-6 pt-16",
-          "transition-all duration-200 motion-reduce:transition-none",
-          open ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0",
-        )}
-      >
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Site navigation"
-          className="w-full max-w-[920px] rounded-2xl border border-border bg-card shadow-[var(--shadow-card-hover)] overflow-hidden"
-        >
-          <div className="flex items-center justify-between px-7 h-14 border-b border-border">
-            <span className="font-display italic font-bold text-base text-primary">Vanlectric</span>
-            <button
-              type="button"
-              aria-label="Close menu"
-              onClick={onClose}
-              className="p-2 -mr-2 rounded-md text-primary hover:bg-background transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="grid grid-cols-3 gap-8 p-8">
-            {/* Plan */}
-            <div>
-              <div className="text-[11px] font-sans uppercase tracking-[0.2em] text-accent font-semibold mb-3">
-                Plan
-              </div>
-              <ul className="space-y-2.5">
-                {planLinks.map((p) =>
-                  p.muted ? (
-                    <li key={p.label}>
-                      <span className="block font-display font-semibold text-lg text-foreground/40 cursor-not-allowed">
-                        {p.label}
-                        <span className="block text-[11px] font-sans uppercase tracking-[0.15em] text-accent/70 font-semibold mt-0.5">
-                          {p.muted}
-                        </span>
-                      </span>
-                    </li>
-                  ) : (
-                    <li key={p.to + p.label}>
-                      <Link
-                        to={p.to}
-                        onClick={onClose}
-                        className={cn(
-                          "block font-display font-semibold text-lg text-primary hover:text-accent transition-colors",
-                          isActive(p.to) && "text-accent",
-                        )}
-                      >
-                        {p.label}
-                      </Link>
-                    </li>
-                  ),
-                )}
-              </ul>
+          {/* Sections */}
+          <div className="flex-1 overflow-y-auto px-5 sm:px-7 py-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-8">
+              {sections.map((section) => (
+                <section key={section.heading}>
+                  <h2 className="text-[11px] font-sans uppercase tracking-[0.2em] text-accent font-semibold mb-3">
+                    {section.heading}
+                  </h2>
+                  <ul className="divide-y divide-border md:divide-y-0 md:space-y-1">
+                    {section.items.map((item) => (
+                      <li key={item.label} className="md:py-0">
+                        {renderItem(item)}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
             </div>
-
-            {/* Learn */}
-            <div>
-              <div className="text-[11px] font-sans uppercase tracking-[0.2em] text-accent font-semibold mb-3">
-                Learn
-              </div>
-              <ul className="space-y-2.5">
-                {learnLinks.map((l) =>
-                  renderLink(
-                    l,
-                    "block font-display font-semibold text-lg text-primary hover:text-accent transition-colors",
-                    "text-accent",
-                  ),
-                )}
-              </ul>
-            </div>
-
-            {/* Featured */}
-            <div className="flex flex-col">
-              <div className="text-[11px] font-sans uppercase tracking-[0.2em] text-accent font-semibold mb-3">
-                Featured
-              </div>
-              <p className="text-sm font-sans text-foreground/80 leading-relaxed mb-4">
-                Plan your campervan electrical system with clear guidance, realistic sizing and a practical shopping list.
-              </p>
-              <Link
-                to="/planner"
-                onClick={onClose}
-                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm px-4 py-2.5 rounded-md hover:bg-[hsl(var(--primary-hover))] transition-colors"
-              >
-                Start planning <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/electrical-guide"
-                onClick={onClose}
-                className="mt-3 text-sm font-sans text-primary underline underline-offset-2 hover:text-accent"
-              >
-                Read the Electrical Guide
-              </Link>
-            </div>
-          </div>
-          <div className="px-8 py-3 border-t border-border bg-background/40 flex flex-wrap gap-x-5 gap-y-2 text-xs font-sans text-muted-foreground">
-            {utility.map((u) =>
-              u.external ? (
-                <a key={u.label} href={u.to} onClick={onClose} className="hover:text-accent transition-colors">
-                  {u.label}
-                </a>
-              ) : (
-                <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-accent transition-colors">
-                  {u.label}
-                </Link>
-              ),
-            )}
           </div>
         </div>
       </div>
