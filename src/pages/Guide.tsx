@@ -300,20 +300,27 @@ export default function Guide() {
             <h3 className="font-display font-bold text-lg text-primary mt-2 mb-2">
               12V DC cable sizing (mm²)
             </h3>
-            <div className="overflow-x-auto rounded-lg border border-border bg-background/60">
-              <table className="w-full text-sm font-sans border-collapse">
+            <div className="rounded-lg border border-border bg-background/60 overflow-hidden">
+              <table className="w-full text-xs sm:text-sm font-sans border-collapse table-fixed">
+                <colgroup>
+                  <col className="w-[14%]" />
+                  <col className="w-[34%]" />
+                  <col className="w-[17%]" />
+                  <col className="w-[17%]" />
+                  <col className="w-[18%]" />
+                </colgroup>
                 <thead>
-                  <tr className="bg-primary/10 text-left">
-                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">Current</th>
-                    <th className="px-3 py-2 font-semibold text-primary">Typical use</th>
-                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">
-                      Short<br /><span className="text-xs font-normal text-muted-foreground">≤ 2 m</span>
+                  <tr className="bg-primary/10 text-left align-bottom">
+                    <th className="px-2 sm:px-3 py-2 font-semibold text-primary">Current</th>
+                    <th className="px-2 sm:px-3 py-2 font-semibold text-primary">Typical use</th>
+                    <th className="px-2 sm:px-3 py-2 font-semibold text-primary">
+                      Short<br /><span className="text-[10px] sm:text-xs font-normal text-muted-foreground">≤ 2 m</span>
                     </th>
-                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">
-                      Medium<br /><span className="text-xs font-normal text-muted-foreground">2–4 m</span>
+                    <th className="px-2 sm:px-3 py-2 font-semibold text-primary">
+                      Medium<br /><span className="text-[10px] sm:text-xs font-normal text-muted-foreground">2–4 m</span>
                     </th>
-                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">
-                      Long<br /><span className="text-xs font-normal text-muted-foreground">4–6 m</span>
+                    <th className="px-2 sm:px-3 py-2 font-semibold text-primary">
+                      Long<br /><span className="text-[10px] sm:text-xs font-normal text-muted-foreground">4–6 m</span>
                     </th>
                   </tr>
                 </thead>
@@ -328,22 +335,17 @@ export default function Guide() {
                     { a: "50A", use: "Larger inverter, short battery links", s: "16", m: "25", l: "35" },
                     { a: "100A", use: "Battery / inverter main cables", s: "35", m: "50", l: "70" },
                   ].map((row) => (
-                    <tr key={row.a} className="border-t border-border">
-                      <td className="px-3 py-2 font-display font-bold text-primary whitespace-nowrap">{row.a}</td>
-                      <td className="px-3 py-2">{row.use}</td>
-                      <td className="px-3 py-2 whitespace-nowrap">{row.s} mm²</td>
-                      <td className="px-3 py-2 whitespace-nowrap">{row.m} mm²</td>
-                      <td className="px-3 py-2 whitespace-nowrap">{row.l} mm²</td>
+                    <tr key={row.a} className="border-t border-border align-top">
+                      <td className="px-2 sm:px-3 py-2 font-display font-bold text-primary break-words">{row.a}</td>
+                      <td className="px-2 sm:px-3 py-2 break-words">{row.use}</td>
+                      <td className="px-2 sm:px-3 py-2 break-words">{row.s} mm²</td>
+                      <td className="px-2 sm:px-3 py-2 break-words">{row.m} mm²</td>
+                      <td className="px-2 sm:px-3 py-2 break-words">{row.l} mm²</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-muted-foreground italic mt-2">
-              Values are practical guidelines for 12V DC at ~3% voltage drop. Always verify
-              against the real run length and conditions.
-            </p>
-          </div>
 
           <div className="not-prose">
             <h3 className="font-display font-bold text-lg text-primary mt-5 mb-2">
