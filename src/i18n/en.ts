@@ -7,9 +7,9 @@ export const en = {
   },
   landing: {
     bullets: [
-      { icon: "⚡", text: "Based on your actual appliances" },
-      { icon: "☀️", text: "Solar, alternator & shore power" },
-      { icon: "📄", text: "Full report & shopping list" },
+      { icon: "zap", text: "Based on your actual appliances" },
+      { icon: "sun", text: "Solar, alternator & shore power" },
+      { icon: "report", text: "Full report & shopping list" },
     ],
     cta: "Start Calculator",
     note: "Free to use • No account required",
