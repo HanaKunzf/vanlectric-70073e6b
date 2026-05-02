@@ -159,6 +159,7 @@ export default function Wizard() {
           </button>
         </div>
       </footer>
+      <BackToTop bottomOffset={72} />
     </div>
   );
 }
