@@ -220,7 +220,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
       { id: "coffee", label: "Espresso machine (230V)", watts: 1200, defaultHours: 0.15, unit: "h/day", powerSource: "230v-inverter" },
       { id: "microwave", label: "Microwave", watts: 800, defaultHours: 0.2, unit: "h/day", powerSource: "230v-inverter" },
       { id: "toaster", label: "Toaster", watts: 800, defaultHours: 0.1, unit: "h/day", powerSource: "230v-inverter" },
-      { id: "oven", label: "Electric oven / mini oven (230V)", watts: 1200, defaultHours: 0.5, unit: "h/day", powerSource: "230v-shore", shorePowerOnly: true, hint: "⚠️ Shore power only recommended" },
+      { id: "oven", label: "Electric oven / mini oven (230V)", watts: 1200, defaultHours: 0.5, unit: "h/day", powerSource: "230v-shore", shorePowerOnly: true, hint: "Shore power only recommended" },
       { id: "gas-stove", label: "Gas stove", watts: 0, defaultHours: 0, powerSource: "12v", informational: true, hint: "No electrical load. Using gas reduces your need for electric cooking appliances." },
     ],
   },
@@ -245,7 +245,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
       { id: "shower-pump", label: "Shower / grey pump", watts: 50, defaultHours: 0.2, unit: "h/day", powerSource: "12v" },
       { id: "diesel-water-heater", label: "Diesel water heater (Webasto/Espar)", watts: 180, defaultHours: 1, unit: "h/day", powerSource: "12v", hint: "Heats tank once then maintains temp" },
       { id: "heat-exchanger", label: "Engine heat exchanger", watts: 0, defaultHours: 0, powerSource: "12v", informational: true, hint: "No electrical load — heats water while driving" },
-      { id: "flow-heater", label: "Electric flow heater (230V)", watts: 3500, defaultHours: 0.2, unit: "h/day", powerSource: "230v-shore", shorePowerOnly: true, hint: "⚠️ Requires shore power — not suitable for off-grid use" },
+      { id: "flow-heater", label: "Electric flow heater (230V)", watts: 3500, defaultHours: 0.2, unit: "h/day", powerSource: "230v-shore", shorePowerOnly: true, hint: "Requires shore power — not suitable for off-grid use" },
     ],
   },
   {
