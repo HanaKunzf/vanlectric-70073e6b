@@ -48,29 +48,17 @@ export const EmailReportModal = ({ open, onClose }: EmailReportModalProps) => {
         <div className="h-px w-12 bg-primary/40 mb-4" />
 
         <p className="text-sm text-foreground/90 leading-relaxed mb-3">
-          We're preparing email reports for the final Vanlectric launch. For now, your full
-          result is available directly on this page.
+          We're preparing email reports for the final Vanlectric launch. Leave your email and
+          we'll let you know as soon as it's ready.
         </p>
-        <p className="text-xs text-muted-foreground leading-relaxed mb-6">
-          Once vanlectric.com is live, you'll be able to send the report to your inbox.
+        <p className="text-xs text-muted-foreground leading-relaxed mb-5">
+          Your full result is also available directly on this page right now.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px]"
-          >
-            Got it
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-border bg-card text-foreground hover:border-primary hover:text-primary transition-colors font-sans font-semibold text-sm min-h-[44px]"
-          >
-            Back to results
-          </button>
-        </div>
+        <SubscribeForm
+          source="Email report"
+          submitLabel="Email me the report when ready"
+        />
       </div>
     </div>
   );
