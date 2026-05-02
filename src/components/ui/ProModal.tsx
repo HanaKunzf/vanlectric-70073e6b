@@ -1,12 +1,16 @@
 import { useEffect } from "react";
 import { X, Lock } from "lucide-react";
+import { SubscribeForm } from "@/components/ui/SubscribeForm";
+
+import type { SubscribeSource } from "@/services/subscribe";
 
 interface ProModalProps {
   open: boolean;
   onClose: () => void;
+  source?: SubscribeSource;
 }
 
-export const ProModal = ({ open, onClose }: ProModalProps) => {
+export const ProModal = ({ open, onClose, source = "PRO coming soon" }: ProModalProps) => {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -46,18 +50,13 @@ export const ProModal = ({ open, onClose }: ProModalProps) => {
         </div>
         <div className="h-px w-12 bg-primary/40 mb-4" />
 
-        <p className="text-sm text-foreground/90 leading-relaxed mb-6">
+        <p className="text-sm text-foreground/90 leading-relaxed mb-5">
           PDF export, Excel shopping lists, saved designs and existing system analysis are
-          planned for Vanlectric PRO. The calculator itself is free to test now.
+          planned for Vanlectric PRO. Leave your email and we'll let you know when it's ready.
+          The calculator itself is free to test now.
         </p>
 
-        <button
-          type="button"
-          onClick={onClose}
-          className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px]"
-        >
-          Got it
-        </button>
+        <SubscribeForm source={source} submitLabel="Notify me when PRO is ready" />
       </div>
     </div>
   );

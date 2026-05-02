@@ -95,7 +95,7 @@ export const Step13_Existing = ({ value = {}, onChange, wizardState }: Props) =>
         </div>
       </div>
 
-      <ProModal open={proOpen} onClose={() => setProOpen(false)} />
+      <ProModal open={proOpen} onClose={() => setProOpen(false)} source="Existing components PRO waitlist" />
     </StepCard>
   );
 };
