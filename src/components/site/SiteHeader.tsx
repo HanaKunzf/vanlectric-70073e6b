@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { to: "/", label: "Home" },
-  { to: "/planner", label: "Planner" },
+  { to: "/planner", label: "Calculator" },
   { to: "/how-it-works", label: "How it works" },
-  { to: "/guide", label: "Guide" },
-  { to: "/guides", label: "Guides" },
+  { to: "/electrical-guide", label: "Electrical Guide" },
+  { to: "/resources", label: "Resources" },
   { to: "/checklist", label: "Checklist" },
   { to: "/examples", label: "Examples" },
   { to: "/about", label: "About" },
