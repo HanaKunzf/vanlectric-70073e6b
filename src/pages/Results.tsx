@@ -1352,7 +1352,7 @@ export default function Results() {
                 Appliance purchase prices are not estimated. Add your own prices if you plan to buy them.
               </p>
             )}
-            <ShoppingList result={result} profile={profile} />
+            <ShoppingList result={result} profile={profile} state={state} />
           </SectionCard>
 
           {/* 12. Confidence */}
