@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { NavMenu } from "./NavMenu";
+import { PlannerLink } from "@/components/ui/PlannerLink";
 
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
@@ -40,12 +41,12 @@ export const SiteHeader = () => {
 
           {/* Right side: Start planning + Menu */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link
+            <PlannerLink
               to="/planner"
               className="hidden sm:inline-flex items-center bg-primary text-primary-foreground text-sm font-sans font-semibold px-4 py-2 rounded-md hover:bg-[hsl(var(--primary-hover))] transition-colors"
             >
               Start planning
-            </Link>
+            </PlannerLink>
             <button
               type="button"
               aria-label="Open menu"
