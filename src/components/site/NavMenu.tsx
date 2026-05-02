@@ -184,7 +184,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
                   onClick={onClose}
                   className={cn(
                     "block py-2.5 font-display font-semibold text-[20px] leading-tight tracking-tight text-primary",
-                    "transition-colors hover:text-[hsl(var(--primary-hover))]",
+                    "transition-colors hover:text-accent",
                     isActive(item.to) && "text-accent",
                   )}
                 >
@@ -198,11 +198,11 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
           <div className="pt-3 pb-2 mt-2 border-t border-border flex items-center justify-center gap-5 text-xs font-sans text-muted-foreground flex-shrink-0">
             {utility.map((u) =>
               u.external ? (
-                <a key={u.label} href={u.to} onClick={onClose} className="hover:text-primary transition-colors">
+                <a key={u.label} href={u.to} onClick={onClose} className="hover:text-accent transition-colors">
                   {u.label}
                 </a>
               ) : (
-                <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-primary transition-colors">
+                <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-accent transition-colors">
                   {u.label}
                 </Link>
               ),
@@ -245,7 +245,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
                 {learnLinks.map((l) =>
                   renderLink(
                     l,
-                    "block font-display font-semibold text-lg text-primary hover:text-[hsl(var(--primary-hover))] transition-colors",
+                    "block font-display font-semibold text-lg text-primary hover:text-accent transition-colors",
                     "text-accent",
                   ),
                 )}
@@ -268,18 +268,18 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
               <Link
                 to="/electrical-guide"
                 onClick={onClose}
-                className="mt-3 text-sm font-sans text-primary underline underline-offset-2 hover:text-[hsl(var(--primary-hover))]"
+                className="mt-3 text-sm font-sans text-primary underline underline-offset-2 hover:text-accent"
               >
                 Read the Electrical Guide
               </Link>
               <div className="mt-6 pt-4 border-t border-border flex flex-wrap gap-x-4 gap-y-2 text-xs font-sans text-muted-foreground">
                 {utility.map((u) =>
                   u.external ? (
-                    <a key={u.label} href={u.to} onClick={onClose} className="hover:text-primary transition-colors">
+                    <a key={u.label} href={u.to} onClick={onClose} className="hover:text-accent transition-colors">
                       {u.label}
                     </a>
                   ) : (
-                    <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-primary transition-colors">
+                    <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-accent transition-colors">
                       {u.label}
                     </Link>
                   ),
@@ -338,7 +338,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
                         to={p.to}
                         onClick={onClose}
                         className={cn(
-                          "block font-display font-semibold text-lg text-primary hover:text-[hsl(var(--primary-hover))] transition-colors",
+                          "block font-display font-semibold text-lg text-primary hover:text-accent transition-colors",
                           isActive(p.to) && "text-accent",
                         )}
                       >
@@ -359,7 +359,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
                 {learnLinks.map((l) =>
                   renderLink(
                     l,
-                    "block font-display font-semibold text-lg text-primary hover:text-[hsl(var(--primary-hover))] transition-colors",
+                    "block font-display font-semibold text-lg text-primary hover:text-accent transition-colors",
                     "text-accent",
                   ),
                 )}
@@ -384,7 +384,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
               <Link
                 to="/electrical-guide"
                 onClick={onClose}
-                className="mt-3 text-sm font-sans text-primary underline underline-offset-2 hover:text-[hsl(var(--primary-hover))]"
+                className="mt-3 text-sm font-sans text-primary underline underline-offset-2 hover:text-accent"
               >
                 Read the Electrical Guide
               </Link>
@@ -393,11 +393,11 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
           <div className="px-8 py-3 border-t border-border bg-background/40 flex flex-wrap gap-x-5 gap-y-2 text-xs font-sans text-muted-foreground">
             {utility.map((u) =>
               u.external ? (
-                <a key={u.label} href={u.to} onClick={onClose} className="hover:text-primary transition-colors">
+                <a key={u.label} href={u.to} onClick={onClose} className="hover:text-accent transition-colors">
                   {u.label}
                 </a>
               ) : (
-                <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-primary transition-colors">
+                <Link key={u.to} to={u.to} onClick={onClose} className="hover:text-accent transition-colors">
                   {u.label}
                 </Link>
               ),
