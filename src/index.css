@@ -100,14 +100,20 @@
 
   html {
     /* Field Notes is a light theme — do not force .dark */
-    scroll-padding-top: 0px;
+    scroll-padding-top: 80px;
   }
 
   @media (min-width: 768px) {
     html {
-      /* Account for sticky header height on tablet/desktop so anchor jumps don't hide content */
+      /* Account for fixed header height on tablet/desktop so anchor jumps don't hide content */
       scroll-padding-top: 88px;
     }
+  }
+
+  /* Anchor targets must clear the fixed header */
+  :target,
+  [id] {
+    scroll-margin-top: 88px;
   }
 
   html, body, #root {
