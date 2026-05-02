@@ -197,7 +197,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
     );
 
     const linkClass =
-      "group block py-2.5 px-2 -mx-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-accent/40 transition-colors";
+      "group block py-2 sm:py-2.5 px-2 -mx-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-accent/40 transition-colors";
 
     if (item.external) {
       return (
