@@ -1050,8 +1050,8 @@ export default function Results() {
               );
             })()}
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="w-full">
+              <table className="w-full text-xs sm:text-sm table-fixed">
                 <thead className="text-left text-muted-foreground font-sans font-semibold border-b border-border">
                   <tr>
                     <th className="py-2 pr-3">Appliance</th>
