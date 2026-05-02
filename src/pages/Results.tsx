@@ -1009,11 +1009,20 @@ export default function Results() {
   const navigate = useNavigate();
   const location = useLocation();
   const incomingWizard = (location.state as { wizard?: Partial<WizardState> })?.wizard;
-  const state: WizardState = { ...initialWizardState, ...(incomingWizard ?? {}) };
+  // Fall back to localStorage when results page is opened directly (e.g. browser refresh).
+  const fallbackWizard = useMemo(() => (incomingWizard ? null : loadLastCalculation()), [incomingWizard]);
+  const state: WizardState = { ...initialWizardState, ...(incomingWizard ?? fallbackWizard ?? {}) };
   const result = useMemo(() => calculate(state), [state]);
   const [proOpen, setProOpen] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [profile, setProfile] = useState<PriceProfile>("balanced");
+  const [confirmStartNew, setConfirmStartNew] = useState(false);
+
+  // Persist whatever the user has reached on this device (free-tier local save).
+  useEffect(() => {
+    saveLastCalculation(state);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Profile-adjusted totals
   const adjComponentsTotal = adjust(result.componentsTotal, profile);
