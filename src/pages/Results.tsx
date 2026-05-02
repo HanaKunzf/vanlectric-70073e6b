@@ -481,20 +481,20 @@ const ShoppingList = ({ result, profile, state }: { result: CalculationResult; p
 };
 
 // ---------- Edit chips ----------
-const EDIT_CHIPS: Array<{ step: number; emoji: string; label: string }> = [
-  { step: 1, emoji: "🚐", label: "Vehicle" },
-  { step: 2, emoji: "🏕️", label: "Usage" },
-  { step: 3, emoji: "🌤️", label: "Climate" },
-  { step: 4, emoji: "🔌", label: "Appliances" },
-  { step: 5, emoji: "🛣️", label: "Driving" },
-  { step: 6, emoji: "⚡", label: "Shore power" },
-  { step: 7, emoji: "🏠", label: "Roof" },
-  { step: 8, emoji: "👥", label: "People" },
-  { step: 9, emoji: "💻", label: "Remote work" },
-  { step: 10, emoji: "🍂", label: "Season" },
-  { step: 11, emoji: "🧱", label: "Insulation" },
-  { step: 12, emoji: "💰", label: "Budget" },
-  { step: 13, emoji: "🔧", label: "Existing" },
+const EDIT_CHIPS: Array<{ step: number; icon: IconKey; label: string }> = [
+  { step: 1, icon: "van", label: "Vehicle" },
+  { step: 2, icon: "tent", label: "Usage" },
+  { step: 3, icon: "partlyCloudy", label: "Climate" },
+  { step: 4, icon: "appliances", label: "Appliances" },
+  { step: 5, icon: "driving", label: "Driving" },
+  { step: 6, icon: "shore", label: "Shore power" },
+  { step: 7, icon: "roof", label: "Roof" },
+  { step: 8, icon: "people", label: "People" },
+  { step: 9, icon: "remoteWork", label: "Remote work" },
+  { step: 10, icon: "leaf", label: "Season" },
+  { step: 11, icon: "insulation", label: "Insulation" },
+  { step: 12, icon: "budget", label: "Budget" },
+  { step: 13, icon: "tools", label: "Existing" },
 ];
 
 const EditChips = ({ state }: { state: WizardState }) => {
@@ -510,9 +510,9 @@ const EditChips = ({ state }: { state: WizardState }) => {
             key={c.step}
             type="button"
             onClick={() => editStep(c.step)}
-            className="basis-[calc((100%-1rem)/3)] sm:basis-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-background text-foreground hover:border-primary hover:bg-primary/5 transition-colors font-sans text-xs font-semibold"
+            className="basis-[calc((100%-1rem)/3)] sm:basis-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-background text-foreground hover:border-primary hover:bg-primary/5 hover:text-accent transition-colors font-sans text-xs font-semibold"
           >
-            <span aria-hidden>{c.emoji}</span>
+            <BrandIcon name={c.icon} size="xs" />
             <span className="truncate">{c.label}</span>
           </button>
         ))}
