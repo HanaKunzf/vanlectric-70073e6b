@@ -19,7 +19,7 @@ export const Step05_Driving = ({ value, onChange }: Props) => {
   return (
     <StepCard title={t.title} illustration={<DrivingIllustration className="w-full h-full" />}>
       <HelperText>{t.helper}</HelperText>
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {freqs.map((f) => (
           <SelectButton
             key={f}

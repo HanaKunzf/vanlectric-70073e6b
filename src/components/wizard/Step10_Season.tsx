@@ -16,7 +16,7 @@ export const Step10_Season = ({ value, onChange }: Props) => {
   return (
     <StepCard title={t.title} illustration={<SeasonIllustration className="w-full h-full" />}>
       <HelperText>{t.helper}</HelperText>
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {keys.map((k) => (
           <SelectButton key={k} selected={value.season === k} onClick={() => onChange({ season: k })} size="md">
             <div>

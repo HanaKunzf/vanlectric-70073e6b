@@ -16,7 +16,7 @@ export const Step03_Climate = ({ value, onChange }: Props) => {
   return (
     <StepCard title={t.title} illustration={<ClimateIllustration className="w-full h-full" />}>
       <HelperText>{t.helper}</HelperText>
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {keys.map((k) => (
           <SelectButton key={k} selected={value.climate === k} onClick={() => onChange({ climate: k })} size="md">
             <div>
