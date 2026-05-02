@@ -971,7 +971,7 @@ export default function Results() {
         description="Review your calculated campervan battery, solar, inverter, DC-DC charger, shore power setup and shopping list."
         noindex
       />
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
+      <header className="relative md:sticky md:top-0 z-30 border-b border-border bg-background/85 md:backdrop-blur">
         <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
           <button
             type="button"
@@ -1471,6 +1471,7 @@ export default function Results() {
       </footer>
       <ProModal open={proOpen} onClose={() => setProOpen(false)} />
       <EmailReportModal open={emailOpen} onClose={() => setEmailOpen(false)} />
+      <BackToTop />
     </div>
   );
 }
