@@ -41,7 +41,7 @@ export const SiteHeader = () => {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 w-full max-w-full border-b transition-shadow duration-200",
+          "fixed top-0 left-0 right-0 z-50 w-full max-w-full border-b transition-shadow duration-200",
           // Translucent warm cream + Apple-style blur
           "bg-[hsl(var(--background)/0.78)] supports-[backdrop-filter]:bg-[hsl(var(--background)/0.65)]",
           "backdrop-blur-md backdrop-saturate-150",
@@ -49,8 +49,9 @@ export const SiteHeader = () => {
             ? "border-border/80 shadow-[0_1px_0_0_hsl(var(--border)),0_4px_14px_-8px_rgba(0,0,0,0.10)]"
             : "border-transparent",
         )}
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
-        <div className="container mx-auto px-4 h-16 lg:h-20 flex items-center justify-between gap-3 min-w-0">
+        <div className="container mx-auto px-4 h-16 md:h-[72px] flex items-center justify-between gap-3 min-w-0">
           {/* Logo */}
           <Link
             to="/"
