@@ -35,9 +35,10 @@ export default function Wizard() {
   const [confirmStartNew, setConfirmStartNew] = useState(false);
 
   // Auto-save wizard state to localStorage on every change (free-tier persistence).
+  // Also keeps `currentStep` in sync so we can resume at the right place.
   useEffect(() => {
-    saveLastCalculation(state);
-  }, [state]);
+    saveLastCalculation(state, { currentStep: step });
+  }, [state, step]);
 
   const set = <K extends keyof WizardState>(key: K, v: WizardState[K]) =>
     setState((s) => ({ ...s, [key]: v }));
