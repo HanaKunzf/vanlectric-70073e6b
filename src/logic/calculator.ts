@@ -363,12 +363,21 @@ export function calculate(state: WizardState): CalculationResult {
     });
   }
 
-  // Shore power charger
+  // Shore battery charger — only when user explicitly wants battery charging from shore,
+  // or is unsure (then labelled optional). "ac-only" or "never" → no charger.
   const shore: ShorePowerAccess = step6.shorePower ?? "never";
-  if (shore === "rare" || shore === "occasional") {
-    components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/17A", why: "Tops up your bank when you connect to a plug.", detail: "Waterproof, compact.", price: 90 });
-  } else if (shore === "frequent" || shore === "home-between-trips") {
-    components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/25A", why: "Faster recharge for frequent shore-power use.", detail: "Waterproof, 25A.", price: 110 });
+  const shoreCharging = step6.shoreCharging ?? (shore === "never" ? "none" : "charge-battery");
+  const wantsShoreCharger = shoreCharging === "charge-battery" || shoreCharging === "not-sure";
+  if (wantsShoreCharger && shore !== "never") {
+    const optional = shoreCharging === "not-sure";
+    const fast = shore === "frequent" || shore === "home-between-trips";
+    const charger: RecommendedComponent = fast
+      ? { key: "shore", category: "Shore battery charger", name: "Victron Blue Smart IP67 12/25A", why: "Charges your leisure battery from 230V shore power.", detail: "Faster recharge for frequent shore-power use. Waterproof, 25A.", price: 110 }
+      : { key: "shore", category: "Shore battery charger", name: "Victron Blue Smart IP67 12/17A", why: "Charges your leisure battery from 230V shore power.", detail: "Tops up your bank when you connect to a plug. Waterproof, compact.", price: 90 };
+    if (optional) {
+      charger.note = "Recommended / optional — you can omit this if you only want 230V sockets and do not need to charge the leisure battery from shore power.";
+    }
+    components.push(charger);
   }
 
   // Inverter — sized only from 230V appliances run from the battery (excludes shore-only)
@@ -380,6 +389,28 @@ export function calculate(state: WizardState): CalculationResult {
     if (max230VInverter < 1000) { inverterSizeRecommendedW = 1000; components.push({ key: "inverter", category: "Inverter", name: "1000W pure sine inverter", why: "Minimum recommended size — covers laptops, kettles, small appliances cleanly.", detail: `Largest 230V load: ${max230VInverter}W. Sized only from battery-powered 230V appliances.`, price: 80 }); }
     else if (max230VInverter < 2500) { inverterSizeRecommendedW = 2000; components.push({ key: "inverter", category: "Inverter", name: "2000W pure sine inverter", why: "Handles high-draw 230V appliances.", detail: `Largest 230V load: ${max230VInverter}W. Sized only from battery-powered 230V appliances.`, price: 150 }); }
     else { inverterSizeRecommendedW = 3000; components.push({ key: "inverter", category: "Inverter", name: "3000W pure sine inverter", why: "Very high 230V draw — heavy loads.", detail: `Largest 230V load: ${max230VInverter}W. Cable sizing critical. Sized only from battery-powered 230V appliances.`, price: 250 }); }
+  }
+
+  // ----- Shore-only appliances detection -----
+  const hasShoreOnlyAppliances = shoreLines.some((l) => !l.informational);
+
+  // ----- 230V shore power circuit (separate from shore battery charger) -----
+  if (hasShoreOnlyAppliances || shore !== "never") {
+    const required = hasShoreOnlyAppliances;
+    components.push({
+      key: "shore-circuit",
+      category: "230V shore power circuit",
+      name: "230V shore hookup + protected AC circuit",
+      why: required
+        ? "Required for shore-only appliances and campsite/home hookup use."
+        : "Useful for campsite/home hookup — adds 230V sockets in the van.",
+      detail:
+        "Includes: external shore inlet, RCD/RCBO protection, MCB / circuit breaker, 230V sockets, 3-core cable, protective earth and an installation enclosure. 230V AC installation should be designed or checked by a qualified electrician.",
+      price: 130,
+      note: required
+        ? "Required: you selected shore-only appliances, which can only run when plugged into 230V."
+        : undefined,
+    });
   }
 
   // ----- AC system recommendation -----
