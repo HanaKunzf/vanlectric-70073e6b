@@ -16,7 +16,7 @@ export const Step09_RemoteWork = ({ value, onChange }: Props) => {
   return (
     <StepCard title={t.title} illustration={<RemoteWorkIllustration className="w-full h-full" />}>
       <HelperText>{t.helper}</HelperText>
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {keys.map((k) => (
           <SelectButton key={k} selected={value.remoteWork === k} onClick={() => onChange({ remoteWork: k })} size="md">
             <div>

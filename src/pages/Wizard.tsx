@@ -88,7 +88,7 @@ export default function Wizard() {
         description="Answer simple questions about your van, appliances, travel style and roof space to get a practical electrical system recommendation."
       />
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
-        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
+        <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors" aria-label="Home">
             <Zap className="w-5 h-5 text-primary" />
             <span className="hidden sm:inline font-display text-base font-semibold tracking-tight">
@@ -109,7 +109,7 @@ export default function Wizard() {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <main className="flex-1 mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-10">
         {editMode && (
           <div className="mb-6 rounded-lg border-l-4 border-accent bg-accent/10 px-4 py-3 text-sm font-sans text-foreground">
             ✏️ Editing — click {en.nav.next} to return to results
@@ -133,7 +133,7 @@ export default function Wizard() {
       </main>
 
       <footer className="sticky bottom-0 border-t border-border bg-background/85 backdrop-blur">
-        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+        <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={goBack}

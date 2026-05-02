@@ -16,7 +16,7 @@ export const Step08_People = ({ value, onChange }: Props) => {
   return (
     <StepCard title={t.title} illustration={<PeopleIllustration className="w-full h-full" />}>
       <HelperText>{t.helper}</HelperText>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {counts.map((c) => (
           <SelectButton key={c} selected={value.people === c} onClick={() => onChange({ people: c })} size="md">
             <div className="flex items-start gap-3">
