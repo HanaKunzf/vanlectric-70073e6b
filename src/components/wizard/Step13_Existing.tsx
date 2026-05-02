@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Lock, CheckCircle2 } from "lucide-react";
 import { StepCard } from "@/components/ui/StepCard";
 import { ProModal } from "@/components/ui/ProModal";
@@ -10,20 +10,22 @@ import type { ExistingStep, BatteryChemistry, WizardState } from "@/types";
 interface Props {
   value: ExistingStep;
   onChange: (next: ExistingStep) => void;
+  wizardState?: WizardState;
 }
 
-export const Step13_Existing = ({ value = {}, onChange }: Props) => {
+export const Step13_Existing = ({ value = {}, onChange, wizardState }: Props) => {
   const enabled = FEATURES.EXISTING_COMPONENTS;
   const navigate = useNavigate();
-  const location = useLocation();
   const [proOpen, setProOpen] = useState(false);
-  const wizard = (location.state as { wizard?: WizardState })?.wizard;
 
   const showFreeResult = () => {
-    onChange({ ...value, skip: true });
-    navigate("/results", {
-      state: { wizard: { ...(wizard ?? {}), step13: { ...value, skip: true } } },
-    });
+    const nextStep13 = { ...value, skip: true };
+    onChange(nextStep13);
+    if (wizardState) {
+      navigate("/results", { state: { wizard: { ...wizardState, step13: nextStep13 } } });
+    } else {
+      navigate("/results");
+    }
   };
 
   return (
