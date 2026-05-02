@@ -102,6 +102,11 @@
     /* Field Notes is a light theme — do not force .dark */
   }
 
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
   body {
     @apply bg-background text-foreground font-sans;
     font-feature-settings: "ss01", "ss02";
