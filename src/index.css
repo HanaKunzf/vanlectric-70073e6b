@@ -110,15 +110,30 @@
     }
   }
 
-  html, body {
+  html, body, #root {
     overflow-x: hidden;
     max-width: 100%;
+  }
+
+  #root {
+    width: 100%;
   }
 
   body {
     @apply bg-background text-foreground font-sans;
     font-feature-settings: "ss01", "ss02";
     -webkit-font-smoothing: antialiased;
+    /* Long words/labels (vehicle names, cable specs) must never push layout */
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  /* Tables that must remain table-like: scroll inside their wrapper, not the page */
+  .table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   h1, h2, h3, h4, h5, h6 {
