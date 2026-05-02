@@ -53,7 +53,7 @@ export default function Guides() {
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">{g.excerpt}</p>
             <div className="mt-3 inline-flex items-center gap-1 text-sm text-primary font-sans">
-              Read guide <ArrowRight className="w-4 h-4" />
+              Read more <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
         ))}

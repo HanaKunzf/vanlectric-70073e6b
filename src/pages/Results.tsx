@@ -129,7 +129,7 @@ const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][numb
         </button>
         {guide && (
           <Link
-            to={`/guide${guide.hash}`}
+            to={`/electrical-guide${guide.hash}`}
             className="text-xs font-sans text-primary hover:underline"
           >
             {guide.label} →
@@ -1272,22 +1272,22 @@ export default function Results() {
 
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                     {g.key === "dc" && (
-                      <Link to="/guide#fuses" className="text-primary hover:underline">
+                      <Link to="/electrical-guide#fuses" className="text-primary hover:underline">
                         Learn how fuses protect cables →
                       </Link>
                     )}
                     {g.key === "solar" && (
-                      <Link to="/guide#solar" className="text-primary hover:underline">
+                      <Link to="/electrical-guide#solar" className="text-primary hover:underline">
                         Learn how solar charging works →
                       </Link>
                     )}
                     {g.key === "shore" && (
-                      <Link to="/guide#shore" className="text-primary hover:underline">
+                      <Link to="/electrical-guide#shore" className="text-primary hover:underline">
                         Learn how shore power works →
                       </Link>
                     )}
                     {g.key === "shore" && result.shoreInstallMode === "full-ac" && (
-                      <Link to="/guide#ac-system" className="text-primary hover:underline">
+                      <Link to="/electrical-guide#ac-system" className="text-primary hover:underline">
                         Learn about 230V safety →
                       </Link>
                     )}

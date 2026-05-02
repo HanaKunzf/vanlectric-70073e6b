@@ -12,6 +12,7 @@ import HowItWorks from "./pages/HowItWorks.tsx";
 import Guides from "./pages/Guides.tsx";
 import GuideArticle from "./pages/GuideArticle.tsx";
 import Guide from "./pages/Guide.tsx";
+import { Navigate } from "react-router-dom";
 import Checklist from "./pages/Checklist.tsx";
 import Examples from "./pages/Examples.tsx";
 import About from "./pages/About.tsx";
@@ -33,8 +34,12 @@ const App = () => (
           <Route path="/wizard" element={<Wizard />} />
           <Route path="/results" element={<Results />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/guide" element={<Guide />} />
-          <Route path="/guides" element={<Guides />} />
+          <Route path="/electrical-guide" element={<Guide />} />
+          <Route path="/resources" element={<Guides />} />
+          <Route path="/resources/:slug" element={<GuideArticle />} />
+          {/* Legacy redirects */}
+          <Route path="/guide" element={<Navigate to="/electrical-guide" replace />} />
+          <Route path="/guides" element={<Navigate to="/resources" replace />} />
           <Route path="/guides/:slug" element={<GuideArticle />} />
           <Route path="/checklist" element={<Checklist />} />
           <Route path="/examples" element={<Examples />} />

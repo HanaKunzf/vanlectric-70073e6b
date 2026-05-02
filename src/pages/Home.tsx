@@ -40,10 +40,10 @@ export default function Home() {
               Start planning <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              to="/guides"
+              to="/electrical-guide"
               className="inline-flex items-center gap-2 border border-border bg-card text-foreground font-sans font-semibold text-base px-7 py-3.5 rounded-lg hover:bg-card/70 transition"
             >
-              <BookOpen className="w-4 h-4" /> Read the guide
+              <BookOpen className="w-4 h-4" /> Electrical Guide
             </Link>
           </div>
 

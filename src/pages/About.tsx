@@ -24,7 +24,7 @@ export default function About() {
           The tool is free, requires no account, and works on a phone in the van.
         </p>
         <p>
-          <Link to="/planner">Try the planner</Link> · <Link to="/guides">Read the guides</Link> ·{" "}
+          <Link to="/planner">Try the planner</Link> · <Link to="/resources">Browse resources</Link> ·{" "}
           <Link to="/contact">Get in touch</Link>
         </p>
       </Prose>
