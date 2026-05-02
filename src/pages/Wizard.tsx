@@ -212,6 +212,7 @@ export default function Wizard() {
           navigate("/", { replace: true });
         }}
       />
+      <NavMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );
 }
