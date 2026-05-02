@@ -17,30 +17,69 @@ const baseProps = {
 };
 
 // ---------- STEP 1 ----------
+// Camper van facing right. Long body (living area) at left, short cab + sloped
+// windshield at right. Subtle roof solar panel + tiny lightning bolt accent.
 export const VanIllustration = ({ className }: IllProps) => (
   <svg viewBox="0 0 200 120" className={className} {...baseProps} aria-hidden>
-    <path d="M11 80 Q10.5 65 10.5 50 Q10 38 22 38 L130 38 L160 55 L184 60 Q192 62 192 70 L192 82 L175 82.5" />
-    <path d="M11 82 L52 82" />
-    <path d="M82 82 L145 82.5" />
-    <path d="M130 38 L160 55 L130 55 Z" />
-    <rect x="22" y="44" width="42" height="14" rx="1.5" />
-    <rect x="72" y="44" width="42" height="14" rx="1.5" />
-    <path d="M134 41 L156 53" strokeWidth="0.6" opacity="0.5" />
-    <path d="M138 41 L156 49" strokeWidth="0.6" opacity="0.5" />
-    <path d="M142 41 L156 45" strokeWidth="0.6" opacity="0.5" />
-    <path d="M30 88 L40 92" strokeWidth="0.6" opacity="0.4" />
-    <path d="M45 88 L55 92" strokeWidth="0.6" opacity="0.4" />
-    <path d="M110 88 L120 92" strokeWidth="0.6" opacity="0.4" />
-    <path d="M125 88 L135 92" strokeWidth="0.6" opacity="0.4" />
-    <circle cx="65" cy="86" r="11" />
-    <circle cx="65" cy="86" r="4" />
-    <circle cx="162" cy="86" r="11" />
-    <circle cx="162" cy="86" r="4" />
-    <rect x="30" y="32" width="90" height="6" />
-    <line x1="55" y1="32" x2="55" y2="38" />
-    <line x1="80" y1="32" x2="80" y2="38" />
-    <line x1="105" y1="32" x2="105" y2="38" />
-    <path d="M158 14 L152 26 L158 26 L154 38 L168 22 L162 22 L166 14 Z" strokeWidth="1" />
+    {/* Ground line — very subtle */}
+    <path d="M8 96 L192 96" strokeWidth="0.5" opacity="0.35" />
+
+    {/* Body silhouette — single continuous outline.
+        Start: rear bottom-left, up the rear, across roof, down windshield,
+        across hood, down front bumper, along underside back to start. */}
+    <path d="
+      M18 82
+      L18 44
+      Q18 38 24 38
+      L138 38
+      Q146 38 150 44
+      L162 60
+      L182 62
+      Q188 63 188 68
+      L188 82
+    " />
+
+    {/* Underside between wheels */}
+    <path d="M18 82 L46 82" />
+    <path d="M76 82 L150 82" />
+    <path d="M178 82 L188 82" />
+
+    {/* Sliding-door rear window */}
+    <rect x="28" y="46" width="40" height="16" rx="1.5" />
+    {/* Mid window */}
+    <rect x="74" y="46" width="40" height="16" rx="1.5" />
+    {/* Door seam */}
+    <line x1="71" y1="40" x2="71" y2="80" strokeWidth="0.6" opacity="0.45" />
+    {/* Body waistline */}
+    <line x1="20" y1="68" x2="148" y2="68" strokeWidth="0.5" opacity="0.35" />
+
+    {/* Cab windshield (sloped) */}
+    <path d="M138 42 L158 60 L150 60 Z" />
+    {/* Cab door window */}
+    <rect x="152" y="50" width="22" height="12" rx="1.5" opacity="0.9" />
+    {/* Door handle */}
+    <line x1="156" y1="68" x2="162" y2="68" strokeWidth="0.6" opacity="0.5" />
+    {/* Side mirror */}
+    <path d="M178 56 L184 54" strokeWidth="0.8" />
+    {/* Headlight */}
+    <path d="M184 70 L188 70" strokeWidth="0.8" />
+
+    {/* Wheels */}
+    <circle cx="61" cy="86" r="10" />
+    <circle cx="61" cy="86" r="3.5" />
+    <circle cx="164" cy="86" r="10" />
+    <circle cx="164" cy="86" r="3.5" />
+    {/* Wheel arch hints */}
+    <path d="M50 82 Q61 70 72 82" strokeWidth="0.5" opacity="0.35" />
+    <path d="M153 82 Q164 70 175 82" strokeWidth="0.5" opacity="0.35" />
+
+    {/* Roof solar panel */}
+    <rect x="32" y="32" width="86" height="6" rx="0.5" />
+    <line x1="60" y1="32" x2="60" y2="38" strokeWidth="0.5" opacity="0.55" />
+    <line x1="89" y1="32" x2="89" y2="38" strokeWidth="0.5" opacity="0.55" />
+
+    {/* Tiny lightning bolt — Vanlectric detail */}
+    <path d="M30 14 L24 24 L29 24 L26 32 L34 22 L29 22 L32 14 Z" strokeWidth="0.9" />
   </svg>
 );
 
