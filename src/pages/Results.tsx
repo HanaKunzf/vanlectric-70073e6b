@@ -945,7 +945,8 @@ const InstallerPreview = ({ onClick }: { onClick: () => void }) => (
 export default function Results() {
   const navigate = useNavigate();
   const location = useLocation();
-  const state: WizardState = (location.state as { wizard?: WizardState })?.wizard ?? initialWizardState;
+  const incomingWizard = (location.state as { wizard?: Partial<WizardState> })?.wizard;
+  const state: WizardState = { ...initialWizardState, ...(incomingWizard ?? {}) };
   const result = useMemo(() => calculate(state), [state]);
   const [proOpen, setProOpen] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
