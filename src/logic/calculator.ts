@@ -365,9 +365,9 @@ export function calculate(state: WizardState): CalculationResult {
 
   // Shore power charger
   const shore: ShorePowerAccess = step6.shorePower ?? "never";
-  if (shore === "occasionally") {
-    components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/17A", why: "Tops up your bank when at a campsite.", detail: "Waterproof, compact.", price: 90 });
-  } else if (shore === "regularly" || shore === "home") {
+  if (shore === "rare" || shore === "occasional") {
+    components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/17A", why: "Tops up your bank when you connect to a plug.", detail: "Waterproof, compact.", price: 90 });
+  } else if (shore === "frequent" || shore === "home-between-trips") {
     components.push({ key: "shore", category: "Shore charger", name: "Victron Blue Smart IP67 12/25A", why: "Faster recharge for frequent shore-power use.", detail: "Waterproof, 25A.", price: 110 });
   }
 
@@ -534,6 +534,13 @@ export function calculate(state: WizardState): CalculationResult {
   }
   if (shoreLines.length > 0 && shore === "never") {
     warnings.push("You have shore-power-only appliances but no shore-power access. Consider removing them or planning campsite stops.");
+  }
+  if (shore === "frequent") {
+    warnings.push("Your system can rely more on shore recharging, so off-grid autonomy requirements are lower.");
+  } else if (shore === "never") {
+    warnings.push("Your system is sized more conservatively because you do not plan to rely on shore power.");
+  } else if (shore === "home-between-trips") {
+    warnings.push("Your system assumes you can recharge at home between trips, but still needs to cover your off-grid stay.");
   }
   // High-power AC appliance warnings
   const highBattery = highPowerAcAppliances.filter((a) => !a.shoreOnly);

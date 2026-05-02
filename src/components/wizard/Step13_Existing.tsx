@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Lock } from "lucide-react";
+import { ArrowRight, Lock, CheckCircle2 } from "lucide-react";
 import { StepCard } from "@/components/ui/StepCard";
-import { HelperText } from "@/components/ui/WarningBanner";
 import { ProModal } from "@/components/ui/ProModal";
 import { FEATURES } from "@/config/features";
 import { en } from "@/i18n/en";
@@ -20,48 +19,79 @@ export const Step13_Existing = ({ value = {}, onChange }: Props) => {
   const [proOpen, setProOpen] = useState(false);
   const wizard = (location.state as { wizard?: WizardState })?.wizard;
 
-  const skipToResults = () => {
+  const showFreeResult = () => {
     onChange({ ...value, skip: true });
-    navigate("/results", { state: { wizard: { ...(wizard ?? {}), step13: { ...value, skip: true } } } });
+    navigate("/results", {
+      state: { wizard: { ...(wizard ?? {}), step13: { ...value, skip: true } } },
+    });
   };
 
   return (
-    <StepCard title="🔧 Do you already have any components?">
-      <HelperText>Optional — skip if you're starting from scratch</HelperText>
+    <StepCard title="Already have some components?">
+      <p className="text-sm sm:text-base text-muted-foreground font-sans -mt-1 mb-5">
+        Optional PRO feature — skip this and see your full result for free.
+      </p>
 
-      <div className="relative">
-        <div className={enabled ? "" : "pointer-events-none select-none opacity-40 blur-[2px]"}>
-          <ExistingForm value={value} onChange={onChange} />
-        </div>
-
-        {!enabled && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6">
-            <div className="rounded-full bg-card border border-primary px-4 py-2 inline-flex items-center gap-2 shadow-sm">
-              <Lock className="w-4 h-4 text-primary" />
-              <span className="font-sans font-bold text-primary tracking-wide">{en.pro.badge}</span>
-            </div>
-            <p className="font-display text-xl sm:text-2xl font-bold text-primary text-center">
-              Analyse your existing system with PRO
+      {/* Reassurance / free-result hero */}
+      <div className="rounded-xl border-2 border-primary bg-primary/5 p-5 sm:p-6 mb-6">
+        <div className="flex items-start gap-3 mb-3">
+          <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="font-display text-xl sm:text-2xl font-bold text-primary">
+              Your calculation is ready
+            </h3>
+            <p className="text-sm sm:text-base text-foreground/80 font-sans mt-1">
+              You can view your full recommended system for free now. PRO will later let you
+              enter components you already own and check how far they can take you.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 mt-2">
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={showFreeResult}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-base min-h-[48px]"
+        >
+          Show my free result
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* PRO preview — clearly secondary */}
+      <div className="rounded-lg border border-border bg-card/60 p-4 sm:p-5">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="inline-flex items-center gap-1 rounded-full border border-primary/60 bg-card px-2 py-0.5 text-[10px] font-bold text-primary tracking-wider">
+            <Lock className="w-3 h-3" /> {en.pro.badge}
+          </span>
+          <span className="text-xs sm:text-sm font-sans font-semibold text-muted-foreground uppercase tracking-wide">
+            Optional — coming soon
+          </span>
+        </div>
+        <h4 className="font-display text-lg sm:text-xl font-bold text-foreground">
+          Analyse existing components — PRO coming soon
+        </h4>
+        <p className="text-sm text-muted-foreground font-sans mt-1 mb-4">
+          Enter the battery, panels, charger or inverter you already have, and we'll tell you
+          how far they can take you and what to add.
+        </p>
+
+        <div className="relative">
+          <div className={enabled ? "" : "pointer-events-none select-none opacity-30 blur-[2px]"}>
+            <ExistingForm value={value} onChange={onChange} />
+          </div>
+          {!enabled && (
+            <div className="absolute inset-0 flex items-center justify-center">
               <button
                 type="button"
                 onClick={() => setProOpen(true)}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] transition-colors font-sans font-semibold text-sm min-h-[44px]"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border bg-card text-foreground hover:border-primary hover:text-primary transition-colors font-sans font-semibold text-sm min-h-[40px]"
               >
-                Coming Soon — Notify Me
-              </button>
-              <button
-                type="button"
-                onClick={skipToResults}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-border bg-card text-foreground hover:border-primary hover:text-primary transition-colors font-sans font-semibold text-sm min-h-[44px]"
-              >
-                Skip — show full new system
+                Notify me when PRO is ready
               </button>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
       <ProModal open={proOpen} onClose={() => setProOpen(false)} />
     </StepCard>
   );
