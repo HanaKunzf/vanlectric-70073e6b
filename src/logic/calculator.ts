@@ -444,15 +444,18 @@ export function calculate(state: WizardState): CalculationResult {
   // ----- Installation materials (categorised) -----
   const hasSolar = recommendedSolarW > 0;
   const hasDcDc = frequency !== "shore-power" && frequency !== "off-grid";
-  const hasShoreCharger = shore !== "never";
   const hasInternal230VSockets = max230VInverter > 0; // inverter implies internal 230V sockets (informational)
-  const shoreOnlyAppliances = shoreLines.length > 0;
-  const hasShorePower = hasShoreCharger || shoreOnlyAppliances;
-  // Full 230V install only required when user has actual shore-only appliances.
-  // If shore is only used to charge the battery, a simpler setup is enough.
-  const shoreInstallMode: ShoreInstallMode = !hasShorePower
-    ? "none"
-    : (shoreOnlyAppliances ? "full-ac" : "charging-only");
+  const shoreOnlyAppliances = hasShoreOnlyAppliances;
+  // Determine the shore install scope:
+  //  - "full-ac": user has shore-only appliances, OR explicitly chose "ac-only" (sockets in van)
+  //  - "charging-only": shore charger only (charge battery from a plug)
+  //  - "none": neither
+  const needsFullAc = shoreOnlyAppliances || (shore !== "never" && shoreCharging === "ac-only");
+  const shoreInstallMode: ShoreInstallMode = needsFullAc
+    ? "full-ac"
+    : wantsShoreCharger
+    ? "charging-only"
+    : "none";
 
   // 1. DC protection and distribution
   const dcItems: MaterialItem[] = [
