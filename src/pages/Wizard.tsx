@@ -125,7 +125,10 @@ export default function Wizard() {
         </div>
       </header>
 
-      <main className="flex-1 mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-10">
+      <main
+        className="flex-1 mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-10"
+        style={{ paddingBottom: "calc(96px + env(safe-area-inset-bottom))" }}
+      >
         {editMode && (
           <div className="mb-6 rounded-lg border-l-4 border-accent bg-accent/10 px-4 py-3 text-sm font-sans text-foreground inline-flex items-center gap-2">
             <Pencil className="w-4 h-4" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
@@ -149,7 +152,10 @@ export default function Wizard() {
         </div>
       </main>
 
-      <footer className="sticky bottom-0 border-t border-border bg-background/85 backdrop-blur">
+      <footer
+        className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/90 backdrop-blur shadow-[0_-2px_12px_-6px_rgba(45,74,62,0.15)]"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
         <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
           <button
             type="button"
