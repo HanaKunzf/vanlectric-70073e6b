@@ -201,7 +201,7 @@ export const APPLIANCE_CATALOG: ApplianceCategory[] = [
   {
     id: "fridge",
     label: "Cooling",
-    icon: "ac",
+    icon: "fridge",
     items: [
       { id: "fridge-small", label: "Compressor fridge up to 40l", watts: 35, defaultHours: 8, unit: "h/day", powerSource: "12v", hint: "Best for 1–2 people with frequent shopping (every 1–2 days)" },
       { id: "fridge-medium", label: "Compressor fridge 40–60l", watts: 45, defaultHours: 8, unit: "h/day", powerSource: "12v", hint: "Good for 1–2 people with less frequent shopping, or 2–3 people daily" },
