@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { PlannerLink } from "@/components/ui/PlannerLink";
 import { ArrowRight } from "lucide-react";
 import { SiteLayout, PageHero } from "@/components/site/SiteLayout";
 
@@ -52,12 +53,12 @@ export default function HowItWorks() {
         </ol>
 
         <div className="mt-10 text-center">
-          <Link
+          <PlannerLink
             to="/planner"
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold px-7 py-3.5 rounded-lg hover:bg-[hsl(var(--primary-hover))]"
           >
             Open the planner <ArrowRight className="w-4 h-4" />
-          </Link>
+          </PlannerLink>
         </div>
       </div>
     </SiteLayout>

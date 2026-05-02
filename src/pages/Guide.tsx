@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { PlannerLink } from "@/components/ui/PlannerLink";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { ArrowRight, AlertTriangle, CheckSquare } from "lucide-react";
@@ -530,13 +531,13 @@ export default function Guide() {
           <p className="text-sm text-muted-foreground mb-4">
             Use the planner to translate this guide into a real component list and budget.
           </p>
-          <Link
+          <PlannerLink
             to="/planner"
             data-prose-cta
             className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] font-sans font-semibold text-sm"
           >
             Open planner <ArrowRight className="w-4 h-4" />
-          </Link>
+          </PlannerLink>
         </div>
       </div>
     </SiteLayout>

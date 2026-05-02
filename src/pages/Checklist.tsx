@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { PlannerLink } from "@/components/ui/PlannerLink";
 import { Copy, Check, ArrowRight } from "lucide-react";
 import { SiteLayout, PageHero } from "@/components/site/SiteLayout";
 
@@ -155,12 +156,12 @@ export default function Checklist() {
             <div className="font-display font-semibold text-lg">Need component sizes?</div>
             <p className="text-sm text-muted-foreground">Run your van through the planner first.</p>
           </div>
-          <Link
+          <PlannerLink
             to="/planner"
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold px-5 py-2.5 rounded-md hover:bg-[hsl(var(--primary-hover))]"
           >
             Open planner <ArrowRight className="w-4 h-4" />
-          </Link>
+          </PlannerLink>
         </div>
       </div>
     </SiteLayout>
