@@ -17,7 +17,7 @@ export const SelectButton = ({
   size = "md",
 }: SelectButtonProps) => {
   const padding =
-    size === "sm" ? "px-4 py-3" : size === "lg" ? "px-6 py-5" : "px-5 py-4";
+    size === "sm" ? "px-4 py-3 pr-8" : size === "lg" ? "px-6 py-5 pr-10" : "px-5 py-4 pr-9";
   return (
     <button
       type="button"
@@ -26,6 +26,7 @@ export const SelectButton = ({
       className={cn(
         "group relative text-left rounded-lg border-2 transition-[transform,border-color,background-color,box-shadow]",
         "min-h-[44px] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+        "w-full max-w-full box-border",
         padding,
         fullWidth && "w-full",
         selected
@@ -34,15 +35,16 @@ export const SelectButton = ({
       )}
       style={selected ? { boxShadow: "var(--shadow-card)" } : undefined}
     >
-      <div className="flex items-center gap-3">
-        <span
-          className={cn(
-            "flex-shrink-0 w-4 h-4 rounded-full border-2 transition-colors",
-            selected ? "border-primary bg-primary" : "border-border",
-          )}
-          aria-hidden
-        />
-        <div className="flex-1">{children}</div>
+      {/* Radio indicator pinned to top-right so it never steals horizontal space from text */}
+      <span
+        className={cn(
+          "absolute top-3 right-3 flex-shrink-0 w-4 h-4 rounded-full border-2 transition-colors",
+          selected ? "border-primary bg-primary" : "border-border",
+        )}
+        aria-hidden
+      />
+      <div className="min-w-0 [overflow-wrap:anywhere] [word-break:normal] hyphens-none">
+        {children}
       </div>
     </button>
   );
