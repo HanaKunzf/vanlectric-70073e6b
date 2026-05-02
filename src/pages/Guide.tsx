@@ -440,8 +440,8 @@ export default function Guide() {
           </div>
         </Section>
 
-        {/* 13. Checklist */}
-        <Section id="checklist" number={13} title="Before you buy checklist">
+        {/* 14. Checklist */}
+        <Section id="checklist" number={14} title="Before you buy checklist">
           <ul className="space-y-2">
             {[
               "Measure your roof.",
