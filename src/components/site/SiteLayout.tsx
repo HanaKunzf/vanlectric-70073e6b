@@ -79,9 +79,19 @@ interface SiteLayoutProps {
   children: ReactNode;
   title?: string;
   description?: string;
+  image?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-export const SiteLayout = ({ children, title, description }: SiteLayoutProps) => {
+export const SiteLayout = ({
+  children,
+  title,
+  description,
+  image,
+  noindex,
+  jsonLd,
+}: SiteLayoutProps) => {
   const location = useLocation();
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -89,7 +99,13 @@ export const SiteLayout = ({ children, title, description }: SiteLayoutProps) =>
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Seo title={title} description={description} />
+      <Seo
+        title={title}
+        description={description}
+        image={image}
+        noindex={noindex}
+        jsonLd={jsonLd}
+      />
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooterFull />
