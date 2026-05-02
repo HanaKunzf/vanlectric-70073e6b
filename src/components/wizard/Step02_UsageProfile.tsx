@@ -16,7 +16,7 @@ export const Step02_UsageProfile = ({ value, onChange }: Props) => {
 
   return (
     <StepCard title={t.title} illustration={<UsageIllustration className="w-full h-full" />}>
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {profiles.map((p) => {
           const opt = t.profileOptions[p];
           return (
