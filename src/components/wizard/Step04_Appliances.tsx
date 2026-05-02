@@ -226,6 +226,17 @@ export const Step04_Appliances = ({ value, onChange, vehicleEngine }: Props) => 
                             )}
                           </div>
                         )}
+
+                        {enabled && item.id === "diesel-heater" && vehicleEngine === "petrol" && (
+                          <div className="mt-3 ml-7 warning-banner flex items-start gap-2 text-sm">
+                            <BrandIcon name="warning" size="xs" />
+                            <span>
+                              Your van appears to have a petrol engine. A diesel heater normally
+                              cannot draw fuel from the vehicle tank. You will likely need a
+                              separate diesel tank for the heater.
+                            </span>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
