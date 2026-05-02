@@ -25,7 +25,8 @@ export const EmailReportModal = ({ open, onClose }: EmailReportModalProps) => {
       aria-modal="true"
     >
       <div
-        className="relative w-full max-w-md bg-background rounded-xl shadow-xl border border-border p-6 sm:p-8"
+        className="relative w-full max-w-md max-h-[80vh] overflow-y-auto bg-background rounded-xl shadow-xl border border-border p-6 sm:p-8"
+        style={{ maxWidth: "min(28rem, calc(100vw - 32px))" }}
         onClick={(e) => e.stopPropagation()}
       >
         <button
