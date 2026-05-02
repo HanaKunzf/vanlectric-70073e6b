@@ -346,17 +346,26 @@ export default function Guide() {
                 </tbody>
               </table>
             </div>
+            <p className="text-xs text-muted-foreground italic mt-2">
+              Values are practical guidelines for 12V DC at ~3% voltage drop. Always verify
+              against the real run length and conditions.
+            </p>
+          </div>
 
           <div className="not-prose">
             <h3 className="font-display font-bold text-lg text-primary mt-5 mb-2">
               Typical cable sizes for common campervan circuits
             </h3>
-            <div className="overflow-x-auto rounded-lg border border-border bg-background/60">
-              <table className="w-full text-sm font-sans border-collapse">
+            <div className="rounded-lg border border-border bg-background/60 overflow-hidden">
+              <table className="w-full text-xs sm:text-sm font-sans border-collapse table-fixed">
+                <colgroup>
+                  <col className="w-[42%]" />
+                  <col className="w-[58%]" />
+                </colgroup>
                 <thead>
                   <tr className="bg-primary/10 text-left">
-                    <th className="px-3 py-2 font-semibold text-primary">Circuit</th>
-                    <th className="px-3 py-2 font-semibold text-primary whitespace-nowrap">Typical size</th>
+                    <th className="px-2 sm:px-3 py-2 font-semibold text-primary">Circuit</th>
+                    <th className="px-2 sm:px-3 py-2 font-semibold text-primary">Typical size</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -373,9 +382,9 @@ export default function Guide() {
                     ["1000W inverter", "25–35 mm²"],
                     ["Battery interconnects", "35–70 mm² (depends on current and length)"],
                   ].map(([circuit, size]) => (
-                    <tr key={circuit} className="border-t border-border">
-                      <td className="px-3 py-2">{circuit}</td>
-                      <td className="px-3 py-2 whitespace-nowrap font-medium">{size}</td>
+                    <tr key={circuit} className="border-t border-border align-top">
+                      <td className="px-2 sm:px-3 py-2 break-words">{circuit}</td>
+                      <td className="px-2 sm:px-3 py-2 font-medium break-words">{size}</td>
                     </tr>
                   ))}
                 </tbody>
