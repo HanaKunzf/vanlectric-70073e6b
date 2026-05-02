@@ -1532,10 +1532,21 @@ export default function Results() {
                 Recalculate (back to appliances)
               </button>
             </div>
+
+            <div className="mt-5">
+              <LocalSaveNotice />
+            </div>
+
             <div className="mt-4 text-center">
               <button
                 type="button"
-                onClick={() => navigate("/", { replace: true })}
+                onClick={() => {
+                  if (hasLastCalculation()) {
+                    setConfirmStartNew(true);
+                  } else {
+                    navigate("/", { replace: true });
+                  }
+                }}
                 className="text-xs font-sans text-muted-foreground hover:text-primary hover:underline transition-colors"
               >
                 ↺ Start a new calculation
