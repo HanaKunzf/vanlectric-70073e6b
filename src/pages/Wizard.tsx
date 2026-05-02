@@ -18,6 +18,7 @@ import { Step13_Existing, isStep13Valid } from "@/components/wizard/Step13_Exist
 import { initialWizardState, TOTAL_STEPS, type WizardState } from "@/types";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
+import { Seo } from "@/components/site/SiteLayout";
 
 export default function Wizard() {
   const navigate = useNavigate();
@@ -82,6 +83,10 @@ export default function Wizard() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Seo
+        title="Campervan Electrical System Calculator — Vanlectric"
+        description="Answer simple questions about your van, appliances, travel style and roof space to get a practical electrical system recommendation."
+      />
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
         <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors" aria-label="Home">
