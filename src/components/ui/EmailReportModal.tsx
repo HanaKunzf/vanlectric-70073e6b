@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { X, Mail } from "lucide-react";
+import { SubscribeForm } from "@/components/ui/SubscribeForm";
 
 interface EmailReportModalProps {
   open: boolean;
