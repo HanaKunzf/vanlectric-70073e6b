@@ -1073,6 +1073,12 @@ export default function Results() {
             Indicative sizing based on your inputs. Use it as a recommended starting point —
             verify before buying and depend on real-world conditions.
           </p>
+          <Link
+            to="/calculation-logic"
+            className="mt-3 inline-flex items-center gap-1 text-xs sm:text-sm font-sans text-primary hover:underline"
+          >
+            <span aria-hidden>ℹ️</span> How are these numbers calculated?
+          </Link>
         </div>
 
         <div className="space-y-6 sm:space-y-8">
