@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { X, Lock } from "lucide-react";
+import { SubscribeForm } from "@/components/ui/SubscribeForm";
 
 interface ProModalProps {
   open: boolean;
