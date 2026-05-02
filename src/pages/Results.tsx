@@ -596,6 +596,11 @@ const ExistingSystemSection = ({ state, result }: { state: WizardState; result: 
 };
 
 // ---------- Autonomy formatting ----------
+const formatDays = (d: number): string => {
+  if (!Number.isFinite(d) || d > 30) return "Continuous";
+  return `${d.toFixed(1)} days`;
+};
+
 type AutonomyDisplay = { title: string; helper: string; isQualitative: boolean };
 const formatAutonomy = (d: number, dailyWh: number, fallbackHelper: string): AutonomyDisplay => {
   if (dailyWh < 1) {
