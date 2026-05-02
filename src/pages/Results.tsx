@@ -381,8 +381,8 @@ const ShoppingList = ({ result, profile, state }: { result: CalculationResult; p
                 </thead>
                 <tbody>
                   {rows.map((r, ri) => (
-                    <tr key={ri} className="border-b border-border/60">
-                      <td className="py-2 pr-3 font-sans">{r.item}</td>
+                    <tr key={ri} className="border-b border-border/60 align-top">
+                      <td className="py-2 pr-3 font-sans break-words">{r.item}</td>
                       <td className="py-2 px-2">
                         <input type="number" min={0} value={r.qty}
                           onChange={(e) => update(gi, ri, { qty: Number(e.target.value) })}
@@ -409,7 +409,7 @@ const ShoppingList = ({ result, profile, state }: { result: CalculationResult; p
             <ul className="sm:hidden space-y-3">
               {rows.map((r, ri) => (
                 <li key={ri} className="rounded-md border border-border bg-card/60 p-3">
-                  <div className="font-sans text-sm font-medium">{r.item}</div>
+                  <div className="font-sans text-sm font-medium break-words">{r.item}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">
                     Est. {r.noEstimate ? "—" : eur(r.estimate)}
                   </div>
@@ -1050,15 +1050,15 @@ export default function Results() {
               );
             })()}
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="w-full">
+              <table className="w-full text-xs sm:text-sm table-fixed">
                 <thead className="text-left text-muted-foreground font-sans font-semibold border-b border-border">
                   <tr>
-                    <th className="py-2 pr-3">Appliance</th>
-                    <th className="py-2 px-2">Source</th>
-                    <th className="py-2 px-2 text-right w-16">W</th>
-                    <th className="py-2 px-2 text-right w-16">h</th>
-                    <th className="py-2 pl-2 text-right w-24">Wh/day</th>
+                    <th className="py-2 pr-2 w-[40%]">Appliance</th>
+                    <th className="py-2 px-1 w-[24%]">Source</th>
+                    <th className="py-2 px-1 text-right w-[10%]">W</th>
+                    <th className="py-2 px-1 text-right w-[10%]">h</th>
+                    <th className="py-2 pl-1 text-right w-[16%]">Wh/day</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1066,9 +1066,9 @@ export default function Results() {
                     <tr><td colSpan={5} className="py-3 text-muted-foreground italic">No appliances selected.</td></tr>
                   )}
                   {result.lines.filter(l => !l.informational).map((l) => (
-                    <tr key={l.id} className="border-b border-border/60">
-                      <td className="py-2 pr-3 font-sans">{l.label}</td>
-                      <td className="py-2 px-2 text-muted-foreground text-xs">{sourceLabel(l.powerSource)}</td>
+                    <tr key={l.id} className="border-b border-border/60 align-top">
+                      <td className="py-2 pr-2 font-sans break-words">{l.label}</td>
+                      <td className="py-2 px-1 text-muted-foreground text-[11px] sm:text-xs break-words">{sourceLabel(l.powerSource)}</td>
                       <td className="py-2 px-2 text-right font-mono">{l.watts}</td>
                       <td className="py-2 px-2 text-right font-mono">
                         {l.isDutyCycle ? (
