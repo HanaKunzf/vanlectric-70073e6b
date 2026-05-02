@@ -9,16 +9,26 @@
 #   Deployment script: (leave empty)
 #   Document root:     vanlectric_html
 #
-# Required GitHub secret:
-#   PROD_DEPLOY_TOKEN  – a Personal Access Token (classic: "repo" scope, OR
-#                        a fine-grained PAT with "Contents: Read and write"
-#                        permission on the HanaKunzf/vanlectric-production
-#                        repository). Add it in:
-#                        Settings → Secrets and variables → Actions → New
-#                        repository secret, name it PROD_DEPLOY_TOKEN.
+# Required GitHub secret (in the SOURCE repo):
+#   PROD_DEPLOY_TOKEN  – Personal Access Token that can push to
+#                        HanaKunzf/vanlectric-production.
 #
-# The token must belong to a user with push access to the production repo.
-# GITHUB_TOKEN cannot be used because it only has access to the source repo.
+#   Accepted token types:
+#     • Classic PAT with the "repo" scope, OR
+#     • Fine-grained PAT with:
+#         - Repository access: HanaKunzf/vanlectric-production
+#         - Repository permissions:
+#             · Contents:      Read and write   (REQUIRED)
+#             · Metadata:      Read-only        (REQUIRED, auto-included)
+#             · Workflows:     Read and write   (only if the production
+#                              repo contains .github/workflows/* files;
+#                              we do not push any, so usually NOT needed)
+#
+#   The token must belong to a user that has push access to the
+#   production repository (owner or collaborator).
+#
+#   Add it in: Settings → Secrets and variables → Actions →
+#              New repository secret → name: PROD_DEPLOY_TOKEN
 
 name: Build and Deploy to Production Repo
 
@@ -49,19 +59,75 @@ jobs:
       - name: Build production bundle
         run: bun run build
 
-      - name: Ensure SPA + hosting helper files
+      - name: Verify dist exists
         run: |
-          # Prevent GitHub Pages-style Jekyll processing if ever served that way.
+          if [ ! -d "dist" ]; then
+            echo "ERROR: dist/ directory was not created by the build."
+            exit 1
+          fi
+          echo "dist/ contents:"
+          ls -la dist
+          echo "Total files: $(find dist -type f | wc -l)"
+
+      - name: Add hosting helper files to dist
+        run: |
+          # Prevent any Jekyll-style processing on static hosts.
           touch dist/.nojekyll
 
-      - name: Deploy dist to production repository (main branch)
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          personal_token: ${{ secrets.PROD_DEPLOY_TOKEN }}
-          external_repository: HanaKunzf/vanlectric-production
-          publish_branch: main
-          publish_dir: ./dist
-          force_orphan: true
-          commit_message: "Deploy: ${{ github.sha }}"
-          user_name: "vanlectric-deploy-bot"
-          user_email: "deploy-bot@users.noreply.github.com"
+      - name: Deploy dist/ to production repository (main branch)
+        env:
+          DEPLOY_TOKEN: ${{ secrets.PROD_DEPLOY_TOKEN }}
+          SRC_SHA: ${{ github.sha }}
+          SRC_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${DEPLOY_TOKEN}" ]; then
+            echo "ERROR: PROD_DEPLOY_TOKEN secret is empty or not set."
+            echo "Add it in Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+          TARGET_REPO="HanaKunzf/vanlectric-production"
+          TARGET_BRANCH="main"
+
+          # Work in a clean directory completely separate from the source repo
+          # so we never accidentally commit src/, package.json, etc.
+          WORK_DIR="$(mktemp -d)"
+          echo "Work dir: ${WORK_DIR}"
+
+          # Copy ONLY the build output. Use cp -a to preserve dotfiles
+          # like .nojekyll. The trailing /. copies contents, not the folder.
+          cp -a dist/. "${WORK_DIR}/"
+
+          cd "${WORK_DIR}"
+
+          # Sanity check: make sure no source files leaked in.
+          for forbidden in src package.json bun.lockb vite.config.ts tsconfig.json node_modules; do
+            if [ -e "${forbidden}" ]; then
+              echo "ERROR: '${forbidden}' is in the publish directory. Aborting."
+              exit 1
+            fi
+          done
+
+          echo "Files to publish:"
+          ls -la
+
+          git init -q -b "${TARGET_BRANCH}"
+          git config user.name  "vanlectric-deploy-bot"
+          git config user.email "deploy-bot@users.noreply.github.com"
+
+          # Authenticate via token in the URL. x-access-token works for both
+          # classic PATs and fine-grained PATs.
+          REMOTE_URL="https://x-access-token:${DEPLOY_TOKEN}@github.com/${TARGET_REPO}.git"
+          git remote add origin "${REMOTE_URL}"
+
+          git add -A
+          git commit -q -m "Deploy from ${SRC_REPO}@${SRC_SHA}"
+
+          # Force-push so the production repo always mirrors the latest
+          # build output and never accumulates source-code history.
+          echo "Pushing to ${TARGET_REPO} (${TARGET_BRANCH})..."
+          git push --force origin "${TARGET_BRANCH}"
+
+          echo "Deploy complete."
