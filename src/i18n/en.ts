@@ -22,7 +22,7 @@ export const en = {
   },
   steps: {
     s1: {
-      title: "🚐 What van are you converting?",
+      title: "What van are you converting?",
       brand: "Brand",
       size: "Size",
       year: "Year",
@@ -57,20 +57,20 @@ export const en = {
       },
     },
     s2: {
-      title: "🏕️ How will you use your van?",
+      title: "How will you use your van?",
       profileOptions: {
         weekendWarrior: {
-          icon: "🏕️",
+          icon: "tent",
           label: "Weekend Warrior",
           desc: "Mostly weekends + occasional 1–2 week trips",
         },
         traveller: {
-          icon: "🗺️",
+          icon: "map",
           label: "Traveller",
           desc: "Regular expeditions of 1–4 weeks, then back home",
         },
         fulltimer: {
-          icon: "🏠",
+          icon: "home",
           label: "Full-timer",
           desc: "The van is my home, living in it long-term",
         },
@@ -79,14 +79,14 @@ export const en = {
       journeyHelper:
         "This affects battery sizing for the drive home — especially if you don't have a DC-DC charger.",
       journeyOptions: {
-        "1h": { icon: "🕐", label: "Up to 1 hour" },
-        "1-2h": { icon: "🕑", label: "1–2 hours" },
-        "2-4h": { icon: "🕓", label: "2–4 hours" },
-        "4h+": { icon: "🕔", label: "4+ hours" },
+        "1h": { icon: "clock", label: "Up to 1 hour" },
+        "1-2h": { icon: "clock", label: "1–2 hours" },
+        "2-4h": { icon: "clock", label: "2–4 hours" },
+        "4h+": { icon: "clock", label: "4+ hours" },
       },
     },
     s3: {
-      title: "🌤️ What's your typical climate?",
+      title: "What's your typical climate?",
       helper:
         "Cold weather reduces battery capacity by up to 30% and increases heater use. Hot climates push fridge and ventilation.",
       options: {
@@ -109,7 +109,7 @@ export const en = {
       },
     },
     s4: {
-      title: "🔌 Which appliances will you use?",
+      title: "Which appliances will you use?",
       helper:
         "Pick everything you'll use regularly. Adjust hours per day if your usage differs from the default.",
       hoursLabel: "h/day",
@@ -117,7 +117,7 @@ export const en = {
       overrideLabel: "Custom wattage",
     },
     s5: {
-      title: "🛣️ How often will you drive?",
+      title: "How often will you drive?",
       helper:
         "Driving recharges your batteries via the alternator. The more you drive, the smaller your solar/battery setup needs to be.",
       frequencyOptions: {
@@ -149,7 +149,7 @@ export const en = {
       },
     },
     s6: {
-      title: "⚡ After how many days do you usually connect to shore power?",
+      title: "After how many days do you usually connect to shore power?",
       helper:
         "Shore power means a 230V hookup at home, campsite, workshop, family house or another reliable plug.",
       options: {
@@ -193,38 +193,38 @@ export const en = {
       },
     },
     s7: {
-      title: "🏠 Tell us about your roof",
+      title: "Tell us about your roof",
       obstaclesTitle: "What's already on your roof?",
       obstaclesHelper: "Set how many of each. We'll subtract their footprint from your usable solar area.",
       measurementInfo:
-        "💡 These calculations use typical dimensions. Always measure your actual roof and mark out obstacle positions before ordering panels. Component placement matters — a window near the centre may block more usable area than one at the edge.",
-      emptyButton: "✨ Nothing — it's empty",
+        "These calculations use typical dimensions. Always measure your actual roof and mark out obstacle positions before ordering panels. Component placement matters — a window near the centre may block more usable area than one at the edge.",
+      emptyButton: "Nothing — it's empty",
       countLabel: "Count",
       countOptions: { 0: "0", 1: "1", 2: "2", 3: "3" },
       tentCoversFanWarning:
-        "⚠️ A roof tent typically covers the full roof including fan openings. Verify compatibility with your specific tent and van.",
+        "A roof tent typically covers the full roof including fan openings. Verify compatibility with your specific tent and van.",
       acFanInfo:
-        "💡 Some roof AC units include ventilation — check if a separate fan is still needed.",
+        "Some roof AC units include ventilation — check if a separate fan is still needed.",
       knowDimensions: "I know the dimensions",
       lengthLabel: "Length (along van), cm",
       widthLabel: "Width (across van), cm",
       otherNameLabel: "Name",
       otherNamePlaceholder: "e.g. cargo box",
       obstacles: {
-        "small-window": { icon: "🪟", label: "Small roof window", defaultText: "up to 50×50 cm", defaultL: 50, defaultW: 50 },
-        "large-window": { icon: "🪟", label: "Large roof window", defaultText: "50×90 cm+", defaultL: 90, defaultW: 50 },
-        "fan": { icon: "💨", label: "Roof fan", defaultText: "Maxxair, Fan-tastic… ~40×40 cm", defaultL: 40, defaultW: 40 },
-        "gps-antenna": { icon: "📡", label: "GPS / mobile antenna", defaultText: "negligible — no area deducted", defaultL: 0, defaultW: 0 },
-        "satellite": { icon: "📡", label: "Satellite dish", defaultText: "~60×60 cm", defaultL: 60, defaultW: 60 },
-        "solar-shower": { icon: "🚿", label: "Solar shower bag", defaultText: "~30×60 cm", defaultL: 60, defaultW: 30 },
-        "rack": { icon: "🔧", label: "Roof rack / carrier", defaultText: "~100×140 cm", defaultL: 140, defaultW: 100 },
-        "ac": { icon: "❄️", label: "Roof AC unit", defaultText: "~70×40 cm", defaultL: 70, defaultW: 40 },
-        "tent": { icon: "🏕️", label: "Roof tent", defaultText: "~120×240 cm", defaultL: 240, defaultW: 120 },
-        "other": { icon: "⬜", label: "Other obstacle", defaultText: "enter dimensions", defaultL: 0, defaultW: 0 },
+        "small-window": { icon: "smallWindow", label: "Small roof window", defaultText: "up to 50×50 cm", defaultL: 50, defaultW: 50 },
+        "large-window": { icon: "largeWindow", label: "Large roof window", defaultText: "50×90 cm+", defaultL: 90, defaultW: 50 },
+        "fan": { icon: "roofFan", label: "Roof fan", defaultText: "Maxxair, Fan-tastic… ~40×40 cm", defaultL: 40, defaultW: 40 },
+        "gps-antenna": { icon: "antenna", label: "GPS / mobile antenna", defaultText: "negligible — no area deducted", defaultL: 0, defaultW: 0 },
+        "satellite": { icon: "satellite", label: "Satellite dish", defaultText: "~60×60 cm", defaultL: 60, defaultW: 60 },
+        "solar-shower": { icon: "shower", label: "Solar shower bag", defaultText: "~30×60 cm", defaultL: 60, defaultW: 30 },
+        "rack": { icon: "rack", label: "Roof rack / carrier", defaultText: "~100×140 cm", defaultL: 140, defaultW: 100 },
+        "ac": { icon: "ac", label: "Roof AC unit", defaultText: "~70×40 cm", defaultL: 70, defaultW: 40 },
+        "tent": { icon: "tent", label: "Roof tent", defaultText: "~120×240 cm", defaultL: 240, defaultW: 120 },
+        "other": { icon: "other", label: "Other obstacle", defaultText: "enter dimensions", defaultL: 0, defaultW: 0 },
       },
       rackPanelsLabel: "Panels can be mounted on/inside the rack",
       rackPanelsHint: "If checked, the rack becomes a mounting platform — its area is not deducted.",
-      rackHeightWarning: "⚠️ Check total vehicle height with panels — may restrict access to car parks and low bridges.",
+      rackHeightWarning: "Check total vehicle height with panels — may restrict access to car parks and low bridges.",
       tentSolarTitle: "Can you mount solar panels alongside the tent?",
       tentSolarYes: "Yes — with quick-disconnect (MC4)",
       tentSolarNo: "No — tent takes the full roof",
@@ -242,18 +242,18 @@ export const en = {
         "A pop-top roof significantly reduces the surface available for solar panels.",
     },
     s8: {
-      title: "👥 How many people will live in the van?",
+      title: "How many people will live in the van?",
       helper:
         "More people = more phones, more lights, more water pumping, more cooking. We'll scale loads accordingly.",
       options: {
-        1: { icon: "👤", label: "Just me", desc: "Solo build" },
-        2: { icon: "👥", label: "2 people", desc: "Couple — most common" },
-        3: { icon: "👨‍👩‍👧", label: "3 people", desc: "Small family" },
-        4: { icon: "👨‍👩‍👧‍👦", label: "4 or more", desc: "Family build" },
+        1: { icon: "person", label: "Just me", desc: "Solo build" },
+        2: { icon: "people", label: "2 people", desc: "Couple — most common" },
+        3: { icon: "family", label: "3 people", desc: "Small family" },
+        4: { icon: "family", label: "4 or more", desc: "Family build" },
       },
     },
     s9: {
-      title: "💻 Will you work remotely from the van?",
+      title: "Will you work remotely from the van?",
       helper:
         "Remote work means laptops, screens, routers and Starlink — significant continuous loads during the day.",
       options: {
@@ -273,7 +273,7 @@ export const en = {
       },
     },
     s10: {
-      title: "🍂 What seasons will you use the van?",
+      title: "What seasons will you use the van?",
       helper:
         "Solar production drops to ~20% in winter at northern latitudes. Year-round users need significantly more battery.",
       options: {
@@ -296,7 +296,7 @@ export const en = {
       },
     },
     s11: {
-      title: "🧱 How well insulated is your van?",
+      title: "How well insulated is your van?",
       helper:
         "Better insulation drastically reduces heating and cooling loads — and therefore battery needs.",
       options: {
@@ -317,7 +317,7 @@ export const en = {
         "Poor insulation can double your heating energy needs in winter.",
     },
     s12: {
-      title: "💰 What's your budget for the electrical system?",
+      title: "What's your budget for the electrical system?",
       helper:
         "This is just the electrical setup (batteries, solar, inverter, charger, cables). Not the full van conversion.",
       options: {
