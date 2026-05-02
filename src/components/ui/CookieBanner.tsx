@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BrandIcon } from "@/components/ui/BrandIcon";
 
 const KEY = "vanlectric-cookie-consent";
 const LEGACY_KEY = "vanlectric_cookie_dismissed";
@@ -32,9 +33,9 @@ export const CookieBanner = () => {
       aria-label="Cookie notice"
     >
       <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
-        <p className="text-xs sm:text-sm font-sans text-primary flex-1 leading-relaxed">
-          🍪 Vanlectric uses only technical cookies necessary for the calculator to work.
-          No tracking or advertising cookies.
+        <p className="text-xs sm:text-sm font-sans text-primary flex-1 leading-relaxed inline-flex items-start gap-2">
+          <BrandIcon name="cookie" size="sm" tone="primary" className="mt-0.5" />
+          <span>Vanlectric uses only technical cookies necessary for the calculator to work. No tracking or advertising cookies.</span>
         </p>
         <button
           type="button"

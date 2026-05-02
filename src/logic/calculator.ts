@@ -330,7 +330,7 @@ export function calculate(state: WizardState): CalculationResult {
   const usableBatteryWh = recommendedBatteryAh * 12 * 0.9;
 
   if (profile === "weekendWarrior" && requiredAh > 300) {
-    battery.note = "💡 As a weekend warrior, you recharge at home between trips. If your system seems oversized, consider whether you really need worst-case winter sizing — or adjust your climate/season settings to match your typical travel conditions.";
+    battery.note = "As a weekend warrior, you recharge at home between trips. If your system seems oversized, consider whether you really need worst-case winter sizing — or adjust your climate/season settings to match your typical travel conditions.";
   }
   components.push(battery);
 
@@ -569,7 +569,7 @@ export function calculate(state: WizardState): CalculationResult {
     );
   }
   if (hasShoreOnlyAppliances && shore === "never") {
-    warnings.push("⚠️ You selected shore-only appliances, but also selected that you will never use shore power. These appliances will not be usable unless you add a 230V shore hookup or remove them from your list.");
+    warnings.push("You selected shore-only appliances, but also selected that you will never use shore power. These appliances will not be usable unless you add a 230V shore hookup or remove them from your list.");
   }
   if (shore !== "never" && shoreCharging === "ac-only") {
     warnings.push("You selected a 230V shore circuit only. Your leisure battery will not recharge from shore power unless you add a shore battery charger.");

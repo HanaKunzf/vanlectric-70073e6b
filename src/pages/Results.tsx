@@ -10,6 +10,7 @@ import { ProModal } from "@/components/ui/ProModal";
 import { EmailReportModal } from "@/components/ui/EmailReportModal";
 import { Seo } from "@/components/site/SiteLayout";
 import { BackToTop } from "@/components/ui/BackToTop";
+import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
@@ -480,20 +481,20 @@ const ShoppingList = ({ result, profile, state }: { result: CalculationResult; p
 };
 
 // ---------- Edit chips ----------
-const EDIT_CHIPS: Array<{ step: number; emoji: string; label: string }> = [
-  { step: 1, emoji: "🚐", label: "Vehicle" },
-  { step: 2, emoji: "🏕️", label: "Usage" },
-  { step: 3, emoji: "🌤️", label: "Climate" },
-  { step: 4, emoji: "🔌", label: "Appliances" },
-  { step: 5, emoji: "🛣️", label: "Driving" },
-  { step: 6, emoji: "⚡", label: "Shore power" },
-  { step: 7, emoji: "🏠", label: "Roof" },
-  { step: 8, emoji: "👥", label: "People" },
-  { step: 9, emoji: "💻", label: "Remote work" },
-  { step: 10, emoji: "🍂", label: "Season" },
-  { step: 11, emoji: "🧱", label: "Insulation" },
-  { step: 12, emoji: "💰", label: "Budget" },
-  { step: 13, emoji: "🔧", label: "Existing" },
+const EDIT_CHIPS: Array<{ step: number; icon: IconKey; label: string }> = [
+  { step: 1, icon: "van", label: "Vehicle" },
+  { step: 2, icon: "tent", label: "Usage" },
+  { step: 3, icon: "partlyCloudy", label: "Climate" },
+  { step: 4, icon: "appliances", label: "Appliances" },
+  { step: 5, icon: "driving", label: "Driving" },
+  { step: 6, icon: "shore", label: "Shore power" },
+  { step: 7, icon: "roof", label: "Roof" },
+  { step: 8, icon: "people", label: "People" },
+  { step: 9, icon: "remoteWork", label: "Remote work" },
+  { step: 10, icon: "leaf", label: "Season" },
+  { step: 11, icon: "insulation", label: "Insulation" },
+  { step: 12, icon: "budget", label: "Budget" },
+  { step: 13, icon: "tools", label: "Existing" },
 ];
 
 const EditChips = ({ state }: { state: WizardState }) => {
@@ -509,9 +510,9 @@ const EditChips = ({ state }: { state: WizardState }) => {
             key={c.step}
             type="button"
             onClick={() => editStep(c.step)}
-            className="basis-[calc((100%-1rem)/3)] sm:basis-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-background text-foreground hover:border-primary hover:bg-primary/5 transition-colors font-sans text-xs font-semibold"
+            className="basis-[calc((100%-1rem)/3)] sm:basis-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-background text-foreground hover:border-primary hover:bg-primary/5 hover:text-accent transition-colors font-sans text-xs font-semibold"
           >
-            <span aria-hidden>{c.emoji}</span>
+            <BrandIcon name={c.icon} size="xs" />
             <span className="truncate">{c.label}</span>
           </button>
         ))}
@@ -577,13 +578,17 @@ const ExistingSystemSection = ({ state, result }: { state: WizardState; result: 
       </div>
       {a.sufficient.length > 0 && (
         <div className="mb-3">
-          <div className="font-sans font-semibold text-primary mb-1">✓ Sufficient</div>
+          <div className="font-sans font-semibold text-primary mb-1 inline-flex items-center gap-1.5">
+            <BrandIcon name="check" size="xs" /> Sufficient
+          </div>
           <ul className="text-sm space-y-1">{a.sufficient.map((s) => <li key={s}>• {s}</li>)}</ul>
         </div>
       )}
       {a.upgrades.length > 0 && (
         <div className="mb-3">
-          <div className="font-sans font-semibold text-accent mb-1">⚠️ Upgrade or add</div>
+          <div className="font-sans font-semibold text-accent mb-1 inline-flex items-center gap-1.5">
+            <BrandIcon name="warning" size="xs" /> Upgrade or add
+          </div>
           <ul className="text-sm space-y-1">{a.upgrades.map((s) => <li key={s}>• {s}</li>)}</ul>
         </div>
       )}
@@ -701,11 +706,11 @@ const AutonomySection = ({ result }: { result: CalculationResult }) => {
 
 // ---------- Scenarios ----------
 const ScenariosSection = ({ result }: { result: CalculationResult }) => {
-  const scenarios = [
-    { key: "good", label: "Good sun", emoji: "☀️", mult: 1.2, desc: "Clear summer days. Strong solar harvest." },
-    { key: "avg", label: "Average weather", emoji: "🌤️", mult: 1.0, desc: "Typical mixed conditions." },
-    { key: "cloudy", label: "Cloudy", emoji: "☁️", mult: 0.35, desc: "Overcast days. Solar covers only part of consumption." },
-    { key: "winter", label: "Winter / poor solar", emoji: "❄️", mult: 0.15, desc: "Short days, low sun angle. Plan alternator or shore." },
+  const scenarios: Array<{ key: string; label: string; icon: IconKey; mult: number; desc: string }> = [
+    { key: "good", label: "Good sun", icon: "sun", mult: 1.2, desc: "Clear summer days. Strong solar harvest." },
+    { key: "avg", label: "Average weather", icon: "partlyCloudy", mult: 1.0, desc: "Typical mixed conditions." },
+    { key: "cloudy", label: "Cloudy", icon: "cloud", mult: 0.35, desc: "Overcast days. Solar covers only part of consumption." },
+    { key: "winter", label: "Winter / poor solar", icon: "snow", mult: 0.15, desc: "Short days, low sun angle. Plan alternator or shore." },
   ];
   const eps = 1;
   return (
@@ -721,7 +726,10 @@ const ScenariosSection = ({ result }: { result: CalculationResult }) => {
           return (
             <div key={s.key} className="rounded-lg border border-border bg-background/60 p-4">
               <div className="flex items-center justify-between">
-                <div className="font-display text-lg font-bold">{s.emoji} {s.label}</div>
+                <div className="font-display text-lg font-bold inline-flex items-center gap-2">
+                  <BrandIcon name={s.icon} size="sm" tone="primary" />
+                  <span>{s.label}</span>
+                </div>
                 <div className="text-xs font-sans text-muted-foreground">{(s.mult * 100).toFixed(0)}%</div>
               </div>
               <dl className="mt-3 space-y-1 text-sm">
@@ -1170,17 +1178,23 @@ export default function Results() {
 
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-lg bg-background/60 border border-border p-3">
-                <div className="text-xs text-muted-foreground">☀️ Solar (avg)</div>
+                <div className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
+                  <BrandIcon name="sun" size="xs" /> Solar (avg)
+                </div>
                 <div className="font-display text-lg font-bold mt-1">~{fmt(result.solarDailyWh)} Wh/day</div>
               </div>
               <div className="rounded-lg bg-background/60 border border-border p-3">
-                <div className="text-xs text-muted-foreground">🚗 Alternator</div>
+                <div className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
+                  <BrandIcon name="car" size="xs" /> Alternator
+                </div>
                 <div className="font-display text-lg font-bold mt-1">
                   {result.alternatorDailyWh > 0 ? `~${fmt(result.alternatorDailyWh)} Wh/day` : "Not applicable"}
                 </div>
               </div>
               <div className="rounded-lg bg-background/60 border border-border p-3">
-                <div className="text-xs text-muted-foreground">🔌 Shore power</div>
+                <div className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
+                  <BrandIcon name="plug" size="xs" /> Shore power
+                </div>
                 <div className="font-display text-lg font-bold mt-1">
                   {state.step6.shorePower && state.step6.shorePower !== "never" ? "As needed" : "Not used"}
                 </div>
@@ -1258,18 +1272,22 @@ export default function Results() {
               return (
                 <>
                   {tight && (
-                    <div className="mb-4 rounded-lg border-l-4 border-accent bg-accent/10 p-3 text-sm leading-relaxed">
-                      ⚠️ Your roof space is tight. The calculation uses typical obstacle dimensions —
-                      your actual available area may differ depending on exact placement of windows,
-                      fans and other components. We strongly recommend measuring your roof carefully
-                      and marking out panel positions before purchasing.
+                    <div className="mb-4 rounded-lg border-l-4 border-accent bg-accent/10 p-3 text-sm leading-relaxed flex items-start gap-2">
+                      <BrandIcon name="warning" size="sm" tone="accent" className="mt-0.5" />
+                      <span>
+                        Your roof space is tight. The calculation uses typical obstacle dimensions —
+                        your actual available area may differ depending on exact placement of windows,
+                        fans and other components. We strongly recommend measuring your roof carefully
+                        and marking out panel positions before purchasing.
+                      </span>
                     </div>
                   )}
                   {customLabels.length > 0 && (
                     <div className="mb-4 space-y-1">
                       {customLabels.map((n) => (
-                        <div key={n} className="text-xs font-sans text-primary">
-                          ✓ Using your custom dimensions for {n} — more accurate result.
+                        <div key={n} className="text-xs font-sans text-primary inline-flex items-center gap-1.5">
+                          <BrandIcon name="check" size="xs" />
+                          <span>Using your custom dimensions for {n} — more accurate result.</span>
                         </div>
                       ))}
                     </div>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Lock, CheckCircle2 } from "lucide-react";
 import { StepCard } from "@/components/ui/StepCard";
 import { ProModal } from "@/components/ui/ProModal";
+import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 import { FEATURES } from "@/config/features";
 import { en } from "@/i18n/en";
 import type { ExistingStep, BatteryChemistry, WizardState } from "@/types";
@@ -99,10 +100,11 @@ export const Step13_Existing = ({ value = {}, onChange, wizardState }: Props) =>
   );
 };
 
-const Row = ({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) => (
+const Row = ({ title, icon, children }: { title: string; icon: IconKey; children: React.ReactNode }) => (
   <div className="border-b border-border/60 py-4">
-    <div className="font-display text-lg font-semibold mb-2">
-      <span className="mr-2" aria-hidden>{icon}</span>{title}
+    <div className="font-display text-lg font-semibold mb-2 flex items-center gap-2">
+      <BrandIcon name={icon} size="md" tone="primary" />
+      <span>{title}</span>
     </div>
     <div className="space-y-2">{children}</div>
   </div>
@@ -127,7 +129,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
   const setSolar = (s: ExistingStep["solar"]) => onChange({ ...value, solar: s });
   return (
     <div>
-      <Row title="Battery" icon="🔋">
+      <Row title="Battery" icon="battery">
         <label className="flex items-center gap-2 text-sm font-sans">
           <input type="radio" checked={!value.battery} onChange={() => setBattery(undefined)} /> I don't have one
         </label>
@@ -150,7 +152,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         )}
       </Row>
 
-      <Row title="Solar panels" icon="☀️">
+      <Row title="Solar panels" icon="sun">
         <label className="flex items-center gap-2 text-sm font-sans">
           <input type="radio" checked={!value.solar} onChange={() => setSolar(undefined)} /> I don't have any
         </label>
@@ -165,7 +167,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         )}
       </Row>
 
-      <Row title="MPPT controller" icon="📟">
+      <Row title="MPPT controller" icon="mppt">
         <label className="flex items-center gap-2 text-sm font-sans">
           <input type="radio" checked={!value.mppt} onChange={() => onChange({ ...value, mppt: undefined })} /> None
         </label>
@@ -179,7 +181,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         )}
       </Row>
 
-      <Row title="DC-DC charger" icon="🚗">
+      <Row title="DC-DC charger" icon="car">
         <label className="flex items-center gap-2 text-sm font-sans">
           <input type="radio" checked={!value.dcdc} onChange={() => onChange({ ...value, dcdc: false })} /> None
         </label>
@@ -188,7 +190,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         </label>
       </Row>
 
-      <Row title="Shore power charger" icon="🔌">
+      <Row title="Shore power charger" icon="plug">
         <label className="flex items-center gap-2 text-sm font-sans">
           <input type="radio" checked={!value.shore} onChange={() => onChange({ ...value, shore: undefined })} /> None
         </label>
@@ -202,7 +204,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         )}
       </Row>
 
-      <Row title="Inverter" icon="⚡">
+      <Row title="Inverter" icon="inverter">
         <label className="flex items-center gap-2 text-sm font-sans">
           <input type="radio" checked={!value.inverter} onChange={() => onChange({ ...value, inverter: undefined })} /> None
         </label>

@@ -2,6 +2,7 @@ import { en } from "@/i18n/en";
 import { SelectButton } from "@/components/ui/SelectButton";
 import { StepCard } from "@/components/ui/StepCard";
 import { UsageIllustration } from "@/components/illustrations/Illustrations";
+import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 import type { JourneyDuration, UsageProfile, UsageStep } from "@/types";
 
 interface Props {
@@ -27,7 +28,7 @@ export const Step02_UsageProfile = ({ value, onChange }: Props) => {
               size="lg"
             >
               <div className="flex items-start gap-3">
-                <span className="text-2xl leading-none">{opt.icon}</span>
+                <BrandIcon name={opt.icon as IconKey} size="md" tone="primary" />
                 <div>
                   <div className="font-display text-xl sm:text-2xl font-semibold tracking-tight">
                     {opt.label}
@@ -46,7 +47,7 @@ export const Step02_UsageProfile = ({ value, onChange }: Props) => {
             {t.journeyTitle}
           </h3>
           <div className="warning-banner mb-4 flex items-start gap-2">
-            <span aria-hidden>💡</span>
+            <BrandIcon name="info" size="xs" />
             <span>{t.journeyHelper}</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
@@ -59,8 +60,8 @@ export const Step02_UsageProfile = ({ value, onChange }: Props) => {
                   onClick={() => onChange({ ...value, journey: j })}
                   size="sm"
                 >
-                  <span className="text-sm">
-                    <span className="mr-2">{opt.icon}</span>
+                  <span className="inline-flex items-center gap-2 text-sm">
+                    <BrandIcon name="clock" size="xs" tone="muted" />
                     {opt.label}
                   </span>
                 </SelectButton>

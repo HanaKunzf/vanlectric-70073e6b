@@ -140,7 +140,9 @@ export const ProModal = ({ open, onClose }: ProModalProps) => {
           </>
         ) : (
           <div className="text-center py-4">
-            <div className="text-3xl mb-3" aria-hidden>✉️</div>
+            <div className="mb-3 flex justify-center" aria-hidden>
+              <Mail className="w-8 h-8 text-primary" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+            </div>
             <p className="font-display text-xl font-bold text-primary mb-2">We'll let you know!</p>
             <p className="text-sm text-muted-foreground mb-5">
               Thanks — we've saved your email and will reach out when PRO launches.

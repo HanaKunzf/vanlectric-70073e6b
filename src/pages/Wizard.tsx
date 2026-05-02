@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Zap, Pencil } from "lucide-react";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Step01_Vehicle, isStep1Valid } from "@/components/wizard/Step01_Vehicle";
@@ -112,8 +112,9 @@ export default function Wizard() {
 
       <main className="flex-1 mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-10">
         {editMode && (
-          <div className="mb-6 rounded-lg border-l-4 border-accent bg-accent/10 px-4 py-3 text-sm font-sans text-foreground">
-            ✏️ Editing — click {en.nav.next} to return to results
+          <div className="mb-6 rounded-lg border-l-4 border-accent bg-accent/10 px-4 py-3 text-sm font-sans text-foreground inline-flex items-center gap-2">
+            <Pencil className="w-4 h-4" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+            <span>Editing — click {en.nav.next} to return to results</span>
           </div>
         )}
         <div key={step}>
