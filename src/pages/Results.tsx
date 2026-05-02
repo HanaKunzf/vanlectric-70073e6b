@@ -13,7 +13,7 @@ import { BackToTop } from "@/components/ui/BackToTop";
 import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 import { LocalSaveNotice } from "@/components/ui/LocalSaveNotice";
 import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
-import { saveLastCalculation, clearLastCalculation, hasLastCalculation, loadLastCalculation, markResultsReached } from "@/services/localCalculation";
+import { clearLastCalculation, hasLastCalculation, loadLastCalculation, markResultsReached } from "@/services/localCalculation";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
