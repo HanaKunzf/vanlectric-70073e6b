@@ -229,11 +229,11 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
         className="absolute inset-0 w-full h-full bg-[hsl(var(--background)/0.55)] backdrop-blur-md transition-opacity duration-200 motion-reduce:transition-none"
       />
 
-      {/* Panel: floating overlay on mobile, dropdown on md+ */}
+      {/* Panel: floating overlay on mobile, compact dropdown on md+ */}
       <div
         className={cn(
           "absolute inset-0 flex items-start justify-center md:justify-end",
-          "px-3 md:px-6 pt-[max(env(safe-area-inset-top),0.75rem)] md:pt-16",
+          "px-3 md:px-4 lg:px-6 pt-[max(env(safe-area-inset-top),0.75rem)] md:pt-20",
           "transition-all duration-250 ease-out motion-reduce:transition-none",
           open
             ? "translate-y-0 opacity-100"
@@ -246,15 +246,15 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
           aria-modal="true"
           aria-label="Site navigation"
           className={cn(
-            "w-full md:max-w-[920px]",
+            "w-full md:w-[400px] lg:w-[420px] md:max-w-[440px]",
             "bg-card rounded-2xl border border-border/70",
             "shadow-[0_20px_50px_-15px_rgba(0,0,0,0.25)] md:shadow-[var(--shadow-card-hover)]",
-            "max-h-[80dvh] md:h-auto md:max-h-[calc(100vh-6rem)]",
+            "max-h-[80dvh] md:max-h-[calc(100vh-7rem)]",
             "flex flex-col overflow-hidden",
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 sm:px-7 h-12 sm:h-14 border-b border-border flex-shrink-0">
+          <div className="flex items-center justify-between px-4 sm:px-6 h-12 sm:h-14 border-b border-border flex-shrink-0">
             <Link
               to="/"
               onClick={onClose}
@@ -279,9 +279,9 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
             </button>
           </div>
 
-          {/* Scrollable content (mobile shows main sections; About handled in footer on mobile) */}
-          <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-7 py-3 sm:py-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5 sm:gap-y-8">
+          {/* Scrollable content — single column on every breakpoint for the compact panel */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-3 sm:py-5">
+            <div className="grid grid-cols-1 gap-y-5">
               {sections.map((section, idx) => {
                 const isAbout = section.heading === "About";
                 return (
