@@ -595,6 +595,13 @@ export function calculate(state: WizardState): CalculationResult {
   if (max230VInverter > 2500) {
     warnings.push("Inverter loads above 2500W draw >200A from the battery. Use 70mm² cables and a Class T fuse.");
   }
+  // Diesel heater + petrol vehicle: heater can't draw from main tank.
+  const dieselHeaterEnabled = !!step4.appliances?.["diesel-heater"]?.enabled;
+  if (dieselHeaterEnabled && step1.engine === "petrol") {
+    warnings.push(
+      "Diesel heater with petrol vehicle: your heater will likely need a separate diesel fuel tank. Plan space, safe mounting and refilling access.",
+    );
+  }
   const budget: Budget = step12.budget ?? "show-me";
   const budgetMaxMap: Record<Budget, number> = {
     "<500": 500, "500-1000": 1000, "1000-2000": 2000, "2000-3000": 3000, "3000+": Infinity, "show-me": Infinity,
