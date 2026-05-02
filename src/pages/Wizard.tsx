@@ -129,7 +129,7 @@ export default function Wizard() {
           {step === 10 && <Step10_Season value={state.step10} onChange={(v) => set("step10", v)} />}
           {step === 11 && <Step11_Insulation value={state.step11} onChange={(v) => set("step11", v)} />}
           {step === 12 && <Step12_Budget value={state.step12} onChange={(v) => set("step12", v)} />}
-          {step === 13 && <Step13_Existing value={state.step13} onChange={(v) => set("step13", v)} />}
+          {step === 13 && <Step13_Existing value={state.step13} onChange={(v) => set("step13", v)} wizardState={state} />}
         </div>
       </main>
 
