@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Zap, Pencil } from "lucide-react";
+import { saveLastCalculation, clearLastCalculation, hasLastCalculation } from "@/services/localCalculation";
+import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Step01_Vehicle, isStep1Valid } from "@/components/wizard/Step01_Vehicle";
@@ -30,6 +32,12 @@ export default function Wizard() {
   );
   const [step, setStep] = useState(incoming.resumeAtStep ?? 1);
   const [editMode] = useState(!!incoming.editMode);
+  const [confirmStartNew, setConfirmStartNew] = useState(false);
+
+  // Auto-save wizard state to localStorage on every change (free-tier persistence).
+  useEffect(() => {
+    saveLastCalculation(state);
+  }, [state]);
 
   const set = <K extends keyof WizardState>(key: K, v: WizardState[K]) =>
     setState((s) => ({ ...s, [key]: v }));
@@ -101,7 +109,14 @@ export default function Wizard() {
           </div>
           <button
             type="button"
-            onClick={() => navigate("/", { replace: true })}
+            onClick={() => {
+              if (hasLastCalculation()) {
+                setConfirmStartNew(true);
+              } else {
+                clearLastCalculation();
+                navigate("/", { replace: true });
+              }
+            }}
             className="text-xs sm:text-sm font-sans font-medium text-foreground/75 hover:text-primary hover:underline transition-colors whitespace-nowrap"
             aria-label="Start over"
           >
@@ -161,6 +176,16 @@ export default function Wizard() {
         </div>
       </footer>
       <BackToTop bottomOffset={72} />
+      <ConfirmStartNewModal
+        open={confirmStartNew}
+        onOpenChange={setConfirmStartNew}
+        onConfirm={() => {
+          clearLastCalculation();
+          setConfirmStartNew(false);
+          setState(initialWizardState);
+          navigate("/", { replace: true });
+        }}
+      />
     </div>
   );
 }

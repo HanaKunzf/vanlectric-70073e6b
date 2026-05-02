@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle, CheckSquare, Square, Wrench } from "lucide-react";
 import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
@@ -11,6 +11,9 @@ import { EmailReportModal } from "@/components/ui/EmailReportModal";
 import { Seo } from "@/components/site/SiteLayout";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
+import { LocalSaveNotice } from "@/components/ui/LocalSaveNotice";
+import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
+import { saveLastCalculation, clearLastCalculation, hasLastCalculation, loadLastCalculation } from "@/services/localCalculation";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
@@ -1006,11 +1009,20 @@ export default function Results() {
   const navigate = useNavigate();
   const location = useLocation();
   const incomingWizard = (location.state as { wizard?: Partial<WizardState> })?.wizard;
-  const state: WizardState = { ...initialWizardState, ...(incomingWizard ?? {}) };
+  // Fall back to localStorage when results page is opened directly (e.g. browser refresh).
+  const fallbackWizard = useMemo(() => (incomingWizard ? null : loadLastCalculation()), [incomingWizard]);
+  const state: WizardState = { ...initialWizardState, ...(incomingWizard ?? fallbackWizard ?? {}) };
   const result = useMemo(() => calculate(state), [state]);
   const [proOpen, setProOpen] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
   const [profile, setProfile] = useState<PriceProfile>("balanced");
+  const [confirmStartNew, setConfirmStartNew] = useState(false);
+
+  // Persist whatever the user has reached on this device (free-tier local save).
+  useEffect(() => {
+    saveLastCalculation(state);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Profile-adjusted totals
   const adjComponentsTotal = adjust(result.componentsTotal, profile);
@@ -1520,10 +1532,21 @@ export default function Results() {
                 Recalculate (back to appliances)
               </button>
             </div>
+
+            <div className="mt-5">
+              <LocalSaveNotice />
+            </div>
+
             <div className="mt-4 text-center">
               <button
                 type="button"
-                onClick={() => navigate("/", { replace: true })}
+                onClick={() => {
+                  if (hasLastCalculation()) {
+                    setConfirmStartNew(true);
+                  } else {
+                    navigate("/", { replace: true });
+                  }
+                }}
                 className="text-xs font-sans text-muted-foreground hover:text-primary hover:underline transition-colors"
               >
                 ↺ Start a new calculation
@@ -1547,6 +1570,15 @@ export default function Results() {
       </footer>
       <ProModal open={proOpen} onClose={() => setProOpen(false)} />
       <EmailReportModal open={emailOpen} onClose={() => setEmailOpen(false)} />
+      <ConfirmStartNewModal
+        open={confirmStartNew}
+        onOpenChange={setConfirmStartNew}
+        onConfirm={() => {
+          clearLastCalculation();
+          setConfirmStartNew(false);
+          navigate("/", { replace: true });
+        }}
+      />
       <BackToTop />
     </div>
   );

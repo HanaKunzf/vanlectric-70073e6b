@@ -1,9 +1,31 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Battery, Sun, Plug, Calculator, ShieldCheck, BookOpen } from "lucide-react";
 import { SiteLayout, Seo } from "@/components/site/SiteLayout";
 import heroImage from "@/assets/hero-van-mountains.png";
+import { ContinueLastCard } from "@/components/ui/ContinueLastCard";
+import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
+import { hasLastCalculation, clearLastCalculation } from "@/services/localCalculation";
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [hasSaved, setHasSaved] = useState<boolean>(() => hasLastCalculation());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const handleStartPlanning = (e: React.MouseEvent) => {
+    if (hasSaved) {
+      e.preventDefault();
+      setConfirmOpen(true);
+    }
+  };
+
+  const onConfirmStartNew = () => {
+    clearLastCalculation();
+    setHasSaved(false);
+    setConfirmOpen(false);
+    navigate("/planner");
+  };
+
   return (
     <SiteLayout>
       <Seo
@@ -36,6 +58,7 @@ export default function Home() {
           <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/planner"
+              onClick={handleStartPlanning}
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-base px-6 py-3 rounded-lg hover:bg-[hsl(var(--primary-hover))] active:scale-[0.98] transition"
             >
               Start planning <ArrowRight className="w-4 h-4" />
@@ -58,6 +81,13 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* CONTINUE LAST CALCULATION */}
+      {hasSaved && (
+        <section className="container mx-auto px-4 pt-8 pb-2 max-w-3xl">
+          <ContinueLastCard onCleared={() => setHasSaved(false)} />
+        </section>
+      )}
 
       {/* WHAT IT CALCULATES */}
       <section className="container mx-auto px-4 py-14 max-w-5xl">
@@ -119,12 +149,19 @@ export default function Home() {
         <div className="mt-10 text-center">
           <Link
             to="/planner"
+            onClick={handleStartPlanning}
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-base px-7 py-3.5 rounded-lg hover:bg-[hsl(var(--primary-hover))]"
           >
             Start planning your van <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </section>
+
+      <ConfirmStartNewModal
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        onConfirm={onConfirmStartNew}
+      />
     </SiteLayout>
   );
 }
