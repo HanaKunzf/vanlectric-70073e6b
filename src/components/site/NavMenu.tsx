@@ -158,9 +158,10 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
           <Link
             to="/"
             onClick={onClose}
-            className="font-display italic font-bold text-lg text-primary"
+            className="flex items-center"
+            aria-label="Vanlectric home"
           >
-            Vanlectric
+            <img src="/logo-transparent.png" alt="Vanlectric" className="h-7 w-auto" />
           </Link>
           <button
             ref={firstFocusableRef}
