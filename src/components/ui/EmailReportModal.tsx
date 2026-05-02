@@ -107,11 +107,11 @@ export const EmailReportModal = ({ open, onClose, calculation }: EmailReportModa
             <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-foreground/90 font-sans">
-                Thanks! Your calculation report is on its way to{" "}
-                <span className="font-semibold">{email}</span>.
+                Thanks! Your calculation report is on its way.
               </p>
               <p className="text-xs text-muted-foreground font-sans mt-2">
-                If it doesn't arrive within a few minutes, please check your spam folder.
+                Sent to <span className="font-semibold">{email}</span>. If it doesn't arrive
+                within a few minutes, please check your spam folder.
               </p>
             </div>
           </div>
