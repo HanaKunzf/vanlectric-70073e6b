@@ -568,8 +568,11 @@ export function calculate(state: WizardState): CalculationResult {
       `Your climate and season combination (${climate} / ${season}) uses a conservative worst-case of ${solarHours} solar hours/day. Your solar panels (~${maxSolarW.toFixed(0)}W) will cover your needs on sunny days. For cloudy periods, plan for alternator top-ups or shore power. If you travel mainly in summer, reconsider your season selection for a more realistic estimate.`
     );
   }
-  if (shoreLines.length > 0 && shore === "never") {
-    warnings.push("You have shore-power-only appliances but no shore-power access. Consider removing them or planning campsite stops.");
+  if (hasShoreOnlyAppliances && shore === "never") {
+    warnings.push("⚠️ You selected shore-only appliances, but also selected that you will never use shore power. These appliances will not be usable unless you add a 230V shore hookup or remove them from your list.");
+  }
+  if (shore !== "never" && shoreCharging === "ac-only") {
+    warnings.push("You selected a 230V shore circuit only. Your leisure battery will not recharge from shore power unless you add a shore battery charger.");
   }
   if (shore === "frequent") {
     warnings.push("Your system can rely more on shore recharging, so off-grid autonomy requirements are lower.");
