@@ -44,6 +44,8 @@ export const EmailReportModal = ({ open, onClose, calculation }: EmailReportModa
   const canSubmit =
     isValidEmail(email) && reportConsent && status !== "loading";
 
+  // Report email is sent via server-side PHP endpoint /api/send-report.php.
+  // No API keys are exposed in frontend.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
@@ -57,6 +59,10 @@ export const EmailReportModal = ({ open, onClose, calculation }: EmailReportModa
     });
     if (result.success) {
       setStatus("success");
+      // Auto-close the modal after the user has seen the confirmation.
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } else {
       setStatus("error");
       setErrorMsg("Something went wrong. Please try again.");
@@ -101,11 +107,11 @@ export const EmailReportModal = ({ open, onClose, calculation }: EmailReportModa
             <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-foreground/90 font-sans">
-                Thanks! Your calculation report is on its way to{" "}
-                <span className="font-semibold">{email}</span>.
+                Thanks! Your calculation report is on its way.
               </p>
               <p className="text-xs text-muted-foreground font-sans mt-2">
-                If it doesn't arrive within a few minutes, please check your spam folder.
+                Sent to <span className="font-semibold">{email}</span>. If it doesn't arrive
+                within a few minutes, please check your spam folder.
               </p>
             </div>
           </div>
