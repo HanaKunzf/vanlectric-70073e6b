@@ -125,7 +125,10 @@ export default function Wizard() {
         </div>
       </header>
 
-      <main className="flex-1 mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-10">
+      <main
+        className="flex-1 mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-10"
+        style={{ paddingBottom: "calc(96px + env(safe-area-inset-bottom))" }}
+      >
         {editMode && (
           <div className="mb-6 rounded-lg border-l-4 border-accent bg-accent/10 px-4 py-3 text-sm font-sans text-foreground inline-flex items-center gap-2">
             <Pencil className="w-4 h-4" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
