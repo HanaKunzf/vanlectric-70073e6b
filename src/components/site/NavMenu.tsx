@@ -152,9 +152,9 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
 
   const renderItem = (item: MenuItem) => {
     const baseTitle =
-      "block font-display font-semibold text-base sm:text-lg leading-snug transition-colors duration-150";
+      "block font-display font-semibold text-[15px] sm:text-lg leading-snug transition-colors duration-150";
     const baseDesc =
-      "mt-0.5 text-xs sm:text-sm font-sans leading-relaxed text-muted-foreground";
+      "mt-0.5 text-[11.5px] sm:text-sm font-sans leading-snug sm:leading-relaxed text-muted-foreground";
 
     if (item.disabled) {
       return (
@@ -197,7 +197,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
     );
 
     const linkClass =
-      "group block py-2.5 px-2 -mx-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-accent/40 transition-colors";
+      "group block py-2 sm:py-2.5 px-2 -mx-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-accent/40 transition-colors";
 
     if (item.external) {
       return (
@@ -229,12 +229,15 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
         className="absolute inset-0 w-full h-full bg-[hsl(var(--background)/0.55)] backdrop-blur-md transition-opacity duration-200 motion-reduce:transition-none"
       />
 
-      {/* Panel: same concept across breakpoints, sized responsively */}
+      {/* Panel: floating overlay on mobile, dropdown on md+ */}
       <div
         className={cn(
-          "absolute inset-0 flex items-start justify-center md:justify-end px-0 md:px-6 pt-0 md:pt-16",
-          "transition-all duration-200 motion-reduce:transition-none",
-          open ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0",
+          "absolute inset-0 flex items-start justify-center md:justify-end",
+          "px-3 md:px-6 pt-[max(env(safe-area-inset-top),0.75rem)] md:pt-16",
+          "transition-all duration-250 ease-out motion-reduce:transition-none",
+          open
+            ? "translate-y-0 opacity-100"
+            : "translate-y-3 md:-translate-y-2 opacity-0",
         )}
       >
         <div
@@ -244,16 +247,14 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
           aria-label="Site navigation"
           className={cn(
             "w-full md:max-w-[920px]",
-            "bg-card md:rounded-2xl md:border md:border-border md:shadow-[var(--shadow-card-hover)]",
-            "h-screen md:h-auto md:max-h-[calc(100vh-6rem)] flex flex-col overflow-hidden",
+            "bg-card rounded-2xl border border-border/70",
+            "shadow-[0_20px_50px_-15px_rgba(0,0,0,0.25)] md:shadow-[var(--shadow-card-hover)]",
+            "max-h-[80dvh] md:h-auto md:max-h-[calc(100vh-6rem)]",
+            "flex flex-col overflow-hidden",
           )}
-          style={{
-            paddingTop: "env(safe-area-inset-top)",
-            paddingBottom: "env(safe-area-inset-bottom)",
-          }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 sm:px-7 h-14 border-b border-border flex-shrink-0">
+          <div className="flex items-center justify-between px-4 sm:px-7 h-12 sm:h-14 border-b border-border flex-shrink-0">
             <Link
               to="/"
               onClick={onClose}
@@ -263,7 +264,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
               <img
                 src="/logo-transparent.png"
                 alt="Vanlectric"
-                className="h-8 w-auto"
+                className="h-7 sm:h-8 w-auto"
                 decoding="async"
               />
             </Link>
@@ -278,24 +279,61 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
             </button>
           </div>
 
-          {/* Sections */}
-          <div className="flex-1 overflow-y-auto px-5 sm:px-7 py-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-8">
-              {sections.map((section) => (
-                <section key={section.heading}>
-                  <h2 className="text-[11px] font-sans uppercase tracking-[0.2em] text-accent font-semibold mb-3">
-                    {section.heading}
-                  </h2>
-                  <ul className="divide-y divide-border md:divide-y-0 md:space-y-1">
-                    {section.items.map((item) => (
-                      <li key={item.label} className="md:py-0">
-                        {renderItem(item)}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
+          {/* Scrollable content (mobile shows main sections; About handled in footer on mobile) */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-7 py-3 sm:py-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5 sm:gap-y-8">
+              {sections.map((section, idx) => {
+                const isAbout = section.heading === "About";
+                return (
+                  <section
+                    key={section.heading}
+                    className={cn(isAbout && "hidden md:block")}
+                  >
+                    <h2 className="text-[10.5px] sm:text-[11px] font-sans uppercase tracking-[0.2em] text-accent font-semibold mb-2 sm:mb-3">
+                      {section.heading}
+                    </h2>
+                    <ul className="divide-y divide-border/60 md:divide-y-0 md:space-y-1">
+                      {section.items.map((item) => (
+                        <li key={item.label} className="md:py-0">
+                          {renderItem(item)}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                );
+              })}
             </div>
+          </div>
+
+          {/* Compact footer (mobile only) — About / Contact / Privacy */}
+          <div
+            className="md:hidden flex-shrink-0 border-t border-border bg-card/80 px-4 py-3"
+            style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.75rem)" }}
+          >
+            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+              {sections
+                .find((s) => s.heading === "About")
+                ?.items.map((item) => {
+                  const cls =
+                    "text-[12px] font-sans text-muted-foreground hover:text-accent focus-visible:text-accent transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded";
+                  if (item.external) {
+                    return (
+                      <li key={item.label}>
+                        <a href={item.to} onClick={onClose} className={cls}>
+                          {item.label}
+                        </a>
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={item.label}>
+                      <Link to={item.to} onClick={onClose} className={cls}>
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
           </div>
         </div>
       </div>
