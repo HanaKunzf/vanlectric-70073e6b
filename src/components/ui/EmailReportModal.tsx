@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { X, Mail } from "lucide-react";
+import { X, Mail, Check } from "lucide-react";
 
 interface EmailReportModalProps {
   open: boolean;
@@ -114,7 +114,9 @@ export const EmailReportModal = ({ open, onClose }: EmailReportModalProps) => {
           </>
         ) : (
           <div className="text-center py-4">
-            <div className="text-3xl mb-3" aria-hidden>✓</div>
+            <div className="mb-3 flex justify-center" aria-hidden>
+              <Check className="w-8 h-8 text-primary" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+            </div>
             <p className="font-display text-xl font-bold text-primary mb-2">Thanks!</p>
             <p className="text-sm text-muted-foreground mb-5">
               We'll notify you when PRO launches with your full report.
