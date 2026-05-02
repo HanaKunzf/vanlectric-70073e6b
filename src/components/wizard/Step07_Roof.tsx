@@ -229,7 +229,7 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
       <h3 className="font-sans text-sm font-semibold tracking-wide text-muted-foreground mb-3">
         {t.roofTypeTitle}
       </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
         {roofKeys.map((k) => (
           <SelectButton
             key={k}
