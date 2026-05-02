@@ -161,7 +161,7 @@ export const NavMenu = ({ open, onClose }: NavMenuProps) => {
             className="flex items-center"
             aria-label="Vanlectric home"
           >
-            <img src="/logo-transparent.png" alt="Vanlectric" className="h-7 w-auto" />
+            <img src="/logo-transparent.png" alt="Vanlectric" className="h-9 w-auto" decoding="async" />
           </Link>
           <button
             ref={firstFocusableRef}
