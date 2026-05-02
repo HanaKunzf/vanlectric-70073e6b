@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 
 const desktopLinks = [
   { to: "/electrical-guide", label: "Electrical Guide" },
-  { to: "/electrical-guide#basics", label: "Basics" },
-  { to: "/electrical-guide#big-picture", label: "Components" },
+  { to: "/electrical-guide#basics", label: "Learn the basics" },
+  { to: "/electrical-guide#big-picture", label: "Components & systems" },
   { to: "/electrical-guide#cable-chart", label: "Cable sizing" },
   { to: "/checklist", label: "Before you buy" },
 ];
@@ -18,15 +18,13 @@ export const SiteHeader = () => {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur">
-        <div className="container mx-auto px-4 h-14 lg:h-16 flex items-center justify-between gap-4">
+        <div className="container mx-auto px-4 h-16 lg:h-[72px] flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="Vanlectric home">
+          <Link to="/" className="flex items-center shrink-0" aria-label="Vanlectric home">
             <img
               src="/logo-transparent.png"
               alt="Vanlectric"
-              className="h-7 lg:h-8 w-auto"
-              width={140}
-              height={32}
+              className="h-8 lg:h-10 w-auto"
             />
             <span className="sr-only">Vanlectric</span>
           </Link>
@@ -43,8 +41,10 @@ export const SiteHeader = () => {
                   end={!hash}
                   className={({ isActive }) =>
                     cn(
-                      "px-3 py-2 rounded-md text-sm font-sans font-medium text-foreground/80 hover:text-primary hover:bg-card transition-colors",
-                      isActive && !hash && "text-primary",
+                      "px-3 py-2 rounded-md text-sm font-sans font-medium transition-colors outline-none",
+                      "text-primary hover:text-accent focus-visible:text-accent",
+                      "focus-visible:ring-2 focus-visible:ring-accent/40",
+                      isActive && !hash && "text-accent",
                     )
                   }
                 >
@@ -67,10 +67,9 @@ export const SiteHeader = () => {
               aria-expanded={open}
               aria-haspopup="dialog"
               onClick={() => setOpen(true)}
-              className="lg:hidden inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-sans font-medium text-primary hover:bg-card transition-colors"
+              className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-primary hover:text-accent focus-visible:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 transition-colors"
             >
-              <Menu className="w-5 h-5" aria-hidden />
-              <span className="hidden md:inline">Menu</span>
+              <Menu className="w-6 h-6" aria-hidden />
             </button>
           </div>
         </div>
