@@ -18,6 +18,7 @@ import Examples from "./pages/Examples.tsx";
 import About from "./pages/About.tsx";
 import Disclaimer from "./pages/Disclaimer.tsx";
 import Contact from "./pages/Contact.tsx";
+import CalculationLogic from "./pages/CalculationLogic.tsx";
 import { CookieBanner } from "@/components/ui/CookieBanner";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/calculation-logic" element={<CalculationLogic />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

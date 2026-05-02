@@ -70,6 +70,11 @@ const sections: MenuSection[] = [
         description: "Learn why cable size, fuse size and distance matter.",
       },
       {
+        to: "/calculation-logic",
+        label: "Calculation logic",
+        description: "How Vanlectric estimates batteries, solar, inverter losses and safety reserve.",
+      },
+      {
         to: "/checklist",
         label: "Before you buy",
         description: "Checklist of things to verify before ordering components.",

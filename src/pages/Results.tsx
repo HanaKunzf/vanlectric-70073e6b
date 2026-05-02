@@ -1073,6 +1073,12 @@ export default function Results() {
             Indicative sizing based on your inputs. Use it as a recommended starting point —
             verify before buying and depend on real-world conditions.
           </p>
+          <Link
+            to="/calculation-logic"
+            className="mt-3 inline-flex items-center gap-1 text-xs sm:text-sm font-sans text-primary hover:underline"
+          >
+            <span aria-hidden>ℹ️</span> How are these numbers calculated?
+          </Link>
         </div>
 
         <div className="space-y-6 sm:space-y-8">
@@ -1089,6 +1095,17 @@ export default function Results() {
 
           {/* 4. Daily consumption */}
           <SectionCard title="Daily consumption">
+            <div className="-mt-3 mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-sans">
+              <Link
+                to="/calculation-logic#daily-consumption"
+                className="text-primary hover:underline inline-flex items-center gap-1"
+              >
+                <span aria-hidden>ℹ️</span> Why doesn't this always equal W × 24 h?
+              </Link>
+              <span className="text-muted-foreground">
+                Fridge runtime uses duty cycle based on climate and insulation.
+              </span>
+            </div>
             {/* Energy split breakdown — 12V vs 230V via inverter vs losses */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
               <div className="rounded-lg bg-background/60 border border-border p-3">
@@ -1308,6 +1325,20 @@ export default function Results() {
                 </>
               );
             })()}
+            <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-sans">
+              <Link
+                to="/calculation-logic#battery"
+                className="text-primary hover:underline inline-flex items-center gap-1"
+              >
+                <span aria-hidden>ℹ️</span> How battery sizing works
+              </Link>
+              <Link
+                to="/calculation-logic#solar"
+                className="text-primary hover:underline inline-flex items-center gap-1"
+              >
+                <span aria-hidden>ℹ️</span> How solar estimate works
+              </Link>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {result.components.map((c) => <ComponentCard key={c.key} c={c} profile={profile} />)}
             </div>
