@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { en } from "@/i18n/en";
 import heroImage from "@/assets/hero-van-mountains.png";
 import { SiteFooter } from "@/components/ui/Footer";
+import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 
 export default function Landing() {
   const [hover, setHover] = useState(false);
@@ -55,7 +56,7 @@ export default function Landing() {
               key={b.text}
               className="step-card px-4 py-4 flex items-center gap-3 text-left"
             >
-              <span className="text-2xl" aria-hidden>{b.icon}</span>
+              <BrandIcon name={b.icon as IconKey} size="md" tone="primary" />
               <span className="text-sm text-foreground/90">{b.text}</span>
             </li>
           ))}
@@ -78,8 +79,9 @@ export default function Landing() {
         </p>
 
         {/* PRO coming soon banner */}
-        <p className="mt-4 text-xs sm:text-sm text-primary/80 font-sans text-center max-w-md">
-          ✨ PRO features coming soon — PDF export, saved designs &amp; more.
+        <p className="mt-4 text-xs sm:text-sm text-primary/80 font-sans text-center max-w-md inline-flex items-center justify-center gap-1.5">
+          <BrandIcon name="sparkles" size="xs" />
+          PRO features coming soon — PDF export, saved designs &amp; more.
         </p>
       </main>
       <SiteFooter />
