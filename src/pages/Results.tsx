@@ -8,6 +8,7 @@ import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
 import { ProModal } from "@/components/ui/ProModal";
 import { EmailReportModal } from "@/components/ui/EmailReportModal";
+import { Seo } from "@/components/site/SiteLayout";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
@@ -965,6 +966,11 @@ export default function Results() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Seo
+        title="Your Campervan Electrical System Results — Vanlectric"
+        description="Review your calculated campervan battery, solar, inverter, DC-DC charger, shore power setup and shopping list."
+        noindex
+      />
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
         <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
           <button

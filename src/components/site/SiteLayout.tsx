@@ -3,9 +3,16 @@ import { useLocation } from "react-router-dom";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooterFull } from "./SiteFooterFull";
 
+const SITE_URL = "https://vanlectric.com";
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.svg`;
+const JSONLD_ID = "vanlectric-page-jsonld";
+
 interface SeoProps {
   title?: string;
   description?: string;
+  image?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const setMeta = (name: string, content: string, attr: "name" | "property" = "name") => {
@@ -29,21 +36,42 @@ const setCanonical = (href: string) => {
   el.setAttribute("href", href);
 };
 
-export const Seo = ({ title, description }: SeoProps) => {
+const setJsonLd = (data: SeoProps["jsonLd"]) => {
+  // remove previous page-level JSON-LD (keep static ones from index.html, which have no id)
+  document.head.querySelectorAll(`script[data-jsonld="${JSONLD_ID}"]`).forEach((n) => n.remove());
+  if (!data) return;
+  const items = Array.isArray(data) ? data : [data];
+  for (const item of items) {
+    const s = document.createElement("script");
+    s.type = "application/ld+json";
+    s.setAttribute("data-jsonld", JSONLD_ID);
+    s.text = JSON.stringify(item);
+    document.head.appendChild(s);
+  }
+};
+
+export const Seo = ({ title, description, image, noindex, jsonLd }: SeoProps) => {
   const location = useLocation();
   useEffect(() => {
     if (title) document.title = title;
     if (description) {
       setMeta("description", description);
       setMeta("og:description", description, "property");
+      setMeta("twitter:description", description);
     }
-    if (title) setMeta("og:title", title, "property");
-    try {
-      setCanonical(`https://vanlectric.com${location.pathname}`);
-    } catch {
-      /* noop */
+    if (title) {
+      setMeta("og:title", title, "property");
+      setMeta("twitter:title", title);
     }
-  }, [title, description, location.pathname]);
+    const url = `${SITE_URL}${location.pathname}`;
+    setMeta("og:url", url, "property");
+    setCanonical(url);
+    setMeta("robots", noindex ? "noindex, nofollow" : "index, follow");
+    const img = image || DEFAULT_OG_IMAGE;
+    setMeta("og:image", img, "property");
+    setMeta("twitter:image", img);
+    setJsonLd(jsonLd);
+  }, [title, description, image, noindex, jsonLd, location.pathname]);
   return null;
 };
 
@@ -51,9 +79,19 @@ interface SiteLayoutProps {
   children: ReactNode;
   title?: string;
   description?: string;
+  image?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-export const SiteLayout = ({ children, title, description }: SiteLayoutProps) => {
+export const SiteLayout = ({
+  children,
+  title,
+  description,
+  image,
+  noindex,
+  jsonLd,
+}: SiteLayoutProps) => {
   const location = useLocation();
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -61,7 +99,13 @@ export const SiteLayout = ({ children, title, description }: SiteLayoutProps) =>
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Seo title={title} description={description} />
+      <Seo
+        title={title}
+        description={description}
+        image={image}
+        noindex={noindex}
+        jsonLd={jsonLd}
+      />
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooterFull />

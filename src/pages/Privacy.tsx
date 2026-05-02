@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { Seo } from "@/components/site/SiteLayout";
 
 export default function Privacy() {
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Privacy Policy — Vanlectric"
+        description="How Vanlectric handles personal data, cookies and analytics for the vanlife electrical calculator."
+        noindex
+      />
       <main className="container mx-auto px-6 py-10 max-w-2xl">
         <Link
           to="/"

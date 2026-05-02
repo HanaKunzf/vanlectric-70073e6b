@@ -7,8 +7,8 @@ export default function Home() {
   return (
     <SiteLayout>
       <Seo
-        title="Vanlectric — Plan your campervan electrical system with confidence"
-        description="Free campervan electrical planner. Size your battery, solar, inverter and shore power, with indicative component costs. Built for DIY van builders."
+        title="Vanlectric — Free Vanlife Electrical Calculator"
+        description="Plan your campervan electrical system. Calculate battery size, solar panels, DC-DC charging, shore power and inverter needs."
       />
 
       {/* HERO */}

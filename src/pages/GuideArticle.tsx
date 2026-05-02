@@ -209,8 +209,40 @@ export default function GuideArticle() {
   const guide = slug ? guides[slug] : undefined;
   if (!guide) return <Navigate to="/resources" replace />;
 
+  const url = `https://vanlectric.com/resources/${guide.slug}`;
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: guide.title,
+      description: guide.description,
+      author: { "@type": "Organization", name: "Vanlectric" },
+      publisher: {
+        "@type": "Organization",
+        name: "Vanlectric",
+        logo: { "@type": "ImageObject", url: "https://vanlectric.com/logo.svg" },
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": url },
+      dateModified: new Date().toISOString().slice(0, 10),
+      inLanguage: "en",
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://vanlectric.com/" },
+        { "@type": "ListItem", position: 2, name: "Resources", item: "https://vanlectric.com/resources" },
+        { "@type": "ListItem", position: 3, name: guide.title, item: url },
+      ],
+    },
+  ];
+
   return (
-    <SiteLayout title={`${guide.title} — Vanlectric`} description={guide.description}>
+    <SiteLayout
+      title={`${guide.title} — Vanlectric`}
+      description={guide.description}
+      jsonLd={jsonLd}
+    >
       <PageHero eyebrow="Resources" title={guide.title} subtitle={guide.description} />
       <Prose>
         <Link to="/resources" data-prose-cta className="inline-flex items-center gap-1 text-sm text-muted-foreground no-underline hover:text-primary">
