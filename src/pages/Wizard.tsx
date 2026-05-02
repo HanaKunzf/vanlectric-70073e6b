@@ -144,7 +144,7 @@ export default function Wizard() {
           {step === 1 && <Step01_Vehicle value={state.step1} onChange={(v) => set("step1", v)} />}
           {step === 2 && <Step02_UsageProfile value={state.step2} onChange={(v) => set("step2", v)} />}
           {step === 3 && <Step03_Climate value={state.step3} onChange={(v) => set("step3", v)} />}
-          {step === 4 && <Step04_Appliances value={state.step4} onChange={(v) => set("step4", v)} />}
+          {step === 4 && <Step04_Appliances value={state.step4} onChange={(v) => set("step4", v)} vehicleEngine={state.step1.engine} />}
           {step === 5 && <Step05_Driving value={state.step5} onChange={(v) => set("step5", v)} />}
           {step === 6 && <Step06_Shore value={state.step6} onChange={(v) => set("step6", v)} />}
           {step === 7 && <Step07_Roof value={state.step7} onChange={(v) => set("step7", v)} />}
