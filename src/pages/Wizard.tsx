@@ -109,7 +109,14 @@ export default function Wizard() {
           </div>
           <button
             type="button"
-            onClick={() => navigate("/", { replace: true })}
+            onClick={() => {
+              if (hasLastCalculation()) {
+                setConfirmStartNew(true);
+              } else {
+                clearLastCalculation();
+                navigate("/", { replace: true });
+              }
+            }}
             className="text-xs sm:text-sm font-sans font-medium text-foreground/75 hover:text-primary hover:underline transition-colors whitespace-nowrap"
             aria-label="Start over"
           >
