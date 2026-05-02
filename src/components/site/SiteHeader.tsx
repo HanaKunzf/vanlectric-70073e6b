@@ -61,7 +61,7 @@ export const SiteHeader = () => {
             <img
               src="/logo-transparent.png"
               alt="Vanlectric"
-              className="h-9 sm:h-10 lg:h-12 w-auto"
+              className="h-9 sm:h-10 md:h-11 w-auto"
               decoding="async"
             />
             <span className="sr-only">Vanlectric</span>
