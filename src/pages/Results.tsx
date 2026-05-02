@@ -81,6 +81,15 @@ const LockedAction = ({ icon, label, onClick }: { icon: React.ReactNode; label: 
 );
 
 // ---------- Component card ----------
+const COMPONENT_GUIDE_LINK: Record<string, { label: string; hash: string }> = {
+  solar: { label: "Learn how solar charging works", hash: "#solar" },
+  mppt: { label: "Learn how solar charging works", hash: "#solar" },
+  dcdc: { label: "Learn how alternator charging works", hash: "#dcdc" },
+  shore: { label: "Learn how shore power works", hash: "#shore" },
+  inverter: { label: "Learn what an inverter does", hash: "#inverter" },
+  battery: { label: "Learn about battery banks", hash: "#battery" },
+};
+
 const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][number]; profile: PriceProfile }) => {
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -98,6 +107,7 @@ const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][numb
   };
   const adjusted = adjust(c.price, profile);
   const displayName = componentNameForProfile(c.name, profile);
+  const guide = COMPONENT_GUIDE_LINK[c.key];
   return (
     <div ref={headerRef} className="rounded-lg border border-border bg-card p-4 scroll-mt-24">
       <div className="flex items-start justify-between gap-3">
@@ -108,14 +118,24 @@ const ComponentCard = ({ c, profile }: { c: CalculationResult["components"][numb
         </div>
         <div className="text-right font-display text-xl font-bold text-primary whitespace-nowrap">~{eur(adjusted)}</div>
       </div>
-      <button
-        type="button"
-        onClick={toggle}
-        className="mt-3 inline-flex items-center gap-1 text-xs font-sans font-semibold text-primary hover:underline"
-      >
-        {open ? "Hide details" : "Why this?"}
-        {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-      </button>
+      <div className="mt-3 flex items-center gap-3 flex-wrap">
+        <button
+          type="button"
+          onClick={toggle}
+          className="inline-flex items-center gap-1 text-xs font-sans font-semibold text-primary hover:underline"
+        >
+          {open ? "Hide details" : "Why this?"}
+          {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        </button>
+        {guide && (
+          <Link
+            to={`/guide${guide.hash}`}
+            className="text-xs font-sans text-primary hover:underline"
+          >
+            {guide.label} →
+          </Link>
+        )}
+      </div>
       {open && (
         <div className="mt-2 text-sm text-muted-foreground bg-background/60 rounded-md p-3 border border-border">
           {c.detail}
