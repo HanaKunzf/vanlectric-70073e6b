@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle, CheckSquare, Square, Wrench } from "lucide-react";
 import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
@@ -11,6 +11,9 @@ import { EmailReportModal } from "@/components/ui/EmailReportModal";
 import { Seo } from "@/components/site/SiteLayout";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
+import { LocalSaveNotice } from "@/components/ui/LocalSaveNotice";
+import { ConfirmStartNewModal } from "@/components/ui/ConfirmStartNewModal";
+import { saveLastCalculation, clearLastCalculation, hasLastCalculation, loadLastCalculation } from "@/services/localCalculation";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-GB");
 const eur = (n: number) => `€${fmt(n)}`;
