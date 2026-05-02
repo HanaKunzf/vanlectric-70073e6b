@@ -176,6 +176,16 @@ export default function Wizard() {
         </div>
       </footer>
       <BackToTop bottomOffset={72} />
+      <ConfirmStartNewModal
+        open={confirmStartNew}
+        onOpenChange={setConfirmStartNew}
+        onConfirm={() => {
+          clearLastCalculation();
+          setConfirmStartNew(false);
+          setState(initialWizardState);
+          navigate("/", { replace: true });
+        }}
+      />
     </div>
   );
 }
