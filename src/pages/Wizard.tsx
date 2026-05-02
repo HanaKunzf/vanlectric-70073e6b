@@ -32,6 +32,12 @@ export default function Wizard() {
   );
   const [step, setStep] = useState(incoming.resumeAtStep ?? 1);
   const [editMode] = useState(!!incoming.editMode);
+  const [confirmStartNew, setConfirmStartNew] = useState(false);
+
+  // Auto-save wizard state to localStorage on every change (free-tier persistence).
+  useEffect(() => {
+    saveLastCalculation(state);
+  }, [state]);
 
   const set = <K extends keyof WizardState>(key: K, v: WizardState[K]) =>
     setState((s) => ({ ...s, [key]: v }));
