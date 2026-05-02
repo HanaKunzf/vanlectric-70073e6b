@@ -66,6 +66,8 @@ export default function Wizard() {
 
   const goNext = () => {
     if (!canAdvance) return;
+    // Persist progress on every Next click (per-step save).
+    saveLastCalculation(state, { currentStep: step, markStepCompleted: step });
     if (editMode) {
       navigate("/results", { state: { wizard: state } });
       return;
@@ -74,7 +76,9 @@ export default function Wizard() {
       navigate("/results", { state: { wizard: state } });
       return;
     }
-    setStep((s) => Math.min(s + 1, TOTAL_STEPS));
+    const nextStep = Math.min(step + 1, TOTAL_STEPS);
+    saveLastCalculation(state, { currentStep: nextStep, markStepCompleted: step });
+    setStep(nextStep);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
