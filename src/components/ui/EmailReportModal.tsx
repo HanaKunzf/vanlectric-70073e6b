@@ -44,8 +44,8 @@ export const EmailReportModal = ({ open, onClose, calculation }: EmailReportModa
   const canSubmit =
     isValidEmail(email) && reportConsent && status !== "loading";
 
-  // Report email is sent via server-side PHP endpoint /api/send-report.php.
-  // No API keys are exposed in frontend.
+  // Calculation reports are sent through /api/send-report.php.
+  // API keys stay server-side.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
