@@ -34,6 +34,7 @@ export default function Wizard() {
   const [step, setStep] = useState(incoming.resumeAtStep ?? 1);
   const [editMode] = useState(!!incoming.editMode);
   const [confirmStartNew, setConfirmStartNew] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Auto-save wizard state to localStorage on every change (free-tier persistence).
   // Also keeps `currentStep` in sync so we can resume at the right place.
