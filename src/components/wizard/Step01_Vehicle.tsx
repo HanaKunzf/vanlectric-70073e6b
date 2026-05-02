@@ -30,7 +30,19 @@ export const Step01_Vehicle = ({ value, onChange }: Props) => {
     onChange({ ...value, [key]: v });
 
   return (
-    <StepCard title={t.title} illustration={<VanIllustration className="w-full h-full" />}>
+    <StepCard
+      title={t.title}
+      illustration={
+        <img
+          src={vanImage}
+          alt="Campervan conversion base vehicle illustration"
+          loading="lazy"
+          width={1024}
+          height={1024}
+          className="w-full h-full object-contain mix-blend-multiply"
+        />
+      }
+    >
       <Section label={t.brand}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {(Object.keys(t.brandOptions) as VehicleBrand[]).map((brand) => (
