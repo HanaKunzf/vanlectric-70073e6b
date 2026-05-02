@@ -1325,6 +1325,20 @@ export default function Results() {
                 </>
               );
             })()}
+            <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-sans">
+              <Link
+                to="/calculation-logic#battery"
+                className="text-primary hover:underline inline-flex items-center gap-1"
+              >
+                <span aria-hidden>ℹ️</span> How battery sizing works
+              </Link>
+              <Link
+                to="/calculation-logic#solar"
+                className="text-primary hover:underline inline-flex items-center gap-1"
+              >
+                <span aria-hidden>ℹ️</span> How solar estimate works
+              </Link>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {result.components.map((c) => <ComponentCard key={c.key} c={c} profile={profile} />)}
             </div>
