@@ -4,6 +4,7 @@ import { en } from "@/i18n/en";
 import { StepCard } from "@/components/ui/StepCard";
 import { HelperText } from "@/components/ui/WarningBanner";
 import { AppliancesIllustration } from "@/components/illustrations/Illustrations";
+import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 import { APPLIANCE_CATALOG, type AppliancesStep, type ApplianceEntry, type PowerSource } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -91,7 +92,7 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                 onClick={() => toggleCat(cat.id)}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/40 transition-colors min-h-[44px]"
               >
-                <span className="text-xl" aria-hidden>{cat.icon}</span>
+                <BrandIcon name={cat.icon as IconKey} size="md" tone="primary" />
                 <span className="flex-1 font-display text-lg font-semibold">{cat.label}</span>
                 {enabledCount > 0 && (
                   <span className="text-xs px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-sans font-semibold">
@@ -188,7 +189,7 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
 
                         {enabled && item.powerSource === "230v-shore" && (
                           <div className="mt-3 ml-7 warning-banner flex items-start gap-2 text-sm">
-                            <span aria-hidden>⚠️</span>
+                            <BrandIcon name="warning" size="xs" />
                             <span>
                               Shore power only. Excluded from off-grid battery sizing.
                             </span>
@@ -217,7 +218,7 @@ export const Step04_Appliances = ({ value, onChange }: Props) => {
                             </label>
                             {entry?.shoreOnly && (
                               <div className="warning-banner flex items-start gap-2 text-sm">
-                                <span aria-hidden>⚠️</span>
+                                <BrandIcon name="warning" size="xs" />
                                 <span>Excluded from off-grid battery sizing.</span>
                               </div>
                             )}
