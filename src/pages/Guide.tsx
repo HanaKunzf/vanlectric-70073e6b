@@ -83,6 +83,8 @@ const TOC: Array<{ id: string; label: string }> = [
   { id: "examples", label: "13. Typical system examples" },
   { id: "checklist", label: "14. Before you buy" },
   { id: "basics", label: "Electrical basics in your pocket" },
+  { id: "deep-dive", label: "Deep-dive: technical details" },
+  { id: "faq", label: "FAQ" },
 ];
 
 export default function Guide() {
@@ -523,7 +525,202 @@ export default function Guide() {
           </div>
         </section>
 
-        {/* CTA */}
+        {/* Deep-dive */}
+        <section id="deep-dive" className="step-card p-5 sm:p-7 scroll-mt-24">
+          <div className="text-xs font-sans uppercase tracking-[0.18em] text-accent font-semibold mb-1">
+            Deep-dive
+          </div>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl text-primary tracking-tight mb-4 normal-case">
+            Technical details worth knowing
+          </h2>
+          <p className="text-sm text-muted-foreground mb-5">
+            Numbers below are <em>approximate</em> and meant for planning. Always confirm with the
+            datasheet of the actual component you buy.
+          </p>
+
+          <div className="space-y-6 text-[15px] leading-relaxed font-sans text-foreground/90">
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                LiFePO4: nominal vs usable energy
+              </h3>
+              <p>
+                A "100 Ah / 12.8 V" LiFePO4 stores ~1280 Wh on paper, but you should plan around
+                ~80–90% usable depth-of-discharge to extend cycle life and leave a small reserve.
+                Vanlectric defaults to a conservative usable figure — that's why "100 Ah" doesn't
+                equal "100 Ah of laptop runtime".
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                Low-temperature charging limits
+              </h3>
+              <p>
+                Standard LiFePO4 cells <strong>must not be charged below 0 °C</strong>. Charging cold
+                cells causes lithium plating and permanent damage. Options for winter use:
+              </p>
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>Battery with built-in low-temp cutoff (charging blocked &lt; 0 °C).</li>
+                <li>Self-heating LiFePO4 (uses charge current to warm the cells).</li>
+                <li>Insulated, heated battery box inside the living area.</li>
+              </ul>
+              <Warn>
+                Discharging is fine down to roughly −20 °C, but a battery that's blocked from
+                charging in winter is effectively dead weight until it warms up.
+              </Warn>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                MPPT vs PWM solar controllers
+              </h3>
+              <p>
+                <strong>PWM</strong> is cheap and acceptable only when panel voltage is close to
+                battery voltage and total wattage is small. <strong>MPPT</strong> tracks the panel's
+                maximum-power point and typically delivers ~15–30% more energy in real conditions,
+                especially with mismatched or partly shaded panels. For anything above ~150 W or
+                series-wired panels, use MPPT.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                Pure sine vs modified sine inverters
+              </h3>
+              <p>
+                <strong>Pure sine</strong> is required for sensitive electronics (laptop chargers,
+                medical devices, induction hobs, variable-speed motors). <strong>Modified sine</strong>{" "}
+                is cheaper but can damage sensitive equipment, hum audibly in audio gear, and
+                overheat motors. For a campervan, default to pure sine.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                Inverter idle losses and realistic efficiency
+              </h3>
+              <p>
+                A 2000 W inverter typically draws ~15–30 W just being on (no load), and converts at
+                ~85–92% efficiency under load. A "1000 W laptop session" is rarely 1000 W — but
+                leaving the inverter on 24/7 can quietly drain 360–700 Wh per day on its own.
+                Switch the inverter off when nothing AC is running.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                Fuse sizing and inrush current
+              </h3>
+              <p>
+                Fuse the cable, not the appliance: pick a fuse below the cable's safe ampacity but
+                above normal load. Many devices (inverters, fridges, motors) draw a brief inrush
+                spike at startup — use slow-blow / time-delay fuses (e.g. MIDI / MEGA) on those
+                circuits to avoid nuisance trips.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                Smart alternators, Euro 6 and DC-DC
+              </h3>
+              <p>
+                Modern Euro 6 vans often have <strong>smart alternators</strong> that vary voltage
+                to save fuel. A direct VSR/split-charge relay won't charge the leisure battery
+                reliably from one of these. A <strong>DC-DC charger</strong> is then required: it
+                takes whatever voltage the alternator gives and outputs a stable, correct charge
+                profile for your LiFePO4 bank. Size it to ~25–30% of battery Ah as a starting point
+                (e.g. 30 A DC-DC for a 100–200 Ah bank).
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                AC safety: shore power, RCD/RCBO and earthing
+              </h3>
+              <p>
+                A 230 V shore-power installation in a vehicle is a real electrical installation.
+                Minimum: an <strong>RCD</strong> (or RCBO) with 30 mA trip on the AC input, an
+                <strong> MCB</strong> for overcurrent, and a proper protective earth (PE) bond
+                between the chassis and the AC earth. Inverter outputs may need their own
+                neutral-earth bond depending on the model. <strong>Have the AC side checked by a
+                qualified electrician.</strong>
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                Battery temperature & winter charging caveats
+              </h3>
+              <p>
+                Cold reduces both available capacity and acceptable charge current. Plan winter
+                trips with: more battery, more solar than you think (low sun angle, snow, short
+                days), realistic shore-power access, and a heating strategy that doesn't depend on
+                the same battery you need for the fridge and lights.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-display font-semibold text-lg text-primary mb-1">
+                EU homologation, insurance and gas/electric inspections
+              </h3>
+              <p>
+                Rules vary by country. Some EU jurisdictions require inspection of the 230 V
+                installation (e.g. NEN 1010 / similar) for insurance or registration as a camper.
+                Document your install (single-line diagram, fuse list, cable sizes) and ask your
+                local authority and insurer what they expect. Vanlectric is a planning tool — it
+                doesn't replace local certification.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="step-card p-5 sm:p-7 scroll-mt-24">
+          <div className="text-xs font-sans uppercase tracking-[0.18em] text-accent font-semibold mb-1">
+            FAQ
+          </div>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl text-primary tracking-tight mb-4 normal-case">
+            Common beginner questions
+          </h2>
+          <div className="divide-y divide-border">
+            {[
+              {
+                q: "Do I need an inverter?",
+                a: "Only if you run real 230 V appliances off-grid. Most laptops, phones, cameras and lights have 12 V or USB-C versions that skip the inverter entirely and waste less energy.",
+              },
+              {
+                q: "How much solar do I really need?",
+                a: "As a rough rule, 100 W of solar replaces ~250–400 Wh per good summer day in central Europe. In winter the same panel may give 1/4 of that. Plan for your worst realistic month, not the best.",
+              },
+              {
+                q: "Is 200 Ah lead-acid the same as 200 Ah LiFePO4?",
+                a: "No. Lead-acid usually delivers only ~50% usable, LiFePO4 ~80–90%. A 100 Ah LiFePO4 typically replaces a 200 Ah lead-acid bank, with longer life and lower weight.",
+              },
+              {
+                q: "Can I use a normal household extension cord for shore power?",
+                a: "No. Use proper outdoor-rated CEE 16 A camping cable, sized for the run length, and protected by an RCD on the van side.",
+              },
+              {
+                q: "Why does Vanlectric recommend more battery than I expected?",
+                a: "Because the planner accounts for usable capacity, autonomy days, inverter losses and a safety reserve — not just appliance Wh. See the calculation logic page for the full breakdown.",
+              },
+            ].map(({ q, a }) => (
+              <details key={q} className="group py-3">
+                <summary className="cursor-pointer font-display font-semibold text-primary list-none flex items-start justify-between gap-3 [&::-webkit-details-marker]:hidden">
+                  <span>{q}</span>
+                  <span aria-hidden className="text-accent transition-transform group-open:rotate-45 select-none">+</span>
+                </summary>
+                <p className="mt-2 text-[15px] leading-relaxed text-foreground/85">{a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <p className="text-xs text-muted-foreground text-center">
+          Last updated: May 2026 · Numbers are approximate planning values, not certified design.
+        </p>
+
+
         <div className="step-card p-6 text-center">
           <h3 className="font-display font-bold text-xl text-primary mb-2">
             Ready to plan your system?
