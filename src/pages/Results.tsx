@@ -41,6 +41,46 @@ const componentNameForProfile = (name: string, p: PriceProfile): string => {
 const sourceLabel = (s: ApplianceLine["powerSource"]) =>
   s === "12v" ? "12V" : s === "230v-inverter" ? "230V (inverter)" : "230V (shore)";
 
+// Per-row appliance with expandable formula breakdown.
+const ApplianceRow = ({ line: l }: { line: ApplianceLine }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <tr className="border-b border-border/60 align-top">
+        <td className="py-2 pr-2 font-sans break-words">{l.label}</td>
+        <td className="py-2 px-1 text-muted-foreground text-[11px] sm:text-xs break-words">{sourceLabel(l.powerSource)}</td>
+        <td className="py-2 px-2 text-right font-mono">{l.watts}</td>
+        <td className="py-2 px-2 text-right font-mono">
+          {l.isDutyCycle ? (
+            <span>~{l.hours.toFixed(1)}<span className="block text-[10px] text-muted-foreground font-sans">(duty cycle)</span></span>
+          ) : (l.hours)}
+        </td>
+        <td className="py-2 pl-2 text-right font-mono">{fmt(l.wh)}</td>
+        <td className="py-2 pl-1 text-right">
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-label={open ? "Hide calculation" : "Show calculation"}
+            className="inline-flex items-center justify-center w-6 h-6 rounded text-primary hover:bg-primary/10 transition-colors"
+          >
+            {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        </td>
+      </tr>
+      {open && (
+        <tr className="border-b border-border/60 bg-background/50">
+          <td colSpan={6} className="px-2 py-2 text-[11px] sm:text-xs font-mono text-muted-foreground">
+            <span className="font-sans not-italic font-semibold text-foreground/70">How is this calculated? </span>
+            {l.formula}
+          </td>
+        </tr>
+      )}
+    </>
+  );
+};
+
+
 // ---------- Section wrapper ----------
 const SectionCard = ({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) => (
   <section className={cn("step-card p-6 sm:p-8", className)}>
