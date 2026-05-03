@@ -1,8 +1,17 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle, CheckSquare, Square, Wrench } from "lucide-react";
-import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
-import { initialWizardState, type WizardState, type ExistingStep } from "@/types";
+import {
+  calculate,
+  type CalculationResult,
+  type ApplianceLine,
+  INVERTER_EFFICIENCY,
+  RESERVE_MARGIN,
+  LIFEPO4_USABLE_DOD,
+  INVERTER_SURGE_HEADROOM,
+} from "@/logic/calculator";
+import { sanityWarnings } from "@/logic/consistency";
+import { initialWizardState, type WizardState, type ExistingStep, type Budget } from "@/types";
 import { FEATURES } from "@/config/features";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
@@ -604,8 +613,9 @@ const ExistingSystemSection = ({ state, result }: { state: WizardState; result: 
 };
 
 // ---------- Autonomy formatting ----------
+// Conservative wording — never claim "continuous" since real-world conditions vary.
 const formatDays = (d: number): string => {
-  if (!Number.isFinite(d) || d > 30) return "Continuous";
+  if (!Number.isFinite(d) || d > 30) return "30+ days";
   return `${d.toFixed(1)} days`;
 };
 
@@ -620,8 +630,9 @@ const formatAutonomy = (d: number, dailyWh: number, fallbackHelper: string): Aut
   }
   if (!Number.isFinite(d) || d > 30) {
     return {
-      title: "Continuous in good conditions",
-      helper: "Your charging sources can cover your estimated daily consumption.",
+      title: "Net positive in good conditions",
+      helper:
+        "Estimated charging covers daily consumption — but real-world weather and temperature reduce this. Plan for cloudy days.",
       isQualitative: true,
     };
   }
@@ -1004,6 +1015,201 @@ const InstallerPreview = ({ onClick }: { onClick: () => void }) => (
   </SectionCard>
 );
 
+// ---------- Sanity warnings (always-visible heuristic feedback) ----------
+const SanityWarningsSection = ({ state, result }: { state: WizardState; result: CalculationResult }) => {
+  const warnings = useMemo(
+    () =>
+      sanityWarnings(state, {
+        totalDailyWh: result.totalDailyWh,
+        usableBatteryWh: result.usableBatteryWh,
+        solarDailyWh: result.solarDailyWh,
+        recommendedSolarW: result.recommendedSolarW,
+        requiredSolarW: result.requiredSolarW,
+        totalBudget: result.totalBudget,
+      }),
+    [state, result],
+  );
+  if (warnings.length === 0) return null;
+  return (
+    <SectionCard title="Sanity checks">
+      <p className="text-sm text-muted-foreground mb-3">
+        Practical guidance based on your inputs. These are warnings, not errors — you can still continue.
+      </p>
+      <ul className="space-y-2">
+        {warnings.map((w) => (
+          <li
+            key={w.id}
+            className="rounded-md border-l-4 border-accent bg-accent/10 p-3 text-sm font-sans"
+          >
+            {w.message}
+          </li>
+        ))}
+      </ul>
+    </SectionCard>
+  );
+};
+
+// ---------- Winter-negative banner ----------
+const WinterDeficitBanner = ({ state, result }: { state: WizardState; result: CalculationResult }) => {
+  const season = state.step10.season;
+  if (season !== "winter" && season !== "year-round") return null;
+  const winterSolar = result.solarDailyWh * 0.35;
+  const winterBalance = winterSolar + result.alternatorDailyWh - result.totalDailyWh;
+  if (winterBalance >= 0) return null;
+  return (
+    <div className="rounded-lg border-l-4 border-red-600 bg-red-50 p-4 flex items-start gap-3">
+      <AlertTriangle className="w-5 h-5 text-red-700 mt-0.5 flex-shrink-0" />
+      <div className="text-sm">
+        <div className="font-display font-bold text-red-800 text-base mb-1">
+          Winter shortfall: ~{fmt(Math.abs(winterBalance))} Wh/day
+        </div>
+        <p className="text-red-800">
+          With short winter days, your solar harvest alone will not cover your daily consumption.
+          Plan for shore-power top-ups, alternator charging, or reduce winter loads.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// ---------- Inverter row (always visible) ----------
+const InverterStatusSection = ({ result }: { result: CalculationResult }) => {
+  const peak = result.inverterPeakW;
+  const sized = Math.max(
+    result.inverterSizeRecommendedW,
+    Math.round(peak * INVERTER_SURGE_HEADROOM),
+  );
+  return (
+    <SectionCard title="Inverter">
+      {peak === 0 ? (
+        <div className="rounded-lg border border-border bg-background/60 p-4 text-sm">
+          <div className="font-sans font-semibold text-primary">No inverter needed</div>
+          <p className="text-muted-foreground mt-1">
+            No 230V loads selected — a pure-sine inverter is not required for your current appliance list.
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-lg border border-primary/40 bg-primary/5 p-4 text-sm space-y-2">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Largest 230V continuous load</span>
+            <span className="font-mono font-semibold">{fmt(peak)} W</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Surge headroom factor</span>
+            <span className="font-mono">×{INVERTER_SURGE_HEADROOM}</span>
+          </div>
+          <div className="flex justify-between border-t border-border pt-2 font-display font-bold text-primary">
+            <span>Recommended inverter</span>
+            <span className="font-mono">{fmt(sized)} W (pure sine)</span>
+          </div>
+          <p className="text-xs text-muted-foreground italic mt-2">
+            Always choose a <strong>pure sine</strong> inverter for laptops, phone chargers, fridges
+            and other sensitive electronics. Modified sine can damage some devices and runs motors hot.
+          </p>
+        </div>
+      )}
+    </SectionCard>
+  );
+};
+
+// ---------- Battery detail (nominal vs usable + low-temp warning) ----------
+const BatteryDetailSection = ({ state, result }: { state: WizardState; result: CalculationResult }) => {
+  const nominalWh = result.recommendedBatteryAh * 12;
+  const usablePct = Math.round(LIFEPO4_USABLE_DOD * 100);
+  const coldRisk =
+    state.step3.climate === "cold" ||
+    state.step10.season === "winter" ||
+    state.step10.season === "year-round";
+  return (
+    <SectionCard title="Your battery in plain English">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        <div className="rounded-lg border border-border bg-background/60 p-4">
+          <div className="text-xs text-muted-foreground">Nominal capacity</div>
+          <div className="font-display text-xl font-bold mt-1">{fmt(nominalWh)} Wh</div>
+          <div className="text-xs text-muted-foreground mt-0.5">
+            {result.recommendedBatteryAh} Ah at 12V — what's printed on the battery.
+          </div>
+        </div>
+        <div className="rounded-lg border border-primary/40 bg-primary/5 p-4">
+          <div className="text-xs text-primary/80 font-semibold">Usable energy</div>
+          <div className="font-display text-xl font-bold mt-1 text-primary">{fmt(result.usableBatteryWh)} Wh</div>
+          <div className="text-xs text-muted-foreground mt-0.5">
+            ~{usablePct}% depth of discharge for LiFePO4 — what you can actually use day-to-day.
+          </div>
+        </div>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        LiFePO4 batteries can be safely discharged to about {usablePct}% without shortening their life.
+        Going deeper occasionally is fine; doing it every day is not.
+      </p>
+      {coldRisk && (
+        <div className="mt-4 warning-banner flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span className="text-sm">
+            <strong>Low-temperature warning:</strong> standard LiFePO4 cells must not be charged below 0°C.
+            For winter / cold-climate use, choose a battery with built-in low-temp cut-off or self-heating,
+            or keep the bank in a heated compartment.
+          </span>
+        </div>
+      )}
+    </SectionCard>
+  );
+};
+
+// ---------- Budget compare (selected vs estimated) ----------
+const BUDGET_MAX: Record<Budget, number> = {
+  "<500": 500,
+  "500-1000": 1000,
+  "1000-2000": 2000,
+  "2000-3000": 3000,
+  "3000+": Infinity,
+  "show-me": Infinity,
+};
+
+const BudgetCompareSection = ({ state, estimatedTotal }: { state: WizardState; estimatedTotal: number }) => {
+  const budget = state.step12.budget;
+  if (!budget || budget === "show-me") return null;
+  const cap = BUDGET_MAX[budget];
+  if (!Number.isFinite(cap)) return null;
+  const over = estimatedTotal > cap;
+  const delta = Math.abs(estimatedTotal - cap);
+  const label = en.steps.s12.options[budget].label;
+  return (
+    <SectionCard title="Budget vs estimated build">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="rounded-lg border border-border bg-background/60 p-3">
+          <div className="text-xs text-muted-foreground">Your selected budget</div>
+          <div className="font-display text-lg font-bold mt-1">{label}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-background/60 p-3">
+          <div className="text-xs text-muted-foreground">Estimated build cost</div>
+          <div className="font-display text-lg font-bold mt-1">{eur(estimatedTotal)}</div>
+        </div>
+        <div
+          className={cn(
+            "rounded-lg p-3 border",
+            over ? "border-red-300 bg-red-50" : "border-primary/30 bg-primary/5",
+          )}
+        >
+          <div className={cn("text-xs font-semibold", over ? "text-red-700" : "text-primary")}>
+            {over ? "Over budget" : "Within budget"}
+          </div>
+          <div className="font-display text-lg font-bold mt-1">
+            {over ? `+${eur(delta)}` : `−${eur(delta)} headroom`}
+          </div>
+        </div>
+      </div>
+      {over && (
+        <p className="text-sm text-muted-foreground mt-3">
+          The recommended build exceeds your selected budget. Consider reducing high-power 230V
+          appliances, picking the <em>Low-cost</em> component variant, or accepting a smaller
+          battery bank with shorter autonomy.
+        </p>
+      )}
+    </SectionCard>
+  );
+};
+
 // ---------- Page ----------
 export default function Results() {
   const navigate = useNavigate();
@@ -1090,8 +1296,15 @@ export default function Results() {
 
           {showExisting && <ExistingSystemSection state={state} result={result} />}
 
+          <WinterDeficitBanner state={state} result={result} />
+          <SanityWarningsSection state={state} result={result} />
+
           {/* 3. Off-grid autonomy */}
           <AutonomySection result={result} />
+
+          <InverterStatusSection result={result} />
+          <BatteryDetailSection state={state} result={result} />
+          <BudgetCompareSection state={state} estimatedTotal={adjTotalBudget} />
 
           {/* 4. Daily consumption */}
           <SectionCard title="Daily consumption">

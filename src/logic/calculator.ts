@@ -18,6 +18,13 @@ import {
   type Budget,
 } from "@/types";
 
+// ---------- named assumptions (exposed for transparent breakdown) ----------
+export const INVERTER_EFFICIENCY = 0.9; // pure-sine inverter ~90%
+export const INVERTER_LOSS_FACTOR = 1 / INVERTER_EFFICIENCY; // ~1.111
+export const RESERVE_MARGIN = 0.25; // +25% safety reserve on daily Wh
+export const LIFEPO4_USABLE_DOD = 0.9; // 90% depth of discharge for LiFePO4
+export const INVERTER_SURGE_HEADROOM = 1.25; // sizing margin over peak continuous
+
 // ---------- helpers ----------
 const FRIDGE_IDS = new Set(["fridge-small", "fridge-medium", "fridge-large", "fridge-freezer", "fridge-absorption", "freezer"]);
 
@@ -81,6 +88,12 @@ export interface ApplianceLine {
   shoreOnly: boolean;
   informational: boolean;
   isDutyCycle?: boolean;
+  /** Effective duty cycle factor used in the formula (1 if not duty-cycled). */
+  dutyCycle: number;
+  /** Loss multiplier applied to convert AC Wh to battery-side Wh (1 for 12V). */
+  lossFactor: number;
+  /** Plain-English formula breakdown, e.g. "45 W × 24 h × 0.35 duty = 378 Wh/day". */
+  formula: string;
 }
 
 export interface RecommendedComponent {
@@ -201,6 +214,8 @@ export function calculate(state: WizardState): CalculationResult {
       shoreLines.push({
         id, label: def.label, powerSource: def.powerSource,
         watts, hours, wh: 0, shoreOnly: true, informational: !!def.informational,
+        dutyCycle: 1, lossFactor: 1,
+        formula: `${watts} W × ${hours} h (shore-only — excluded from off-grid sizing)`,
       });
       continue;
     }
@@ -209,18 +224,21 @@ export function calculate(state: WizardState): CalculationResult {
       lines.push({
         id, label: def.label, powerSource: def.powerSource,
         watts: 0, hours: 0, wh: 0, shoreOnly: false, informational: true,
+        dutyCycle: 1, lossFactor: 1,
+        formula: "No electrical load.",
       });
       continue;
     }
 
     let baseWh = watts * hours;
     let displayHours = hours;
+    let dutyCycle = 1;
 
     // Fridge duty cycle
     if (FRIDGE_IDS.has(id)) {
-      const duty = fridgeDuty[climate][insulation];
-      baseWh = watts * 24 * duty;
-      displayHours = 24 * duty;
+      dutyCycle = fridgeDuty[climate][insulation];
+      baseWh = watts * 24 * dutyCycle;
+      displayHours = 24 * dutyCycle;
     }
 
     // Diesel heater
@@ -235,17 +253,31 @@ export function calculate(state: WizardState): CalculationResult {
     if (id === "water-pump") baseWh *= 1 + (people - 1) * 0.2;
 
     // Inverter losses — assume 90% inverter efficiency: battery draw = AC Wh / 0.9
+    let lossFactor = 1;
     if (def.powerSource === "230v-inverter") {
       hasInverterLoad = true;
       const before = baseWh;
-      baseWh = baseWh / 0.9;
+      baseWh = baseWh / INVERTER_EFFICIENCY;
       inverterLossWh += baseWh - before;
+      lossFactor = INVERTER_LOSS_FACTOR;
     }
+
+    const formula =
+      id === "diesel-heater"
+        ? `Heater fan + glow plug — ~${Math.round(baseWh)} Wh/day at this climate/season.`
+        : FRIDGE_IDS.has(id)
+        ? `${watts} W × 24 h × ${dutyCycle.toFixed(2)} duty${
+            lossFactor > 1 ? ` × ${lossFactor.toFixed(2)} inverter loss` : ""
+          } = ${Math.round(baseWh)} Wh/day`
+        : `${watts} W × ${displayHours} h${
+            lossFactor > 1 ? ` × ${lossFactor.toFixed(2)} inverter loss` : ""
+          } = ${Math.round(baseWh)} Wh/day`;
 
     lines.push({
       id, label: def.label, powerSource: def.powerSource,
       watts, hours: displayHours, wh: baseWh, shoreOnly: false, informational: false,
       isDutyCycle: FRIDGE_IDS.has(id),
+      dutyCycle, lossFactor, formula,
     });
     applianceSubtotalWh += baseWh;
     if (def.powerSource === "230v-inverter") {
@@ -257,7 +289,7 @@ export function calculate(state: WizardState): CalculationResult {
 
   const rwWh = remoteWorkWh[step9.remoteWork ?? "no"];
   const beforeReserve = applianceSubtotalWh + rwWh;
-  const totalDailyWh = beforeReserve * 1.25;
+  const totalDailyWh = beforeReserve * (1 + RESERVE_MARGIN);
   const reserveWh = totalDailyWh - beforeReserve;
 
   // ----- Battery -----
@@ -327,7 +359,7 @@ export function calculate(state: WizardState): CalculationResult {
   else if (requiredAh < 400) { recommendedBatteryAh = 400; battery = { key: "battery", category: "Battery", name: "2× 200Ah LiFePO4", why: "Large bank for full-time / heavy daily loads.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 440 }; }
   else { recommendedBatteryAh = 600; battery = { key: "battery", category: "Battery", name: "3× 200Ah LiFePO4", why: "Maximum bank for extended off-grid use.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 660 }; }
   // LiFePO4 usable energy ~90% DoD at 12V
-  const usableBatteryWh = recommendedBatteryAh * 12 * 0.9;
+  const usableBatteryWh = recommendedBatteryAh * 12 * LIFEPO4_USABLE_DOD;
 
   if (profile === "weekendWarrior" && requiredAh > 300) {
     battery.note = "As a weekend warrior, you recharge at home between trips. If your system seems oversized, consider whether you really need worst-case winter sizing — or adjust your climate/season settings to match your typical travel conditions.";
