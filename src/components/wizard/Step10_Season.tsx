@@ -3,16 +3,20 @@ import { SelectButton } from "@/components/ui/SelectButton";
 import { StepCard } from "@/components/ui/StepCard";
 import { HelperText } from "@/components/ui/WarningBanner";
 import { SeasonIllustration } from "@/components/illustrations/Illustrations";
-import type { Season, SeasonStep } from "@/types";
+import { climateSeasonWarning } from "@/logic/consistency";
+import type { ClimateZone, Season, SeasonStep } from "@/types";
 
 interface Props {
   value: SeasonStep;
   onChange: (next: SeasonStep) => void;
+  /** Climate from Step 3 — used for soft consistency warning. */
+  climate?: ClimateZone;
 }
 
-export const Step10_Season = ({ value, onChange }: Props) => {
+export const Step10_Season = ({ value, onChange, climate }: Props) => {
   const t = en.steps.s10;
   const keys = Object.keys(t.options) as Season[];
+  const warning = climateSeasonWarning(climate, value.season);
   return (
     <StepCard title={t.title} illustration={<SeasonIllustration className="w-full h-full" />}>
       <HelperText>{t.helper}</HelperText>
@@ -26,6 +30,15 @@ export const Step10_Season = ({ value, onChange }: Props) => {
           </SelectButton>
         ))}
       </div>
+      {warning && (
+        <div
+          role="status"
+          className="mt-5 rounded-lg border-l-4 border-accent bg-accent/10 p-3 text-sm font-sans"
+        >
+          <span className="font-semibold">Heads up — </span>
+          {warning.message}
+        </div>
+      )}
     </StepCard>
   );
 };
