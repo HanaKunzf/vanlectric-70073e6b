@@ -100,6 +100,12 @@ export const SiteLayout = ({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-3 focus:py-2 focus:rounded-md focus:bg-primary focus:text-primary-foreground focus:font-sans focus:font-semibold focus:text-sm focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       <Seo
         title={title}
         description={description}
@@ -110,7 +116,7 @@ export const SiteLayout = ({
       <SiteHeader />
       {/* Spacer matching fixed header height to prevent content from sliding under */}
       <div aria-hidden className="h-16 md:h-[72px]" style={{ marginTop: "env(safe-area-inset-top)" }} />
-      <main className="flex-1">{children}</main>
+      <main id="main" tabIndex={-1} className="flex-1">{children}</main>
       <SiteFooterFull />
       <BackToTop />
     </div>
