@@ -2,9 +2,12 @@ import { en } from "@/i18n/en";
 import { SelectButton } from "@/components/ui/SelectButton";
 import { StepCard } from "@/components/ui/StepCard";
 import { WarningBanner } from "@/components/ui/WarningBanner";
+import { NumberField } from "@/components/ui/NumberField";
+import { ErrorSummary } from "@/components/ui/ErrorSummary";
 import { RoofIllustration } from "@/components/illustrations/Illustrations";
 import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
 import type { RoofObstacleEntry, RoofObstacleId, RoofStep, RoofType, ObstacleCount } from "@/types";
+import { validateRoofDim, type ValidationIssue } from "@/lib/validation";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -48,6 +51,8 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
 
   const allZero = obstacleKeys.every((k) => (value.obstacles[k]?.count ?? 0) === 0);
 
+  const issues = validateStep7(value);
+
   return (
     <StepCard title={t.title} illustration={<RoofIllustration className="w-full h-full" />}>
       <h3 className="font-sans text-sm font-semibold tracking-wide text-muted-foreground mb-2">
@@ -69,11 +74,25 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
         {t.emptyButton}
       </button>
 
-      <div className="space-y-3 mb-8">
+      <div
+        className={cn(
+          "space-y-3 mb-8 transition-opacity",
+          allZero && "opacity-60",
+        )}
+        aria-disabled={allZero || undefined}
+      >
         {obstacleKeys.map((id) => {
           const meta = t.obstacles[id];
           const entry = getEntry(id);
           const expanded = entry.count > 0;
+          const lengthErr =
+            id !== "gps-antenna" && (entry.customSize || id === "other") && entry.count > 0
+              ? validateRoofDim(entry.lengthCm)
+              : null;
+          const widthErr =
+            id !== "gps-antenna" && (entry.customSize || id === "other") && entry.count > 0
+              ? validateRoofDim(entry.widthCm)
+              : null;
           return (
             <div key={id} className="rounded-lg border border-border bg-card">
               <div className="flex items-center gap-3 p-3">
@@ -134,26 +153,28 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
 
                   {(entry.customSize || id === "other") && id !== "gps-antenna" && (
                     <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-xs font-sans text-muted-foreground mb-1">{t.lengthLabel}</label>
-                        <input
-                          type="number"
-                          min={0}
-                          value={entry.lengthCm ?? ""}
-                          onChange={(e) => updateEntry(id, { lengthCm: e.target.value === "" ? undefined : Number(e.target.value) })}
-                          className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-sans text-muted-foreground mb-1">{t.widthLabel}</label>
-                        <input
-                          type="number"
-                          min={0}
-                          value={entry.widthCm ?? ""}
-                          onChange={(e) => updateEntry(id, { widthCm: e.target.value === "" ? undefined : Number(e.target.value) })}
-                          className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                        />
-                      </div>
+                      <NumberField
+                        id={`roof-len-${id}`}
+                        label={t.lengthLabel}
+                        value={entry.lengthCm}
+                        min={1}
+                        max={400}
+                        step={1}
+                        suffix="cm"
+                        error={lengthErr}
+                        onChange={(v) => updateEntry(id, { lengthCm: v })}
+                      />
+                      <NumberField
+                        id={`roof-wid-${id}`}
+                        label={t.widthLabel}
+                        value={entry.widthCm}
+                        min={1}
+                        max={400}
+                        step={1}
+                        suffix="cm"
+                        error={widthErr}
+                        onChange={(v) => updateEntry(id, { widthCm: v })}
+                      />
                     </div>
                   )}
 
@@ -246,34 +267,49 @@ export const Step07_Roof = ({ value, onChange }: Props) => {
       {value.roofType === "pop-top" && (
         <div className="mt-6 animate-fade-in space-y-3">
           <WarningBanner>{t.warning}</WarningBanner>
-          <div>
-            <label className="block font-sans text-sm font-semibold mb-1">{t.popTopTitle}</label>
-            <p className="text-xs text-muted-foreground mb-2">{t.popTopHelper}</p>
-            <input
-              type="number"
-              min={0}
-              max={24}
-              step={0.5}
-              value={value.popTopHoursPerDay ?? 4}
-              onChange={(e) => onChange({ ...value, popTopHoursPerDay: Number(e.target.value) })}
-              className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:border-primary"
-            />
-          </div>
+          <NumberField
+            id="poptop-hours"
+            label={t.popTopTitle}
+            value={value.popTopHoursPerDay ?? 4}
+            min={0}
+            max={24}
+            step={0.5}
+            suffix="h/day"
+            onChange={(v) => onChange({ ...value, popTopHoursPerDay: v })}
+          />
+          <p className="text-xs text-muted-foreground">{t.popTopHelper}</p>
         </div>
       )}
+
+      <ErrorSummary issues={issues} />
     </StepCard>
   );
 };
 
-export const isStep7Valid = (v: RoofStep) => {
-  if (!v.roofType) return false;
-  // If "other" obstacle has count > 0, require dimensions
-  const other = v.obstacles.other;
-  if (other && other.count > 0) {
-    if (!other.lengthCm || !other.widthCm) return false;
+export const validateStep7 = (v: RoofStep): ValidationIssue[] => {
+  const issues: ValidationIssue[] = [];
+  if (!v.roofType) {
+    issues.push({ fieldId: "roof-type", label: "Roof type", message: "Pick a roof type." });
   }
-  // Tent must have solarAlongside choice if used
+  for (const [id, entry] of Object.entries(v.obstacles ?? {})) {
+    if (!entry || !entry.count) continue;
+    if (id === "gps-antenna") continue;
+    if (entry.customSize || id === "other") {
+      const lErr = validateRoofDim(entry.lengthCm);
+      if (lErr) issues.push({ fieldId: `roof-len-${id}`, label: `${id} length`, message: lErr });
+      const wErr = validateRoofDim(entry.widthCm);
+      if (wErr) issues.push({ fieldId: `roof-wid-${id}`, label: `${id} width`, message: wErr });
+    }
+  }
   const tent = v.obstacles.tent;
-  if (tent && tent.count > 0 && !tent.solarAlongside) return false;
-  return true;
+  if (tent && tent.count > 0 && !tent.solarAlongside) {
+    issues.push({
+      fieldId: "roof-tent-solar",
+      label: "Roof tent",
+      message: "Choose whether solar can be mounted alongside the tent.",
+    });
+  }
+  return issues;
 };
+
+export const isStep7Valid = (v: RoofStep) => validateStep7(v).length === 0;
