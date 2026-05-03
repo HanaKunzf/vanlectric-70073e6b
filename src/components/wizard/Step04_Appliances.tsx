@@ -5,7 +5,21 @@ import { StepCard } from "@/components/ui/StepCard";
 import { HelperText } from "@/components/ui/WarningBanner";
 import { AppliancesIllustration } from "@/components/illustrations/Illustrations";
 import { BrandIcon, type IconKey } from "@/components/ui/BrandIcon";
-import { APPLIANCE_CATALOG, type AppliancesStep, type ApplianceEntry, type PowerSource } from "@/types";
+import { NumberField } from "@/components/ui/NumberField";
+import { ErrorSummary } from "@/components/ui/ErrorSummary";
+import {
+  APPLIANCE_CATALOG,
+  type AppliancesStep,
+  type ApplianceEntry,
+  type PowerSource,
+} from "@/types";
+import {
+  categoryForApplianceId,
+  validateHoursPerDay,
+  validateWatts,
+  WATT_CAPS,
+  type ValidationIssue,
+} from "@/lib/validation";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -55,14 +69,11 @@ export const Step04_Appliances = ({ value, onChange, vehicleEngine }: Props) => 
     const willOpen = openCat !== catId;
     setOpenCat(willOpen ? catId : "");
     if (willOpen) {
-      // Keep the category header anchored at the top so the first items are
-      // visible immediately, instead of the page settling at the bottom of
-      // the newly expanded list.
       requestAnimationFrame(() => {
         const el = headerRefs.current[catId];
         if (!el) return;
         const rect = el.getBoundingClientRect();
-        const target = window.scrollY + rect.top - 80; // leave room for sticky header
+        const target = window.scrollY + rect.top - 80;
         window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
       });
     }
@@ -77,6 +88,8 @@ export const Step04_Appliances = ({ value, onChange, vehicleEngine }: Props) => 
       appliances: { ...value.appliances, [id]: next },
     });
   };
+
+  const issues = validateStep4(value);
 
   return (
     <StepCard title={t.title} illustration={<AppliancesIllustration className="w-full h-full" />}>
@@ -112,6 +125,9 @@ export const Step04_Appliances = ({ value, onChange, vehicleEngine }: Props) => 
                     const hours = entry?.hours ?? item.defaultHours;
                     const watts = entry?.watts ?? item.watts;
                     const isOverride = overrideOpen[item.id] ?? false;
+                    const cat = categoryForApplianceId(item.id);
+                    const hoursError = enabled && !item.informational ? validateHoursPerDay(hours) : null;
+                    const wattsError = enabled && !item.informational && isOverride ? validateWatts(watts, cat) : null;
                     return (
                       <div
                         key={item.id}
@@ -140,21 +156,17 @@ export const Step04_Appliances = ({ value, onChange, vehicleEngine }: Props) => 
 
                         {enabled && !item.informational && (
                           <div className="mt-3 ml-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                              <label className="text-xs font-sans font-semibold text-muted-foreground">
-                                {t.hoursLabel}
-                              </label>
-                              <input
-                                type="number"
-                                min={0}
-                                step={0.25}
-                                value={hours}
-                                onChange={(e) =>
-                                  updateEntry(item.id, { hours: Number(e.target.value) })
-                                }
-                                className="mt-1 w-full bg-background border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:border-primary"
-                              />
-                            </div>
+                            <NumberField
+                              id={`appl-hours-${item.id}`}
+                              label={t.hoursLabel}
+                              value={hours}
+                              min={0}
+                              max={24}
+                              step={0.1}
+                              suffix={t.hoursLabel}
+                              error={hoursError}
+                              onChange={(v) => updateEntry(item.id, { hours: v ?? 0 })}
+                            />
                             <div>
                               <button
                                 type="button"
@@ -166,21 +178,26 @@ export const Step04_Appliances = ({ value, onChange, vehicleEngine }: Props) => 
                                 <Settings2 className="w-3 h-3" />
                                 {t.overrideLabel}
                               </button>
-                              {isOverride && (
-                                <input
-                                  type="number"
-                                  min={0}
+                              {isOverride ? (
+                                <NumberField
+                                  id={`appl-watts-${item.id}`}
+                                  label={`Custom wattage (max ${WATT_CAPS[cat]} W)`}
+                                  hideLabel
                                   value={watts}
-                                  onChange={(e) =>
+                                  min={0}
+                                  max={WATT_CAPS[cat]}
+                                  step={1}
+                                  suffix="W"
+                                  error={wattsError}
+                                  onChange={(v) =>
                                     updateEntry(item.id, {
-                                      watts: Number(e.target.value),
+                                      watts: v ?? 0,
                                       wattsOverride: true,
                                     })
                                   }
-                                  className="mt-1 w-full bg-background border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:border-primary"
+                                  className="mt-1"
                                 />
-                              )}
-                              {!isOverride && (
+                              ) : (
                                 <div className="mt-1 text-sm text-muted-foreground font-sans">
                                   {watts} {t.wattsLabel} (default)
                                 </div>
@@ -246,9 +263,51 @@ export const Step04_Appliances = ({ value, onChange, vehicleEngine }: Props) => 
           );
         })}
       </div>
+
+      <ErrorSummary issues={issues} />
     </StepCard>
   );
 };
 
-export const isStep4Valid = (v: AppliancesStep) =>
-  Object.values(v.appliances).some((e) => e.enabled);
+export const validateStep4 = (v: AppliancesStep): ValidationIssue[] => {
+  const issues: ValidationIssue[] = [];
+  let anyEnabled = false;
+  for (const cat of APPLIANCE_CATALOG) {
+    for (const item of cat.items) {
+      const entry = v.appliances[item.id];
+      if (!entry?.enabled) continue;
+      anyEnabled = true;
+      if (item.informational) continue;
+      const cat = categoryForApplianceId(item.id);
+      const hours = entry.hours ?? item.defaultHours;
+      const hErr = validateHoursPerDay(hours);
+      if (hErr) {
+        issues.push({
+          fieldId: `appl-hours-${item.id}`,
+          label: `${item.label} — hours/day`,
+          message: hErr,
+        });
+      }
+      if (entry.wattsOverride) {
+        const wErr = validateWatts(entry.watts, cat);
+        if (wErr) {
+          issues.push({
+            fieldId: `appl-watts-${item.id}`,
+            label: `${item.label} — wattage`,
+            message: wErr,
+          });
+        }
+      }
+    }
+  }
+  if (!anyEnabled) {
+    issues.push({
+      fieldId: "appl-none",
+      label: "Appliances",
+      message: "Select at least one appliance.",
+    });
+  }
+  return issues;
+};
+
+export const isStep4Valid = (v: AppliancesStep) => validateStep4(v).length === 0;
