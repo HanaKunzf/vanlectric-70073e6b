@@ -18,6 +18,13 @@ import {
   type Budget,
 } from "@/types";
 
+// ---------- named assumptions (exposed for transparent breakdown) ----------
+export const INVERTER_EFFICIENCY = 0.9; // pure-sine inverter ~90%
+export const INVERTER_LOSS_FACTOR = 1 / INVERTER_EFFICIENCY; // ~1.111
+export const RESERVE_MARGIN = 0.25; // +25% safety reserve on daily Wh
+export const LIFEPO4_USABLE_DOD = 0.9; // 90% depth of discharge for LiFePO4
+export const INVERTER_SURGE_HEADROOM = 1.25; // sizing margin over peak continuous
+
 // ---------- helpers ----------
 const FRIDGE_IDS = new Set(["fridge-small", "fridge-medium", "fridge-large", "fridge-freezer", "fridge-absorption", "freezer"]);
 
@@ -81,6 +88,12 @@ export interface ApplianceLine {
   shoreOnly: boolean;
   informational: boolean;
   isDutyCycle?: boolean;
+  /** Effective duty cycle factor used in the formula (1 if not duty-cycled). */
+  dutyCycle: number;
+  /** Loss multiplier applied to convert AC Wh to battery-side Wh (1 for 12V). */
+  lossFactor: number;
+  /** Plain-English formula breakdown, e.g. "45 W × 24 h × 0.35 duty = 378 Wh/day". */
+  formula: string;
 }
 
 export interface RecommendedComponent {
