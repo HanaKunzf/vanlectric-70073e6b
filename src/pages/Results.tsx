@@ -1,8 +1,17 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Mail, RotateCcw, Save, Lock, Zap, AlertTriangle, CheckSquare, Square, Wrench } from "lucide-react";
-import { calculate, type CalculationResult, type ApplianceLine } from "@/logic/calculator";
-import { initialWizardState, type WizardState, type ExistingStep } from "@/types";
+import {
+  calculate,
+  type CalculationResult,
+  type ApplianceLine,
+  INVERTER_EFFICIENCY,
+  RESERVE_MARGIN,
+  LIFEPO4_USABLE_DOD,
+  INVERTER_SURGE_HEADROOM,
+} from "@/logic/calculator";
+import { sanityWarnings } from "@/logic/consistency";
+import { initialWizardState, type WizardState, type ExistingStep, type Budget } from "@/types";
 import { FEATURES } from "@/config/features";
 import { en } from "@/i18n/en";
 import { cn } from "@/lib/utils";
