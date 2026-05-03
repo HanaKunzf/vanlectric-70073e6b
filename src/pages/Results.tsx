@@ -1474,7 +1474,33 @@ export default function Results() {
                 </div>
               </div>
             </div>
+
+            {/* Global assumptions panel — exposes hidden multipliers used above. */}
+            <details className="mt-6 rounded-lg border border-border bg-background/50 group">
+              <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-2 text-sm font-sans font-semibold text-primary">
+                <span className="inline-flex items-center gap-2">
+                  <span aria-hidden>ℹ️</span>
+                  Assumptions used in these numbers
+                </span>
+                <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="px-4 pb-4 pt-1 text-sm text-muted-foreground space-y-2 font-sans">
+                <p><span className="font-semibold text-foreground">Inverter efficiency:</span> {Math.round(INVERTER_EFFICIENCY * 100)}% — battery-side draw is AC Wh ÷ {INVERTER_EFFICIENCY}.</p>
+                <p><span className="font-semibold text-foreground">Safety reserve:</span> +{Math.round(RESERVE_MARGIN * 100)}% on top of appliance + remote-work consumption.</p>
+                <p><span className="font-semibold text-foreground">Fridge duty cycle:</span> derived from your climate and insulation choice (e.g. temperate + basic insulation ≈ 35% of 24 h).</p>
+                <p><span className="font-semibold text-foreground">LiFePO4 usable energy:</span> {Math.round(LIFEPO4_USABLE_DOD * 100)}% depth of discharge of nominal capacity.</p>
+                <p><span className="font-semibold text-foreground">Solar harvest:</span> recommended W × effective sun hours for your climate &amp; season.</p>
+                <p><span className="font-semibold text-foreground">Alternator harvest:</span> drive duration × ~360 W × 85% conversion (halved for occasional drivers).</p>
+                <p><span className="font-semibold text-foreground">Inverter sizing:</span> peak continuous load × {INVERTER_SURGE_HEADROOM} surge headroom.</p>
+                <p className="pt-1">
+                  <Link to="/calculation-logic" className="text-primary hover:underline">
+                    See the full calculation logic page →
+                  </Link>
+                </p>
+              </div>
+            </details>
           </SectionCard>
+
 
           {/* Shore appliances list (kept inline) */}
           {result.shoreLines.length > 0 && (
