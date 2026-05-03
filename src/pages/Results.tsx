@@ -41,6 +41,46 @@ const componentNameForProfile = (name: string, p: PriceProfile): string => {
 const sourceLabel = (s: ApplianceLine["powerSource"]) =>
   s === "12v" ? "12V" : s === "230v-inverter" ? "230V (inverter)" : "230V (shore)";
 
+// Per-row appliance with expandable formula breakdown.
+const ApplianceRow = ({ line: l }: { line: ApplianceLine }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <tr className="border-b border-border/60 align-top">
+        <td className="py-2 pr-2 font-sans break-words">{l.label}</td>
+        <td className="py-2 px-1 text-muted-foreground text-[11px] sm:text-xs break-words">{sourceLabel(l.powerSource)}</td>
+        <td className="py-2 px-2 text-right font-mono">{l.watts}</td>
+        <td className="py-2 px-2 text-right font-mono">
+          {l.isDutyCycle ? (
+            <span>~{l.hours.toFixed(1)}<span className="block text-[10px] text-muted-foreground font-sans">(duty cycle)</span></span>
+          ) : (l.hours)}
+        </td>
+        <td className="py-2 pl-2 text-right font-mono">{fmt(l.wh)}</td>
+        <td className="py-2 pl-1 text-right">
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-label={open ? "Hide calculation" : "Show calculation"}
+            className="inline-flex items-center justify-center w-6 h-6 rounded text-primary hover:bg-primary/10 transition-colors"
+          >
+            {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        </td>
+      </tr>
+      {open && (
+        <tr className="border-b border-border/60 bg-background/50">
+          <td colSpan={6} className="px-2 py-2 text-[11px] sm:text-xs font-mono text-muted-foreground">
+            <span className="font-sans not-italic font-semibold text-foreground/70">How is this calculated? </span>
+            {l.formula}
+          </td>
+        </tr>
+      )}
+    </>
+  );
+};
+
+
 // ---------- Section wrapper ----------
 const SectionCard = ({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) => (
   <section className={cn("step-card p-6 sm:p-8", className)}>
@@ -1365,54 +1405,45 @@ export default function Results() {
               <table className="w-full text-xs sm:text-sm table-fixed">
                 <thead className="text-left text-muted-foreground font-sans font-semibold border-b border-border">
                   <tr>
-                    <th className="py-2 pr-2 w-[40%]">Appliance</th>
-                    <th className="py-2 px-1 w-[24%]">Source</th>
+                    <th className="py-2 pr-2 w-[36%]">Appliance</th>
+                    <th className="py-2 px-1 w-[22%]">Source</th>
                     <th className="py-2 px-1 text-right w-[10%]">W</th>
                     <th className="py-2 px-1 text-right w-[10%]">h</th>
                     <th className="py-2 pl-1 text-right w-[16%]">Wh/day</th>
+                    <th className="py-2 pl-1 w-[6%]" aria-label="Details" />
                   </tr>
                 </thead>
                 <tbody>
                   {result.lines.length === 0 && (
-                    <tr><td colSpan={5} className="py-3 text-muted-foreground italic">No appliances selected.</td></tr>
+                    <tr><td colSpan={6} className="py-3 text-muted-foreground italic">No appliances selected.</td></tr>
                   )}
                   {result.lines.filter(l => !l.informational).map((l) => (
-                    <tr key={l.id} className="border-b border-border/60 align-top">
-                      <td className="py-2 pr-2 font-sans break-words">{l.label}</td>
-                      <td className="py-2 px-1 text-muted-foreground text-[11px] sm:text-xs break-words">{sourceLabel(l.powerSource)}</td>
-                      <td className="py-2 px-2 text-right font-mono">{l.watts}</td>
-                      <td className="py-2 px-2 text-right font-mono">
-                        {l.isDutyCycle ? (
-                          <span>~{l.hours.toFixed(1)}<span className="block text-[10px] text-muted-foreground font-sans">(duty cycle)</span></span>
-                        ) : (l.hours)}
-                      </td>
-                      <td className="py-2 pl-2 text-right font-mono">{fmt(l.wh)}</td>
-                    </tr>
+                    <ApplianceRow key={l.id} line={l} />
                   ))}
                 </tbody>
                 <tfoot className="font-sans">
                   <tr>
-                    <td colSpan={4} className="pt-3 text-right text-muted-foreground">Appliance subtotal</td>
+                    <td colSpan={5} className="pt-3 text-right text-muted-foreground">Appliance subtotal</td>
                     <td className="pt-3 pl-2 text-right font-mono">{fmt(result.applianceSubtotalWh)}</td>
                   </tr>
                   {result.hasInverterLoad && (
                     <tr>
-                      <td colSpan={4} className="text-right text-muted-foreground text-xs">Inverter losses (~90% efficiency) — included above</td>
+                      <td colSpan={5} className="text-right text-muted-foreground text-xs">Inverter losses (~90% efficiency) — included above</td>
                       <td className="pl-2 text-right font-mono text-xs text-muted-foreground">+{fmt(result.inverterLossWh)}</td>
                     </tr>
                   )}
                   {result.remoteWorkWh > 0 && (
                     <tr>
-                      <td colSpan={4} className="text-right text-muted-foreground">Remote work addition</td>
+                      <td colSpan={5} className="text-right text-muted-foreground">Remote work addition</td>
                       <td className="pl-2 text-right font-mono">+{fmt(result.remoteWorkWh)}</td>
                     </tr>
                   )}
                   <tr>
-                    <td colSpan={4} className="text-right text-muted-foreground">Safety reserve (+25%)</td>
+                    <td colSpan={5} className="text-right text-muted-foreground">Safety reserve (+25%)</td>
                     <td className="pl-2 text-right font-mono">+{fmt(result.reserveWh)}</td>
                   </tr>
                   <tr className="font-bold text-primary text-base">
-                    <td colSpan={4} className="pt-2 text-right">TOTAL daily consumption</td>
+                    <td colSpan={5} className="pt-2 text-right">TOTAL daily consumption</td>
                     <td className="pt-2 pl-2 text-right font-mono">{fmt(result.totalDailyWh)} Wh</td>
                   </tr>
                 </tfoot>
@@ -1443,7 +1474,33 @@ export default function Results() {
                 </div>
               </div>
             </div>
+
+            {/* Global assumptions panel — exposes hidden multipliers used above. */}
+            <details className="mt-6 rounded-lg border border-border bg-background/50 group">
+              <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-2 text-sm font-sans font-semibold text-primary">
+                <span className="inline-flex items-center gap-2">
+                  <span aria-hidden>ℹ️</span>
+                  Assumptions used in these numbers
+                </span>
+                <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="px-4 pb-4 pt-1 text-sm text-muted-foreground space-y-2 font-sans">
+                <p><span className="font-semibold text-foreground">Inverter efficiency:</span> {Math.round(INVERTER_EFFICIENCY * 100)}% — battery-side draw is AC Wh ÷ {INVERTER_EFFICIENCY}.</p>
+                <p><span className="font-semibold text-foreground">Safety reserve:</span> +{Math.round(RESERVE_MARGIN * 100)}% on top of appliance + remote-work consumption.</p>
+                <p><span className="font-semibold text-foreground">Fridge duty cycle:</span> derived from your climate and insulation choice (e.g. temperate + basic insulation ≈ 35% of 24 h).</p>
+                <p><span className="font-semibold text-foreground">LiFePO4 usable energy:</span> {Math.round(LIFEPO4_USABLE_DOD * 100)}% depth of discharge of nominal capacity.</p>
+                <p><span className="font-semibold text-foreground">Solar harvest:</span> recommended W × effective sun hours for your climate &amp; season.</p>
+                <p><span className="font-semibold text-foreground">Alternator harvest:</span> drive duration × ~360 W × 85% conversion (halved for occasional drivers).</p>
+                <p><span className="font-semibold text-foreground">Inverter sizing:</span> peak continuous load × {INVERTER_SURGE_HEADROOM} surge headroom.</p>
+                <p className="pt-1">
+                  <Link to="/calculation-logic" className="text-primary hover:underline">
+                    See the full calculation logic page →
+                  </Link>
+                </p>
+              </div>
+            </details>
           </SectionCard>
+
 
           {/* Shore appliances list (kept inline) */}
           {result.shoreLines.length > 0 && (

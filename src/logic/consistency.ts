@@ -92,5 +92,34 @@ export function sanityWarnings(state: WizardState, totals: {
         "Your roof cannot fit the solar capacity needed for winter conditions. Plan for alternator or shore-power top-ups.",
     });
   }
+
+  // Short drives + rarely shore + heavy AC loads → no realistic recharge path.
+  const journey = state.step2.journey;
+  const shortDrives = journey === "1h" || journey === "1-2h";
+  const heavyAc = totals.totalDailyWh > 3000;
+  if (
+    shortDrives &&
+    (shore === "never" || shore === "rare") &&
+    heavyAc
+  ) {
+    out.push({
+      id: "short-drives-heavy-loads",
+      message:
+        "You drive only short distances, rarely use shore power, but have high daily consumption. There is no realistic way to recharge the battery — plan for longer drives, more solar, or reduce loads.",
+    });
+  }
+
+  // Weekend warriors with long off-grid frequency are a likely mismatch.
+  if (
+    profile === "weekendWarrior" &&
+    frequency === "off-grid"
+  ) {
+    out.push({
+      id: "weekend-long-offgrid",
+      message:
+        "You picked weekend trips but also \"off-grid only\" driving. Most weekenders drive to/from a spot, which gives some alternator charging — double-check this matches how you actually travel.",
+    });
+  }
+
   return out;
 }

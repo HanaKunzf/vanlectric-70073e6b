@@ -110,19 +110,52 @@ const Row = ({ title, icon, children }: { title: string; icon: IconKey; children
   </div>
 );
 
-const NumberInput = ({ value, onChange, label, min = 0, max }: { value?: number; onChange: (n: number) => void; label: string; min?: number; max?: number }) => (
-  <label className="inline-flex items-center gap-2 text-sm font-sans">
-    <span className="text-muted-foreground">{label}</span>
-    <input
-      type="number"
-      min={min}
-      max={max}
-      value={value ?? ""}
-      onChange={(e) => onChange(Number(e.target.value))}
-      className="w-24 bg-background border border-border rounded px-2 py-1 text-right"
-    />
-  </label>
-);
+const NumberInput = ({
+  value,
+  onChange,
+  label,
+  min = 0,
+  max,
+}: {
+  value?: number;
+  onChange: (n: number) => void;
+  label: string;
+  min?: number;
+  max?: number;
+}) => {
+  const error =
+    value === undefined || Number.isNaN(value)
+      ? null
+      : value < min
+      ? `Min ${min}`
+      : max !== undefined && value > max
+      ? `Max ${max}`
+      : null;
+  return (
+    <label className="inline-flex flex-col gap-1 text-sm font-sans">
+      <span className="text-muted-foreground">{label}</span>
+      <input
+        type="number"
+        inputMode="numeric"
+        min={min}
+        max={max}
+        value={value ?? ""}
+        aria-invalid={!!error || undefined}
+        onChange={(e) => {
+          const v = e.target.value;
+          if (v === "") return onChange(0);
+          const n = Number(v);
+          if (Number.isFinite(n)) onChange(n);
+        }}
+        className={`w-24 bg-background border rounded px-2 py-1 text-right ${
+          error ? "border-red-600" : "border-border"
+        }`}
+      />
+      {error && <span role="alert" className="text-[11px] text-red-700">{error}</span>}
+    </label>
+  );
+};
+
 
 const ExistingForm = ({ value, onChange }: Props) => {
   const setBattery = (b: ExistingStep["battery"]) => onChange({ ...value, battery: b });
@@ -139,7 +172,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         {value.battery && (
           <div className="ml-6 flex flex-wrap items-center gap-3">
             <NumberInput label="Qty" min={1} max={4} value={value.battery.qty} onChange={(n) => setBattery({ ...value.battery!, qty: n })} />
-            <NumberInput label="Ah" value={value.battery.ah} onChange={(n) => setBattery({ ...value.battery!, ah: n })} />
+            <NumberInput label="Ah" min={1} max={1000} value={value.battery.ah} onChange={(n) => setBattery({ ...value.battery!, ah: n })} />
             <div className="flex items-center gap-3 text-sm font-sans">
               {(["lifepo4", "agm", "other"] as BatteryChemistry[]).map((c) => (
                 <label key={c} className="inline-flex items-center gap-1">
@@ -162,7 +195,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         {value.solar && (
           <div className="ml-6 flex flex-wrap items-center gap-3">
             <NumberInput label="Qty" min={1} max={4} value={value.solar.qty} onChange={(n) => setSolar({ ...value.solar!, qty: n })} />
-            <NumberInput label="W" value={value.solar.watts} onChange={(n) => setSolar({ ...value.solar!, watts: n })} />
+            <NumberInput label="W" min={1} max={2000} value={value.solar.watts} onChange={(n) => setSolar({ ...value.solar!, watts: n })} />
           </div>
         )}
       </Row>
@@ -176,7 +209,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         </label>
         {value.mppt && (
           <div className="ml-6">
-            <NumberInput label="Max amps" value={value.mppt.amps} onChange={(n) => onChange({ ...value, mppt: { amps: n } })} />
+            <NumberInput label="Max amps" min={1} max={100} value={value.mppt.amps} onChange={(n) => onChange({ ...value, mppt: { amps: n } })} />
           </div>
         )}
       </Row>
@@ -199,7 +232,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         </label>
         {value.shore && (
           <div className="ml-6">
-            <NumberInput label="Amps" value={value.shore.amps} onChange={(n) => onChange({ ...value, shore: { amps: n } })} />
+            <NumberInput label="Amps" min={1} max={63} value={value.shore.amps} onChange={(n) => onChange({ ...value, shore: { amps: n } })} />
           </div>
         )}
       </Row>
@@ -213,7 +246,7 @@ const ExistingForm = ({ value, onChange }: Props) => {
         </label>
         {value.inverter && (
           <div className="ml-6">
-            <NumberInput label="W" value={value.inverter.watts} onChange={(n) => onChange({ ...value, inverter: { watts: n } })} />
+            <NumberInput label="W" min={100} max={5000} value={value.inverter.watts} onChange={(n) => onChange({ ...value, inverter: { watts: n } })} />
           </div>
         )}
       </Row>
