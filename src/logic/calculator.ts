@@ -289,7 +289,7 @@ export function calculate(state: WizardState): CalculationResult {
 
   const rwWh = remoteWorkWh[step9.remoteWork ?? "no"];
   const beforeReserve = applianceSubtotalWh + rwWh;
-  const totalDailyWh = beforeReserve * 1.25;
+  const totalDailyWh = beforeReserve * (1 + RESERVE_MARGIN);
   const reserveWh = totalDailyWh - beforeReserve;
 
   // ----- Battery -----
@@ -359,7 +359,7 @@ export function calculate(state: WizardState): CalculationResult {
   else if (requiredAh < 400) { recommendedBatteryAh = 400; battery = { key: "battery", category: "Battery", name: "2× 200Ah LiFePO4", why: "Large bank for full-time / heavy daily loads.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 440 }; }
   else { recommendedBatteryAh = 600; battery = { key: "battery", category: "Battery", name: "3× 200Ah LiFePO4", why: "Maximum bank for extended off-grid use.", detail: `Required ~${Math.round(requiredAh)}Ah usable.`, price: 660 }; }
   // LiFePO4 usable energy ~90% DoD at 12V
-  const usableBatteryWh = recommendedBatteryAh * 12 * 0.9;
+  const usableBatteryWh = recommendedBatteryAh * 12 * LIFEPO4_USABLE_DOD;
 
   if (profile === "weekendWarrior" && requiredAh > 300) {
     battery.note = "As a weekend warrior, you recharge at home between trips. If your system seems oversized, consider whether you really need worst-case winter sizing — or adjust your climate/season settings to match your typical travel conditions.";
