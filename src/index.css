@@ -29,7 +29,7 @@
     --secondary-foreground: 156 30% 10%; /* deep forest for AA contrast on terracotta */
 
     --muted: 45 25% 88%;               /* warm grey */
-    --muted-foreground: 150 14% 26%;   /* darker forest for legibility */
+    --muted-foreground: 153 18% 22%;   /* deeper forest for WCAG AA on cream */
 
     /* Accent — golden brown */
     --accent: 41 75% 32%;              /* #8B6914 */
@@ -82,7 +82,7 @@
     --secondary: 28 41% 59%;
     --secondary-foreground: 156 30% 10%;
     --muted: 45 25% 88%;
-    --muted-foreground: 150 14% 26%;
+    --muted-foreground: 153 18% 22%;
     --accent: 41 75% 32%;
     --accent-foreground: 50 30% 97%;
     --destructive: 0 70% 45%;
