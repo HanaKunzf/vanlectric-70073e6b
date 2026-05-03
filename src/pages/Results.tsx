@@ -1365,29 +1365,20 @@ export default function Results() {
               <table className="w-full text-xs sm:text-sm table-fixed">
                 <thead className="text-left text-muted-foreground font-sans font-semibold border-b border-border">
                   <tr>
-                    <th className="py-2 pr-2 w-[40%]">Appliance</th>
-                    <th className="py-2 px-1 w-[24%]">Source</th>
+                    <th className="py-2 pr-2 w-[36%]">Appliance</th>
+                    <th className="py-2 px-1 w-[22%]">Source</th>
                     <th className="py-2 px-1 text-right w-[10%]">W</th>
                     <th className="py-2 px-1 text-right w-[10%]">h</th>
                     <th className="py-2 pl-1 text-right w-[16%]">Wh/day</th>
+                    <th className="py-2 pl-1 w-[6%]" aria-label="Details" />
                   </tr>
                 </thead>
                 <tbody>
                   {result.lines.length === 0 && (
-                    <tr><td colSpan={5} className="py-3 text-muted-foreground italic">No appliances selected.</td></tr>
+                    <tr><td colSpan={6} className="py-3 text-muted-foreground italic">No appliances selected.</td></tr>
                   )}
                   {result.lines.filter(l => !l.informational).map((l) => (
-                    <tr key={l.id} className="border-b border-border/60 align-top">
-                      <td className="py-2 pr-2 font-sans break-words">{l.label}</td>
-                      <td className="py-2 px-1 text-muted-foreground text-[11px] sm:text-xs break-words">{sourceLabel(l.powerSource)}</td>
-                      <td className="py-2 px-2 text-right font-mono">{l.watts}</td>
-                      <td className="py-2 px-2 text-right font-mono">
-                        {l.isDutyCycle ? (
-                          <span>~{l.hours.toFixed(1)}<span className="block text-[10px] text-muted-foreground font-sans">(duty cycle)</span></span>
-                        ) : (l.hours)}
-                      </td>
-                      <td className="py-2 pl-2 text-right font-mono">{fmt(l.wh)}</td>
-                    </tr>
+                    <ApplianceRow key={l.id} line={l} />
                   ))}
                 </tbody>
                 <tfoot className="font-sans">
