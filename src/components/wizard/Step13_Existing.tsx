@@ -110,19 +110,52 @@ const Row = ({ title, icon, children }: { title: string; icon: IconKey; children
   </div>
 );
 
-const NumberInput = ({ value, onChange, label, min = 0, max }: { value?: number; onChange: (n: number) => void; label: string; min?: number; max?: number }) => (
-  <label className="inline-flex items-center gap-2 text-sm font-sans">
-    <span className="text-muted-foreground">{label}</span>
-    <input
-      type="number"
-      min={min}
-      max={max}
-      value={value ?? ""}
-      onChange={(e) => onChange(Number(e.target.value))}
-      className="w-24 bg-background border border-border rounded px-2 py-1 text-right"
-    />
-  </label>
-);
+const NumberInput = ({
+  value,
+  onChange,
+  label,
+  min = 0,
+  max,
+}: {
+  value?: number;
+  onChange: (n: number) => void;
+  label: string;
+  min?: number;
+  max?: number;
+}) => {
+  const error =
+    value === undefined || Number.isNaN(value)
+      ? null
+      : value < min
+      ? `Min ${min}`
+      : max !== undefined && value > max
+      ? `Max ${max}`
+      : null;
+  return (
+    <label className="inline-flex flex-col gap-1 text-sm font-sans">
+      <span className="text-muted-foreground">{label}</span>
+      <input
+        type="number"
+        inputMode="numeric"
+        min={min}
+        max={max}
+        value={value ?? ""}
+        aria-invalid={!!error || undefined}
+        onChange={(e) => {
+          const v = e.target.value;
+          if (v === "") return onChange(0);
+          const n = Number(v);
+          if (Number.isFinite(n)) onChange(n);
+        }}
+        className={`w-24 bg-background border rounded px-2 py-1 text-right ${
+          error ? "border-red-600" : "border-border"
+        }`}
+      />
+      {error && <span role="alert" className="text-[11px] text-red-700">{error}</span>}
+    </label>
+  );
+};
+
 
 const ExistingForm = ({ value, onChange }: Props) => {
   const setBattery = (b: ExistingStep["battery"]) => onChange({ ...value, battery: b });
