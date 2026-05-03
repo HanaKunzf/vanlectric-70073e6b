@@ -80,6 +80,7 @@ export default function Examples() {
 
             <div className="mt-4 rounded-md border-l-2 border-accent bg-accent/5 px-3 py-2 text-xs text-foreground/85">
               <span className="font-semibold text-primary">Suitability:</span> {s.suitability}
+            </div>
 
             <div className="grid sm:grid-cols-2 gap-4 mt-5 pt-5 border-t border-border text-sm">
               <div>
