@@ -214,6 +214,8 @@ export function calculate(state: WizardState): CalculationResult {
       shoreLines.push({
         id, label: def.label, powerSource: def.powerSource,
         watts, hours, wh: 0, shoreOnly: true, informational: !!def.informational,
+        dutyCycle: 1, lossFactor: 1,
+        formula: `${watts} W × ${hours} h (shore-only — excluded from off-grid sizing)`,
       });
       continue;
     }
@@ -222,18 +224,21 @@ export function calculate(state: WizardState): CalculationResult {
       lines.push({
         id, label: def.label, powerSource: def.powerSource,
         watts: 0, hours: 0, wh: 0, shoreOnly: false, informational: true,
+        dutyCycle: 1, lossFactor: 1,
+        formula: "No electrical load.",
       });
       continue;
     }
 
     let baseWh = watts * hours;
     let displayHours = hours;
+    let dutyCycle = 1;
 
     // Fridge duty cycle
     if (FRIDGE_IDS.has(id)) {
-      const duty = fridgeDuty[climate][insulation];
-      baseWh = watts * 24 * duty;
-      displayHours = 24 * duty;
+      dutyCycle = fridgeDuty[climate][insulation];
+      baseWh = watts * 24 * dutyCycle;
+      displayHours = 24 * dutyCycle;
     }
 
     // Diesel heater
@@ -248,17 +253,31 @@ export function calculate(state: WizardState): CalculationResult {
     if (id === "water-pump") baseWh *= 1 + (people - 1) * 0.2;
 
     // Inverter losses — assume 90% inverter efficiency: battery draw = AC Wh / 0.9
+    let lossFactor = 1;
     if (def.powerSource === "230v-inverter") {
       hasInverterLoad = true;
       const before = baseWh;
-      baseWh = baseWh / 0.9;
+      baseWh = baseWh / INVERTER_EFFICIENCY;
       inverterLossWh += baseWh - before;
+      lossFactor = INVERTER_LOSS_FACTOR;
     }
+
+    const formula =
+      id === "diesel-heater"
+        ? `Heater fan + glow plug — ~${Math.round(baseWh)} Wh/day at this climate/season.`
+        : FRIDGE_IDS.has(id)
+        ? `${watts} W × 24 h × ${dutyCycle.toFixed(2)} duty${
+            lossFactor > 1 ? ` × ${lossFactor.toFixed(2)} inverter loss` : ""
+          } = ${Math.round(baseWh)} Wh/day`
+        : `${watts} W × ${displayHours} h${
+            lossFactor > 1 ? ` × ${lossFactor.toFixed(2)} inverter loss` : ""
+          } = ${Math.round(baseWh)} Wh/day`;
 
     lines.push({
       id, label: def.label, powerSource: def.powerSource,
       watts, hours: displayHours, wh: baseWh, shoreOnly: false, informational: false,
       isDutyCycle: FRIDGE_IDS.has(id),
+      dutyCycle, lossFactor, formula,
     });
     applianceSubtotalWh += baseWh;
     if (def.powerSource === "230v-inverter") {
