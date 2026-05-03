@@ -13,6 +13,7 @@ const setups = [
     inverter: "Optional 300 W pure-sine (or none)",
     charging: "Single solar MPPT, optional cheap shore charger",
     cost: "€800 – €1,400",
+    suitability: "Good for: 2–3 night summer trips, weekend warriors, festival vans. Not for: full-time living, winter trips, induction cooking off-grid.",
     pros: ["Cheap to build", "Fast install", "Good summer behaviour"],
     cons: ["Marginal in winter", "No high-power 230V appliances", "Components last 3–5 years"],
   },
@@ -25,6 +26,7 @@ const setups = [
     inverter: "1,500 W pure-sine",
     charging: "MPPT + 30A DC-DC charger + shore charger",
     cost: "€2,500 – €4,500",
+    suitability: "Good for: multi-week trips, remote work, mild winter use. Not for: full-time off-grid in deep winter without shore-power top-ups.",
     pros: ["Real off-grid capability", "Handles remote work", "Good winter buffer"],
     cons: ["Heavier", "More cabling", "Needs careful battery placement"],
   },
@@ -37,6 +39,7 @@ const setups = [
     inverter: "2,000–3,000 W inverter-charger (Multi/Quattro)",
     charging: "MPPT + 50A DC-DC + integrated shore charger + Cerbo GX",
     cost: "€7,000 – €12,000+",
+    suitability: "Good for: year-round full-time vanlife, cold climates, induction cooking on shore, heavy remote work. Not for: weight-sensitive small vans or tight budgets.",
     pros: ["Year-round comfort", "Full monitoring", "Handles cold climates"],
     cons: ["Expensive", "Heavy — affects payload", "Longer install"],
   },
@@ -75,6 +78,10 @@ export default function Examples() {
               </div>
             </div>
 
+            <div className="mt-4 rounded-md border-l-2 border-accent bg-accent/5 px-3 py-2 text-xs text-foreground/85">
+              <span className="font-semibold text-primary">Suitability:</span> {s.suitability}
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-4 mt-5 pt-5 border-t border-border text-sm">
               <div>
                 <div className="font-semibold mb-1 flex items-center gap-1"><Check className="w-4 h-4 text-primary" /> Pros</div>
@@ -94,7 +101,7 @@ export default function Examples() {
 
         <div className="step-card p-5 flex items-center justify-between gap-4 flex-wrap">
           <p className="text-sm text-muted-foreground">
-            Costs are indicative ranges and vary by brand, country and supplier.
+            Costs are indicative ranges and vary by brand, country and supplier. Last updated: May 2026.
           </p>
           <PlannerLink
             to="/planner"
