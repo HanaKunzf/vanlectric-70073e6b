@@ -22,9 +22,18 @@ export default function Home() {
         <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" aria-hidden />
         <div className="absolute inset-0 pointer-events-none" style={{ background: "var(--gradient-hero)" }} aria-hidden />
         <div className="relative container mx-auto px-4 pt-8 pb-6 sm:pt-12 sm:pb-10 max-w-5xl text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card/70 backdrop-blur text-xs font-sans tracking-wide text-muted-foreground mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            12V · Off-grid · DIY campervan electrics
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card/70 backdrop-blur text-xs font-sans tracking-wide text-muted-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              12V · Off-grid · DIY campervan electrics
+            </span>
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-accent/40 bg-accent/10 text-xs font-sans tracking-wide text-accent font-semibold"
+              title="Vanlectric is in public beta — built by vanlifers, refined with real builds."
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden />
+              Built by vanlifers · public beta
+            </span>
           </div>
           <h1 className="font-display font-bold tracking-tight">
             <span className="block text-primary italic text-5xl sm:text-6xl md:text-7xl leading-[1.05]">
