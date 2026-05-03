@@ -1383,27 +1383,27 @@ export default function Results() {
                 </tbody>
                 <tfoot className="font-sans">
                   <tr>
-                    <td colSpan={4} className="pt-3 text-right text-muted-foreground">Appliance subtotal</td>
+                    <td colSpan={5} className="pt-3 text-right text-muted-foreground">Appliance subtotal</td>
                     <td className="pt-3 pl-2 text-right font-mono">{fmt(result.applianceSubtotalWh)}</td>
                   </tr>
                   {result.hasInverterLoad && (
                     <tr>
-                      <td colSpan={4} className="text-right text-muted-foreground text-xs">Inverter losses (~90% efficiency) — included above</td>
+                      <td colSpan={5} className="text-right text-muted-foreground text-xs">Inverter losses (~90% efficiency) — included above</td>
                       <td className="pl-2 text-right font-mono text-xs text-muted-foreground">+{fmt(result.inverterLossWh)}</td>
                     </tr>
                   )}
                   {result.remoteWorkWh > 0 && (
                     <tr>
-                      <td colSpan={4} className="text-right text-muted-foreground">Remote work addition</td>
+                      <td colSpan={5} className="text-right text-muted-foreground">Remote work addition</td>
                       <td className="pl-2 text-right font-mono">+{fmt(result.remoteWorkWh)}</td>
                     </tr>
                   )}
                   <tr>
-                    <td colSpan={4} className="text-right text-muted-foreground">Safety reserve (+25%)</td>
+                    <td colSpan={5} className="text-right text-muted-foreground">Safety reserve (+25%)</td>
                     <td className="pl-2 text-right font-mono">+{fmt(result.reserveWh)}</td>
                   </tr>
                   <tr className="font-bold text-primary text-base">
-                    <td colSpan={4} className="pt-2 text-right">TOTAL daily consumption</td>
+                    <td colSpan={5} className="pt-2 text-right">TOTAL daily consumption</td>
                     <td className="pt-2 pl-2 text-right font-mono">{fmt(result.totalDailyWh)} Wh</td>
                   </tr>
                 </tfoot>
