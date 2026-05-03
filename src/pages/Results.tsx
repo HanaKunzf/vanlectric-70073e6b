@@ -604,8 +604,9 @@ const ExistingSystemSection = ({ state, result }: { state: WizardState; result: 
 };
 
 // ---------- Autonomy formatting ----------
+// Conservative wording — never claim "continuous" since real-world conditions vary.
 const formatDays = (d: number): string => {
-  if (!Number.isFinite(d) || d > 30) return "Continuous";
+  if (!Number.isFinite(d) || d > 30) return "30+ days";
   return `${d.toFixed(1)} days`;
 };
 
@@ -620,8 +621,9 @@ const formatAutonomy = (d: number, dailyWh: number, fallbackHelper: string): Aut
   }
   if (!Number.isFinite(d) || d > 30) {
     return {
-      title: "Continuous in good conditions",
-      helper: "Your charging sources can cover your estimated daily consumption.",
+      title: "Net positive in good conditions",
+      helper:
+        "Estimated charging covers daily consumption — but real-world weather and temperature reduce this. Plan for cloudy days.",
       isQualitative: true,
     };
   }
