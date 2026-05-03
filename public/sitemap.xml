@@ -36,14 +36,19 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://vanlectric.com/resources/cable-sizing</loc>
+    <loc>https://vanlectric.com/resources/shore-vs-inverter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://vanlectric.com/resources/shore-vs-inverter</loc>
+    <loc>https://vanlectric.com/resources/12v-vs-230v</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vanlectric.com/resources/tiers</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://vanlectric.com/examples</loc>
@@ -54,11 +59,6 @@
     <loc>https://vanlectric.com/checklist</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://vanlectric.com/disclaimer</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://vanlectric.com/how-it-works</loc>
@@ -76,7 +76,7 @@
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://vanlectric.com/privacy</loc>
+    <loc>https://vanlectric.com/disclaimer</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
