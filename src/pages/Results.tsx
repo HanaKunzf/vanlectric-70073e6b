@@ -1296,8 +1296,15 @@ export default function Results() {
 
           {showExisting && <ExistingSystemSection state={state} result={result} />}
 
+          <WinterDeficitBanner state={state} result={result} />
+          <SanityWarningsSection state={state} result={result} />
+
           {/* 3. Off-grid autonomy */}
           <AutonomySection result={result} />
+
+          <InverterStatusSection result={result} />
+          <BatteryDetailSection state={state} result={result} />
+          <BudgetCompareSection state={state} estimatedTotal={adjTotalBudget} />
 
           {/* 4. Daily consumption */}
           <SectionCard title="Daily consumption">
